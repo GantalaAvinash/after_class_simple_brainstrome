@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="AfterClass — a fictitious after-school activities coursework application.">
+    <title>AfterClass | After-school activities</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/vue@3.5.44/dist/vue.global.prod.js"></script>
+    <script defer src="./config.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <main id="app" v-cloak>
+      <header>
+        <p class="eyebrow">After-school activities in North London</p>
+        <h1>AfterClass<span>.</span></h1>
+        <p>Make room for something new.</p>
+      </header>
+      <section aria-labelledby="catalogue-heading">
+        <h2 id="catalogue-heading">Find your next thing</h2>
+        <p>Explore a new interest, build a skill, and make the most of the hours after school.</p>
+        <p v-if="loading" role="status">Connecting to the lesson catalogue…</p>
+        <div v-else-if="error" role="alert" class="notice">
+          <p>{{ error }}</p>
+          <button type="button" v-on:click="loadLessons">Try again</button>
+        </div>
+        <p v-else-if="lessons.length === 0" role="status">Connected successfully. Seed the lesson collection to display lessons.</p>
+        <ul v-else class="lessons" aria-label="Lessons retrieved from Atlas">
+          <li v-for="lesson in lessons" v-bind:key="lesson._id">
+            <h3>{{ lesson.topic }}</h3>
+            <p>{{ lesson.location }}</p>
+            <p>{{ formatPrice(lesson.price) }} · {{ lesson.space }} spaces</p>
+          </li>
+        </ul>
+      </section>
+      <footer>AfterClass · A little curiosity goes a long way.</footer>
+    </main>
+    <noscript>This application needs JavaScript enabled.</noscript>
+  </body>
+</html>
