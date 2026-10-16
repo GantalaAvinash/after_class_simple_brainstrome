@@ -5,13 +5,13 @@ import { join } from 'node:path';
 import { readConfig } from '../src/config.js';
 import { connectDatabase } from '../src/database.js';
 import { serialiseCollection, exportFilename } from '../src/export-data.js';
+import { assessmentCollections, operationalCollections } from '../src/export-policy.js';
 
 const config = readConfig();
 const { client, db } = await connectDatabase(config);
 const session = client.startSession();
 try {
-  const collections = (await db.listCollections({}, { nameOnly: true }).toArray())
-    .filter((collection) => !collection.name.startsWith('system.')).sort((a, b) => a.name.localeCompare(b.name));
+  const collections = assessmentCollections(await db.listCollections({}, { nameOnly: true }).toArray()).sort((a, b) => a.name.localeCompare(b.name));
   for (const required of ['lesson', 'order', 'teacher']) {
     if (!collections.some((collection) => collection.name === required)) throw new Error('Seed the assessment database before export: missing ' + required + '.');
   }
@@ -23,7 +23,7 @@ try {
   const output = new URL('../../exports/', import.meta.url);
   await mkdir(output, { recursive: true });
   const outputPath = fileURLToPath(output);
-  const manifest = { source: 'MongoDB Atlas', database: config.databaseName, exportedAt: new Date().toISOString(), collections: [] };
+  const manifest = { source: 'MongoDB Atlas', database: config.databaseName, exportedAt: new Date().toISOString(), excludedOperationalCollections: operationalCollections, collections: [] };
   for (const collection of snapshot) {
     const file = exportFilename(collection.name);
     const contents = serialiseCollection(collection.data);

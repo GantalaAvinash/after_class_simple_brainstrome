@@ -1,6 +1,7 @@
 import { requireValue } from './errors.js';
 import { normaliseUpdates } from './validation.js';
 import { orderResponse } from './orders.js';
+import { randomUUID } from 'node:crypto';
 
 export async function transaction(client, work) {
   requireValue(client?.startSession, 'Database writes are temporarily unavailable.', 503);
@@ -9,24 +10,26 @@ export async function transaction(client, work) {
   finally { await session.endSession(); }
 }
 
-export async function applyGeneralUpdates(db, client, updates) {
+export async function applyGeneralUpdates(db, client, updates, username) {
   return transaction(client, async (session) => {
     const lessons = db.collection('lesson');
     for (const update of updates) {
-      requireValue(await lessons.findOne({ _id: update.lessonId }, { session }), 'Lesson not found.', 404);
+      requireValue(await lessons.findOne({ _id: update.lessonId, deleted: { $ne: true } }, { session }), 'Lesson not found.', 404);
     }
     for (const update of updates) {
-      const result = await lessons.updateOne({ _id: update.lessonId }, { $set: update.changes }, { session });
+      const result = await lessons.updateOne({ _id: update.lessonId }, { $set: { ...update.changes, updatedAt: new Date() }, $inc: { revision: 1 } }, { session });
       requireValue(result.matchedCount === 1, 'A lesson changed during the update. Please retry.', 409);
     }
-    return { lessons: await lessons.find({ _id: { $in: updates.map((update) => update.lessonId) } }, { session }).toArray() };
+    const result = { lessons: await lessons.find({ _id: { $in: updates.map((update) => update.lessonId) } }, { session }).toArray() };
+    if (username) await db.collection('adminAudit').insertOne({ _id: randomUUID(), username, action: 'bulk-update', lessonId: updates[0].lessonId, occurredAt: new Date(), result }, { session });
+    return result;
   });
 }
 
-export async function updateLessons(db, client, body) {
+export async function updateLessons(db, client, body, username) {
   const { updates, orderId } = normaliseUpdates(body);
   if (orderId) return confirmOrder(db, client, orderId, updates);
-  return applyGeneralUpdates(db, client, updates);
+  return applyGeneralUpdates(db, client, updates, username);
 }
 
 function checkTargets(order, updates) {
@@ -49,10 +52,10 @@ export async function confirmOrder(db, client, orderId, updates) {
       for (const item of order.items) {
         // Compare-and-set prevents a stale browser from overwriting another purchase.
         const result = await lessons.updateOne(
-          { _id: item.lessonId, space: item.spaceBefore },
-          { $set: { space: item.spaceAfter } }, { session },
+          { _id: item.lessonId, space: item.spaceBefore, price: item.unitPrice, deleted: { $ne: true } },
+          { $set: { space: item.spaceAfter, updatedAt: new Date() }, $inc: { revision: 1 } }, { session },
         );
-        requireValue(result.matchedCount === 1, 'Availability changed. Please refresh your basket and try again.', 409);
+        requireValue(result.matchedCount === 1, 'Availability or lesson details changed. Please refresh your basket and try again.', 409);
       }
       const result = await orders.updateOne({ _id: orderId, status: 'pending' }, {
         $set: { status: 'confirmed', confirmedAt: new Date() },
@@ -72,5 +75,5 @@ export function registerUpdateRoute(app, db, client, guard) {
     // the complete, saved set of absolute space targets before writing.
     if (req.body?.orderId !== undefined) return next();
     await guard(req, res, next);
-  }, async (req, res) => res.json(await updateLessons(db, client, req.body)));
+  }, async (req, res) => res.json(await updateLessons(db, client, req.body, req.admin?.username)));
 }

@@ -3,7 +3,7 @@ import { recordId } from './validation.js';
 
 export async function findLessons(db, query = {}) {
   requireValue(query.q === undefined || (typeof query.q === 'string' && query.q.length <= 100), 'Search must be text of at most 100 characters.');
-  const filter = {};
+  const filter = { deleted: { $ne: true } };
   if (query.teacherId !== undefined) {
     const teacher = await db.collection('teacher').findOne({ _id: recordId(query.teacherId, 'Teacher ID') });
     requireValue(teacher, 'Teacher not found.', 404);

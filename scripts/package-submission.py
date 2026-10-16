@@ -42,7 +42,7 @@ def main():
         for name in filter(None, tracked):
             path = repo / name
             require(not path.is_symlink(), "Refusing to archive a symlink: " + name)
-            require(".git" not in path.parts and "node_modules" not in path.parts and (not path.name.startswith(".env") or path.name == ".env.example"), "Refusing to include a secret or dependency path.")
+            require(".git" not in path.parts and "node_modules" not in path.parts and path.name != ".admin-local.txt" and (not path.name.startswith(".env") or path.name == ".env.example"), "Refusing to include a secret or dependency path.")
             files.append((path, folder + "/" + name))
     manifest_path = ROOT / "exports" / "manifest.json"
     require(manifest_path.is_file(), "Run the actual Atlas export before packaging.")
@@ -51,6 +51,7 @@ def main():
     collections = manifest["collections"]
     require({"lesson", "order", "teacher"}.issubset({item["name"] for item in collections}), "Export lessons, orders and teachers.")
     for item in collections:
+        require(item["name"] not in ["adminSession", "adminLoginAttempt"], "Never package operational authentication data.")
         name = item["file"]
         require(Path(name).name == name, "Invalid export filename.")
         path = ROOT / "exports" / name

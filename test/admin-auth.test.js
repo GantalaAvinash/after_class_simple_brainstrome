@@ -56,6 +56,22 @@ test('all unbound lesson updates require admin authorisation; CORS supports bear
   assert.match(preflight.headers.get('access-control-allow-methods'), /DELETE/);
 });
 
+test('every management endpoint rejects anonymous requests and authenticated CRUD works over HTTP', async (t) => {
+  const { request } = await setup(t);
+  for (const [path, method] of [['/admin/lessons', 'GET'], ['/admin/overview', 'GET'], ['/admin/lessons', 'POST'], ['/admin/lessons/100000000000000000000001', 'PUT'], ['/admin/lessons/100000000000000000000001', 'DELETE'], ['/admin/lessons/100000000000000000000001/restore', 'POST']]) {
+    assert.equal((await request(path, method, method === 'GET' ? undefined : {})).status, 401);
+  }
+  const { data: { token } } = await request('/admin/session', 'POST', { username: 'operator', password });
+  const body = { requestId: crypto.randomUUID(), lesson: { topic: 'New club', location: 'Hendon', price: 19, space: 5, image: '/images/art.svg' }, teacherIds: [] };
+  const created = await request('/admin/lessons', 'POST', body, token);
+  assert.equal(created.status, 201);
+  const id = created.data.lesson._id;
+  assert.equal((await request('/admin/lessons/' + id, 'PUT', { ...body, requestId: crypto.randomUUID(), revision: 1 }, token)).status, 200);
+  assert.equal((await request('/admin/lessons/' + id, 'DELETE', { requestId: crypto.randomUUID(), revision: 2 }, token)).status, 200);
+  assert.equal((await request('/admin/lessons/' + id + '/restore', 'POST', { requestId: crypto.randomUUID(), revision: 3 }, token)).status, 200);
+  assert.equal((await request('/admin/overview', 'GET', undefined, token)).data.stats.activeLessons, 13);
+});
+
 test('login throttling includes invalid usernames and is shared through the database', async (t) => {
   const { request } = await setup(t);
   for (let i = 0; i < 10; i++) assert.equal((await request('/admin/session', 'POST', { username: 'unknown', password: 'bad' })).status, 401);

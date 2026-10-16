@@ -25,7 +25,7 @@ export async function createPendingOrder(db, body) {
   const items = [];
   for (const item of input.items) {
     const lesson = await db.collection('lesson').findOne({ _id: item.lessonId });
-    requireValue(lesson, 'A selected lesson no longer exists.', 404);
+    requireValue(lesson && lesson.deleted !== true, 'A selected lesson no longer exists.', 404);
     requireValue(lesson.space >= item.quantity, 'There are not enough spaces for ' + lesson.topic + '. Please refresh your basket.', 409);
     items.push({ ...item, unitPrice: lesson.price, spaceBefore: lesson.space, spaceAfter: lesson.space - item.quantity });
   }
