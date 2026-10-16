@@ -8,6 +8,7 @@ import { registerUpdateRoute } from "./updates.js";
 import { registerEnrolmentRoute } from "./enrolment.js";
 import { createAdminAuth, registerAdminSessionRoutes } from "./admin-auth.js";
 import { registerAdminRoutes } from "./admin.js";
+import { registerTeacherAdminRoutes } from './teachers.js';
 
 export function createApp({ db, client, allowedOrigins, logger, admin }) {
   const app = express();
@@ -46,6 +47,7 @@ export function createApp({ db, client, allowedOrigins, logger, admin }) {
   const auth = createAdminAuth(db, admin);
   registerAdminSessionRoutes(app, db, auth);
   registerAdminRoutes(app, db, client, auth.guard);
+  registerTeacherAdminRoutes(app, db, client, auth.guard);
   registerUpdateRoute(app, db, client, auth.guard);
   registerEnrolmentRoute(app, db);
 

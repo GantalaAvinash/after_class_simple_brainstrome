@@ -16,7 +16,7 @@ export async function listAdminLessons(db, session) {
       revision: lesson.revision || 0,
       teacherIds: teachers
         .filter((teacher) =>
-          teacher.lessonIds.some((id) => id.equals(lesson._id)),
+          teacher.deleted !== true && teacher.lessonIds.some((id) => id.equals(lesson._id)),
         )
         .map((teacher) => teacher._id),
     }))
@@ -73,7 +73,7 @@ export async function mutateLesson(db, client, username, action, id, body) {
       if (input.teacherIds)
         for (const teacherId of input.teacherIds) {
           requireValue(
-            teachers.some((teacher) => teacher._id.equals(teacherId)),
+            teachers.some((teacher) => teacher.deleted !== true && teacher._id.equals(teacherId)),
             "A selected teacher was not found.",
             404,
           );
@@ -112,6 +112,7 @@ export async function mutateLesson(db, client, username, action, id, body) {
       // retains associations for restoration, but public GET excludes it.
       if (input.teacherIds)
         for (const teacher of teachers) {
+          if (teacher.deleted === true) continue;
           const ids = teacher.lessonIds.filter(
             (value) => !value.equals(lessonId),
           );
@@ -122,7 +123,7 @@ export async function mutateLesson(db, client, username, action, id, body) {
               .collection("teacher")
               .updateOne(
                 { _id: teacher._id },
-                { $set: { lessonIds: ids } },
+                { $set: { lessonIds: ids, updatedAt: now }, $inc: { revision: 1 } },
                 { session },
               );
           }
@@ -131,7 +132,7 @@ export async function mutateLesson(db, client, username, action, id, body) {
         input.teacherIds ||
         teachers
           .filter((teacher) =>
-            teacher.lessonIds.some((value) => value.equals(lessonId)),
+            teacher.deleted !== true && teacher.lessonIds.some((value) => value.equals(lessonId)),
           )
           .map((teacher) => teacher._id);
       const result = { lesson: { ...after, teacherIds } };
@@ -210,6 +211,8 @@ export async function adminOverview(db) {
       .map((entry) => ({
         action: entry.action,
         lessonId: entry.lessonId,
+        teacherId: entry.teacherId,
+        label: entry.entityLabel,
         username: entry.username,
         occurredAt: entry.occurredAt,
       })),

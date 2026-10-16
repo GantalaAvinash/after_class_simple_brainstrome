@@ -53,7 +53,7 @@ export function normaliseUpdates(body) {
     requireValue(!seen.has(lessonId.toHexString()), 'A lesson cannot be updated twice in one request.');
     seen.add(lessonId.toHexString());
     object(update.changes, 'Changes');
-    keys(update.changes, ['topic', 'location', 'price', 'space', 'image']);
+    keys(update.changes, ['topic', 'location', 'price', 'space', 'image', 'description', 'ageGroup', 'durationMinutes', 'learningOutcomes']);
     requireValue(Object.keys(update.changes).length > 0, 'Provide at least one field to update.');
     const changes = { ...update.changes };
     for (const field of ['topic', 'location']) {
@@ -62,6 +62,14 @@ export function normaliseUpdates(body) {
     if ('price' in changes) requireValue(typeof changes.price === 'number' && Number.isFinite(changes.price) && changes.price >= 0, 'Price must be a nonnegative number.');
     if ('space' in changes) requireValue(Number.isSafeInteger(changes.space) && changes.space >= 0, 'Spaces must be a nonnegative whole number.');
     if ('image' in changes) requireValue(typeof changes.image === 'string' && /^\/images\/[a-z0-9-]+\.(svg|png|jpe?g|webp)$/.test(changes.image), 'Image must be a local lesson image path.');
+    for (const [field, max] of [['description',2000],['ageGroup',60]]) {
+      if (field in changes) { requireValue(typeof changes[field] === 'string' && changes[field].trim().length <= max, field + ' must be text of at most ' + max + ' characters.'); changes[field] = changes[field].trim(); }
+    }
+    if ('durationMinutes' in changes) requireValue(changes.durationMinutes === null || (Number.isInteger(changes.durationMinutes) && changes.durationMinutes > 0 && changes.durationMinutes <= 480), 'Duration must be a whole number from 1 to 480 minutes or null.');
+    if ('learningOutcomes' in changes) {
+      requireValue(Array.isArray(changes.learningOutcomes) && changes.learningOutcomes.length <= 8, 'Provide up to eight learning outcomes.');
+      changes.learningOutcomes = changes.learningOutcomes.map(value => text(value, 'Learning outcome', 160));
+    }
     return { lessonId, changes };
   });
   const orderId = body.orderId === undefined ? undefined : recordId(body.orderId, 'Order ID');
