@@ -11,6 +11,8 @@ createApp({
       view: 'catalogue', busy: false,
       name: '', phone: '', touched: false, checkoutError: '', confirmation: '',
       attempt: null, storage: null,
+      searchTerm: '', teacherId: '', teachers: [], teacherError: '',
+      searchTimer: null, searchController: null, requestVersion: 0,
     };
   },
   computed: {
@@ -26,6 +28,13 @@ createApp({
     canCheckout() {
       return this.cartCount > 0 && !this.busy && !this.contactError.name && !this.contactError.phone && (Boolean(this.attempt) || !this.cartConflict);
     },
+  },
+  watch: {
+    searchTerm() {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = setTimeout(() => this.loadLessons(), 300);
+    },
+    teacherId() { this.loadLessons(); },
   },
   methods: {
     formatPrice,
@@ -55,6 +64,15 @@ createApp({
       for (const lesson of lessons) this.lessons[lesson._id] = lesson;
     },
     async refreshAll() { this.mergeLessons(await this.api('/lessons')); },
+    async loadTeachers() {
+      try {
+        const teachers = await this.api('/teachers');
+        if (!Array.isArray(teachers)) throw new Error();
+        this.teachers = teachers;
+        this.teacherError = '';
+      } catch { this.teacherError = 'Teachers could not be loaded. You can still browse all activities.'; }
+    },
+    clearFilters() { this.searchTerm = ''; this.teacherId = ''; },
     forgetAttempt() {
       this.attempt = null;
       try { this.storage?.removeItem(STORAGE_KEY); } catch { this.announcement = 'Your browser could not clear the saved checkout.'; }
@@ -90,16 +108,26 @@ createApp({
       } finally { this.busy = false; }
     },
     async loadLessons() {
+      clearTimeout(this.searchTimer);
+      this.searchController?.abort();
+      const controller = new AbortController();
+      this.searchController = controller;
+      const version = ++this.requestVersion;
       this.loading = true;
       this.error = '';
       try {
         this.apiBase = resolveApiBase(window.AFTERCLASS_CONFIG?.apiBaseUrl, window.location);
         this.api ||= createApi(this.apiBase);
-        const lessons = await this.api('/lessons');
+        const params = new URLSearchParams();
+        if (this.searchTerm.trim()) params.set('q', this.searchTerm.trim());
+        if (this.teacherId) params.set('teacherId', this.teacherId);
+        const lessons = await this.api('/lessons' + (params.size ? '?' + params : ''), { signal: controller.signal });
+        if (version !== this.requestVersion) return;
         this.mergeLessons(lessons);
         this.resultIds = lessons.map((lesson) => lesson._id);
-      } catch (error) { this.error = error.message; }
-      finally { this.loading = false; }
+      } catch (error) {
+        if (!controller.signal.aborted && version === this.requestVersion) this.error = error.message;
+      } finally { if (version === this.requestVersion) this.loading = false; }
     },
   },
   mounted() {
@@ -112,5 +140,7 @@ createApp({
       this.view = 'cart';
     }
     this.loadLessons();
+    if (this.api) this.loadTeachers();
   },
+  beforeUnmount() { clearTimeout(this.searchTimer); this.searchController?.abort(); },
 }).mount('#app');

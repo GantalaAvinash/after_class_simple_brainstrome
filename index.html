@@ -39,6 +39,12 @@
             <div><p class="eyebrow">FIND THEIR SPARK</p><h2 id="catalogue-heading">Something for every curiosity.</h2></div>
             <p class="result-count" v-if="!loading && !error">{{ visibleLessons.length }} activities to explore</p>
           </div>
+          <div class="filter-controls">
+            <div class="search-field"><label for="lesson-search">What would they love to try?</label><input id="lesson-search" v-model="searchTerm" type="search" maxlength="100" placeholder="Search subject, location, price or spaces…" autocomplete="off"></div>
+            <div class="teacher-field"><label for="teacher-filter">Learn with</label><select id="teacher-filter" v-model="teacherId" v-bind:disabled="teachers.length === 0"><option value="">All teachers</option><option v-for="teacher in teachers" v-bind:key="teacher._id" v-bind:value="teacher._id">{{ teacher.firstName }} {{ teacher.lastName }}</option></select></div>
+            <button class="clear-button" type="button" v-on:click="clearFilters" v-bind:disabled="!searchTerm && !teacherId">Clear filters</button>
+          </div>
+          <p v-if="teacherError" class="field-error" role="status">{{ teacherError }} <button type="button" class="clear-button" v-on:click="loadTeachers">Retry teachers</button></p>
           <div class="sort-controls">
             <label for="sort-field">Sort by</label>
             <select id="sort-field" v-model="sortField">
@@ -49,7 +55,7 @@
           </div>
           <p v-if="loading" role="status" class="empty-state">Finding your next adventure…</p>
           <div v-else-if="error" role="alert" class="notice"><p>{{ error }}</p><button class="button" type="button" v-on:click="loadLessons">Try again</button></div>
-          <p v-else-if="!visibleLessons.length" role="status" class="empty-state">No activities to show just yet. Please check back soon.</p>
+          <p v-else-if="!visibleLessons.length" role="status" class="empty-state">No activities match those filters. Try another search or clear the filters.</p>
           <ul v-else class="lesson-grid" aria-label="After-school activities">
             <li v-for="(lesson, index) in visibleLessons" v-bind:key="lesson._id" class="lesson-card">
               <div class="card-art" v-bind:class="'tone-' + (index % 4)">

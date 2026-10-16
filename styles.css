@@ -60,6 +60,8 @@ h3 { font-size: 18px; letter-spacing: -.4px; margin: 0 0 28px; line-height: 1.3;
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .skip-link { position: fixed; top: -100px; left: 16px; z-index: 20; background: var(--green); color: #fff; padding: 14px; }
 .skip-link:focus { top: 16px; }
+.filter-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }.filter-controls label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; }.search-field { flex: 1; min-width: min(100%, 270px); }.search-field input { width: 100%; font-size: 14px; }.teacher-field { min-width: 180px; }.teacher-field select { width: 100%; font-size: 14px; }.clear-button { border: 0; background: transparent; color: var(--green); text-decoration: underline; font-size: 12px; padding: 12px; min-height: 44px; }
+@media (max-width: 620px) { .search-field, .teacher-field { width: 100%; min-width: 0; }.filter-controls { gap: 12px; } }
 .success { border: 1px solid #78916c; background: #edf4e7; padding: 20px; margin-top: 24px; border-radius: 6px; line-height: 1.6; overflow-wrap: anywhere; }
 .checkout-heading { margin-top: 28px !important; }.form-field { margin-bottom: 20px; }.form-field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; }.form-field input { width: 100%; }.form-field small { display: block; color: var(--muted); font-size: 11px; line-height: 1.6; margin-top: 6px; }.field-error { color: #8c2d1e; font-size: 12px; line-height: 1.6; }.checkout-button { width: 100%; }
 .cart-toggle { white-space: nowrap; }
