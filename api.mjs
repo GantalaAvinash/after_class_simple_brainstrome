@@ -1,0 +1,43 @@
+export class ApiError extends Error {
+  constructor(message, status = 0) { super(message); this.status = status; }
+}
+
+export function resolveApiBase(configured, location) {
+  const local = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  const base = configured?.trim() || (local ? 'http://localhost:3000' : '');
+  if (!base) throw new ApiError('Lessons are unavailable while the service is being configured.');
+  let url;
+  try { url = new URL(base); } catch { throw new ApiError('The lesson service address is invalid.'); }
+  if (!['http:', 'https:'].includes(url.protocol) || (!local && url.protocol !== 'https:') || url.username || url.password || url.search || url.hash || url.pathname !== '/') {
+    throw new ApiError('The lesson service needs a valid HTTPS address.');
+  }
+  return url.origin;
+}
+
+export function createApi(base, fetcher = fetch, timeoutMs = 90000) {
+  return async function request(path, { method = 'GET', body, signal } = {}) {
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    signal?.addEventListener('abort', abort, { once: true });
+    if (signal?.aborted) abort();
+    const timer = setTimeout(abort, timeoutMs);
+    try {
+      const response = await fetcher(base + path, {
+        method, signal: controller.signal,
+        headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new ApiError(data?.error || 'The request failed. Please try again.', response.status);
+      if (data === null) throw new ApiError('The lesson service returned an unexpected response.');
+      return data;
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      if (error instanceof ApiError) throw error;
+      throw new ApiError(controller.signal.aborted ? 'The service is taking longer than expected. Please retry.' : 'Unable to reach the lesson service. Please check your connection and retry.');
+    } finally {
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', abort);
+    }
+  };
+}
