@@ -4,8 +4,9 @@ import { cors, requestLogger } from './middleware.js';
 import { HttpError } from './errors.js';
 import { registerCatalogueRoutes } from './catalogue.js';
 import { registerOrderRoutes } from './orders.js';
+import { registerUpdateRoute } from './updates.js';
 
-export function createApp({ db, allowedOrigins, logger }) {
+export function createApp({ db, client, allowedOrigins, logger }) {
   const app = express();
   app.disable('x-powered-by');
   app.use(requestLogger(logger));
@@ -27,6 +28,7 @@ export function createApp({ db, allowedOrigins, logger }) {
 
   registerCatalogueRoutes(app, db);
   registerOrderRoutes(app, db);
+  registerUpdateRoute(app, db, client);
 
   app.use((_req, res) => res.status(404).json({ error: 'Route not found.' }));
   app.use((error, _req, res, _next) => {

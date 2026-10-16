@@ -5,7 +5,7 @@ import { connectDatabase } from './database.js';
 try {
   const config = readConfig();
   const { client, db } = await connectDatabase(config);
-  const server = createApp({ db, allowedOrigins: config.allowedOrigins })
+  const server = createApp({ client, db, allowedOrigins: config.allowedOrigins })
     .listen(config.port, '0.0.0.0', () => console.info(`AfterClass API listening on port ${config.port}`));
   server.on('error', async () => {
     console.error('The API could not start. Check that its port is available.');
