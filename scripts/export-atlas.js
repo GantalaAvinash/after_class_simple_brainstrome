@@ -1,5 +1,7 @@
 import { mkdir, writeFile, rename } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { readConfig } from '../src/config.js';
 import { connectDatabase } from '../src/database.js';
 import { serialiseCollection, exportFilename } from '../src/export-data.js';
@@ -20,16 +22,17 @@ try {
   }, { readConcern: { level: 'snapshot' } });
   const output = new URL('../../exports/', import.meta.url);
   await mkdir(output, { recursive: true });
+  const outputPath = fileURLToPath(output);
   const manifest = { source: 'MongoDB Atlas', database: config.databaseName, exportedAt: new Date().toISOString(), collections: [] };
   for (const collection of snapshot) {
     const file = exportFilename(collection.name);
     const contents = serialiseCollection(collection.data);
-    await writeFile(new URL(file + '.tmp', output), contents);
-    await rename(new URL(file + '.tmp', output), new URL(file, output));
+    await writeFile(join(outputPath, file + '.tmp'), contents);
+    await rename(join(outputPath, file + '.tmp'), join(outputPath, file));
     manifest.collections.push({ name: collection.name, file, count: collection.data.length, sha256: createHash('sha256').update(contents).digest('hex') });
   }
-  await writeFile(new URL('manifest.json.tmp', output), JSON.stringify(manifest, null, 2) + '\n');
-  await rename(new URL('manifest.json.tmp', output), new URL('manifest.json', output));
+  await writeFile(join(outputPath, 'manifest.json.tmp'), JSON.stringify(manifest, null, 2) + '\n');
+  await rename(join(outputPath, 'manifest.json.tmp'), join(outputPath, 'manifest.json'));
   console.info('Atlas export complete: ' + manifest.collections.map((item) => item.name + ' (' + item.count + ')').join(', '));
 } finally {
   await session.endSession();
