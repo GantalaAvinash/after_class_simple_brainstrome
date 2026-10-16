@@ -16,9 +16,10 @@
       <nav class="site-nav wrap" aria-label="Main navigation">
         <a class="wordmark" href="./" aria-label="AfterClass home">AfterClass<span>.</span></a>
         <span class="nav-note">Small groups. Big possibilities.</span>
+        <button class="button secondary cart-toggle" type="button" v-bind:disabled="cartCount === 0 || busy" v-on:click="toggleCart">{{ view === 'cart' ? 'Back to activities' : 'Your basket (' + cartCount + ')' }}</button>
       </nav>
       <main>
-        <header class="hero wrap">
+        <header v-show="view === 'catalogue'" class="hero wrap">
           <div class="hero-copy">
             <p class="eyebrow"><span class="status-dot"></span> AFTER SCHOOL, A WORLD OPENS UP</p>
             <h1>Big discoveries.<br><em>After school.</em></h1>
@@ -32,7 +33,7 @@
             <span class="note-bottom">NORTH LONDON · AFTER SCHOOL</span>
           </aside>
         </header>
-        <section id="catalogue" class="catalogue wrap" aria-labelledby="catalogue-heading" tabindex="-1">
+        <section v-show="view === 'catalogue'" id="catalogue" class="catalogue wrap" aria-labelledby="catalogue-heading" tabindex="-1">
           <div class="section-heading">
             <div><p class="eyebrow">FIND THEIR SPARK</p><h2 id="catalogue-heading">Something for every curiosity.</h2></div>
             <p class="result-count" v-if="!loading && !error">{{ visibleLessons.length }} activities to explore</p>
@@ -57,10 +58,34 @@
               <div class="card-body">
                 <p class="location">{{ lesson.location }}</p>
                 <h3>{{ lesson.topic }}</h3>
-                <div class="card-bottom"><p class="price">{{ formatPrice(lesson.price) }} <span>/ place</span></p></div>
+                <div class="card-bottom">
+                  <p class="price">{{ formatPrice(lesson.price) }} <span>/ place</span></p>
+                  <button class="button" type="button" v-bind:disabled="lesson.available === 0 || busy" v-on:click="addPlace(lesson._id)" v-bind:aria-label="'Add one place for ' + lesson.topic">Add to cart <span aria-hidden="true">+</span></button>
+                </div>
               </div>
             </li>
           </ul>
+        </section>
+        <section v-show="view === 'cart'" id="cart" class="cart-section wrap" aria-labelledby="cart-heading" tabindex="-1">
+          <p class="eyebrow">THEIR NEXT CHAPTER</p>
+          <h2 id="cart-heading">A little something to look forward to.</h2>
+          <p class="cart-intro">Your selected places, all in one spot.</p>
+          <div class="cart-layout">
+            <div>
+              <ul class="cart-list" aria-label="Selected activities">
+                <li v-for="item in cartItems" v-bind:key="item._id" class="cart-row">
+                  <img v-if="item.image" v-bind:src="imageUrl(item.image)" alt="" width="40" height="40">
+                  <div class="cart-description"><p class="location">{{ item.location }}</p><h3>{{ item.topic }}</h3><p>{{ item.quantity }} {{ item.quantity === 1 ? 'place' : 'places' }} · {{ formatPrice(item.price) }} each</p></div>
+                  <div class="cart-actions"><strong>{{ formatPrice(item.quantity * item.price) }}</strong><button class="remove-button" type="button" v-bind:disabled="busy" v-on:click="removePlace(item._id)" v-bind:aria-label="'Remove one place for ' + item.topic">Remove one</button></div>
+                </li>
+              </ul>
+              <p v-if="cartConflict" class="notice" role="alert">Availability has changed. Please remove unavailable places before continuing.</p>
+            </div>
+            <aside class="order-summary" aria-labelledby="summary-heading">
+              <h3 id="summary-heading">Your selection</h3><div class="summary-line"><span>{{ cartCount }} {{ cartCount === 1 ? 'place' : 'places' }}</span><strong>{{ formatPrice(cartTotal) }}</strong></div>
+              <p class="summary-note">Small groups. Room to discover something new.</p>
+            </aside>
+          </div>
         </section>
       </main>
       <footer class="site-footer wrap"><a class="wordmark" href="./">AfterClass<span>.</span></a><p>A little curiosity goes a long way.</p><small>A fictitious after-school activities service.</small></footer>
