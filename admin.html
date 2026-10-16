@@ -93,7 +93,7 @@
             >
               Lesson library
               <span>{{ lessons.filter(l => !l.deleted).length }}</span></button
-            ><button
+            ><button type="button" v-bind:class="{ selected: tab === 'teachers' }" v-on:click="tab = 'teachers'" v-bind:aria-pressed="tab === 'teachers'">Teaching team <span>{{ activeTeachers.length }}</span></button><button
               type="button"
               v-bind:class="{ selected: tab === 'insights' }"
               v-on:click="tab = 'insights'"
@@ -130,7 +130,7 @@
             <span
               >Workspace <span aria-hidden="true">/</span>
               <strong
-                >{{ tab === 'lessons' ? 'Lesson library' : 'Booking insights' }}</strong
+                >{{ tabLabel }}</strong
               ></span
             ><a href="./" class="text-link">Open catalogue ↗</a>
           </header>
@@ -138,10 +138,10 @@
             <div>
               <p class="eyebrow">MAKE EVERY AFTERNOON COUNT</p>
               <h1>
-                {{ tab === 'lessons' ? 'Your lesson library.' : 'A clearer picture.' }}
+                {{ tabTitle }}
               </h1>
               <p class="muted">
-                {{ tab === 'lessons' ? 'Create possibilities. Keep every detail in good shape.' : 'Confirmed bookings, real quantities and a useful view of availability.' }}
+                {{ tabDescription }}
               </p>
             </div>
             <button
@@ -152,7 +152,7 @@
               v-on:click="openEditor()"
             >
               + Create lesson</button
-            ><button
+            ><button v-else-if="tab === 'teachers'" type="button" class="button" v-bind:disabled="busy || pending || loading" v-on:click="openTeacherEditor()">+ Create teacher</button><button
               v-else
               type="button"
               class="button secondary"
@@ -275,6 +275,11 @@
                       </p>
                     </div>
                   </div>
+                  <div class="detail-fields">
+                    <div class="form-field"><label for="admin-description">Lesson overview</label><textarea id="admin-description" v-model="draft.description" rows="5" maxlength="2000" v-bind:aria-invalid="touched && Boolean(errors.description)" v-bind:aria-describedby="touched && errors.description ? 'error-description' : undefined"></textarea><p v-if="touched && errors.description" id="error-description" class="field-error">{{ errors.description }}</p></div>
+                    <div class="editor-grid"><div class="form-field"><label for="admin-ageGroup">Age guidance</label><input id="admin-ageGroup" v-model="draft.ageGroup" maxlength="60" placeholder="For example, Ages 8–12" v-bind:aria-invalid="touched && Boolean(errors.ageGroup)"><p v-if="touched && errors.ageGroup" class="field-error">{{ errors.ageGroup }}</p></div><div class="form-field"><label for="admin-duration">Duration in minutes</label><input id="admin-duration" v-model="draft.durationMinutes" type="number" min="1" max="480" step="1" placeholder="Leave blank if unconfirmed" v-bind:aria-invalid="touched && Boolean(errors.durationMinutes)"><p v-if="touched && errors.durationMinutes" class="field-error">{{ errors.durationMinutes }}</p></div></div>
+                    <div class="form-field"><label for="admin-outcomes">Learning outcomes</label><textarea id="admin-outcomes" v-model="draft.outcomesText" rows="4" aria-describedby="outcomes-hint" v-bind:aria-invalid="touched && Boolean(errors.outcomesText)"></textarea><small id="outcomes-hint">One outcome per line. Up to eight, with 160 characters each.</small><p v-if="touched && errors.outcomesText" class="field-error">{{ errors.outcomesText }}</p></div>
+                  </div>
                   <div class="form-field">
                     <label for="admin-image">Lesson illustration</label>
                     <div class="image-picker">
@@ -296,7 +301,7 @@
                   </div>
                   <fieldset class="teacher-picker">
                     <legend>Teaching team</legend>
-                    <label v-for="teacher in teachers" v-bind:key="teacher._id"
+                    <label v-for="teacher in activeTeachers" v-bind:key="teacher._id"
                       ><input
                         type="checkbox"
                         v-model="draft.teacherIds"
@@ -309,6 +314,7 @@
                       Assignments update with the lesson. You can also leave a
                       lesson unassigned.
                     </p>
+                    <p class="summary-note">Need a new teacher? Use the Teaching team section to create their profile first.</p>
                   </fieldset>
                   <p class="summary-note">
                     Spaces are an absolute number of places still available. A
@@ -425,6 +431,23 @@
               </p>
             </section>
           </template>
+          <template v-else-if="tab === 'teachers'">
+            <section v-if="teacherEditorOpen" id="teacher-editor" class="editor-panel" aria-labelledby="teacher-editor-heading">
+              <div class="panel-heading"><div><p class="eyebrow">THE PEOPLE BEHIND THE POSSIBILITIES</p><h2 id="teacher-editor-heading">{{ teacherEditing ? 'Edit teacher profile' : 'Create a teacher' }}</h2></div><button class="button secondary" type="button" v-on:click="closeTeacherEditor" v-bind:disabled="busy || pending">Cancel</button></div>
+              <form novalidate v-on:submit.prevent="saveTeacher"><fieldset class="editor-fields" v-bind:disabled="busy || Boolean(pending)"><legend class="sr-only">Teacher profile and assignments</legend>
+                <div class="editor-grid"><div v-for="field in ['firstName','lastName']" v-bind:key="field" class="form-field"><label v-bind:for="'teacher-' + field">{{ field === 'firstName' ? 'First name' : 'Last name' }}</label><input v-bind:id="'teacher-' + field" v-model="teacherDraft[field]" maxlength="60" v-bind:aria-invalid="teacherTouched && Boolean(teacherValidation[field])" v-bind:aria-describedby="teacherTouched && teacherValidation[field] ? 'teacher-error-' + field : undefined"><p v-if="teacherTouched && teacherValidation[field]" v-bind:id="'teacher-error-' + field" class="field-error">{{ teacherValidation[field] }}</p></div></div>
+                <div class="form-field"><label for="teacher-specialism">Specialism or profile headline</label><input id="teacher-specialism" v-model="teacherDraft.specialism" maxlength="100" placeholder="For example, Creative technology"><p v-if="teacherTouched && teacherValidation.specialism" class="field-error">{{ teacherValidation.specialism }}</p></div>
+                <div class="form-field"><label for="teacher-bio">About this teacher</label><textarea id="teacher-bio" v-model="teacherDraft.bio" rows="4" maxlength="2000" placeholder="Introduce their approach and interests. Use fictitious details for coursework."></textarea><p v-if="teacherTouched && teacherValidation.bio" class="field-error">{{ teacherValidation.bio }}</p></div>
+                <fieldset class="teacher-picker lesson-assignment-picker"><legend>Assign lessons</legend><label v-for="lesson in lessons" v-bind:key="lesson._id"><input type="checkbox" v-model="teacherDraft.lessonIds" v-bind:value="lesson._id"><span>{{ lesson.topic }}<small>{{ lesson.location }}{{ lesson.deleted ? ' · deleted lesson' : '' }}</small></span></label><p v-if="teacherTouched && teacherValidation.lessonIds" class="field-error">{{ teacherValidation.lessonIds }}</p><p class="summary-note">Select every lesson this teacher teaches. Deleted lessons stay hidden in the public catalogue.</p></fieldset>
+                <button class="button" type="submit">{{ busy ? 'Saving…' : teacherEditing ? 'Save profile & assignments →' : 'Create teacher →' }}</button>
+              </fieldset></form>
+            </section>
+            <section class="library-panel" aria-labelledby="teachers-library-heading"><div class="panel-heading"><div><p class="eyebrow">A LITTLE ENCOURAGEMENT GOES A LONG WAY</p><h2 id="teachers-library-heading">Your teaching team.</h2><p class="muted">{{ filteredTeachers.length }} {{ filteredTeachers.length === 1 ? 'teacher' : 'teachers' }} in this view</p></div><button type="button" class="clear-button" v-on:click="load" v-bind:disabled="busy || loading">Refresh team ↻</button></div>
+              <div class="library-filters"><div><label class="sr-only" for="teacher-search">Search teachers</label><input id="teacher-search" type="search" v-model="teacherSearch" placeholder="Search names or specialisms…"></div><label class="sr-only" for="teacher-status">Teacher status</label><select id="teacher-status" v-model="teacherStatus"><option value="active">Active teachers</option><option value="deleted">Deleted teachers</option><option value="all">All teachers</option></select></div>
+              <ul class="teacher-profile-grid" aria-label="Manage teachers"><li class="teacher-profile-card" v-for="teacher in filteredTeachers" v-bind:key="teacher._id"><div class="profile-card-head"><span class="teacher-profile-avatar" aria-hidden="true">{{ teacher.firstName.slice(0,1) }}{{ teacher.lastName.slice(0,1) }}</span><span class="stock-pill" v-bind:class="{ low: teacher.deleted }">{{ teacher.deleted ? 'Deleted' : 'Active' }}</span></div><h3>{{ teacher.firstName }} {{ teacher.lastName }}</h3><p class="profile-specialism">{{ teacher.specialism || 'Teacher profile' }}</p><p class="profile-bio">{{ teacher.bio || 'A profile introduction has not been added yet.' }}</p><div class="profile-assignments"><strong>{{ assignedLessons(teacher).length }} {{ assignedLessons(teacher).length === 1 ? 'lesson' : 'lessons' }} assigned</strong><ul><li v-for="lesson in assignedLessons(teacher)" v-bind:key="lesson._id">{{ lesson.topic }}<small v-if="lesson.deleted"> · deleted</small></li></ul><p v-if="!teacher.lessonIds.length" class="summary-note">No lessons assigned yet.</p></div><div class="profile-actions"><button v-if="!teacher.deleted" type="button" class="button secondary" v-on:click="openTeacherEditor(teacher)" v-bind:disabled="busy || Boolean(pending)" v-bind:aria-label="'Edit ' + teacher.firstName + ' ' + teacher.lastName">Edit & assign</button><button v-if="!teacher.deleted" type="button" class="remove-button" v-on:click="askDelete(teacher,'teacher')" v-bind:disabled="busy || Boolean(pending)" v-bind:aria-label="'Delete ' + teacher.firstName + ' ' + teacher.lastName">Delete</button><button v-else type="button" class="button secondary" v-on:click="restoreTeacher(teacher)" v-bind:disabled="busy || Boolean(pending)" v-bind:aria-label="'Restore ' + teacher.firstName + ' ' + teacher.lastName">Restore teacher</button></div></li></ul>
+              <p v-if="!filteredTeachers.length && !loading" class="empty-state">No teachers match this view. Create a teacher or change the filters.</p>
+            </section>
+          </template>
           <div v-else-if="overview" class="insights-grid">
             <section class="library-panel">
               <div class="panel-heading">
@@ -485,7 +508,7 @@
                     v-bind:key="index"
                   >
                     <strong
-                      >{{ entry.action }} · {{ lessons.find(l => l._id === entry.lessonId)?.topic || 'Lesson' }}</strong
+                      >{{ entry.action }} · {{ entry.label || lessons.find(l => l._id === entry.lessonId)?.topic || 'Lesson' }}</strong
                     ><small
                       >{{ entry.username }} · {{ date(entry.occurredAt) }}</small
                     >
@@ -509,9 +532,10 @@
         v-on:cancel="deleteTarget = null"
       >
         <p class="eyebrow">CHECK BEFORE YOU CHANGE</p>
-        <h2 id="delete-heading">Delete this lesson?</h2>
-        <p id="delete-description">
-          {{ deleteTarget?.topic }} will leave the public catalogue. Existing
+        <h2 id="delete-heading">Delete this {{ deleteEntity === 'teacher' ? 'teacher' : 'lesson' }}?</h2>
+        <p v-if="deleteEntity === 'teacher'" id="delete-description">{{ deleteTargetName }} will leave public teacher profiles and filters. Lesson availability and purchase history stay unchanged. You can restore this teacher and their assignments later.</p>
+        <p v-else id="delete-description">
+          {{ deleteTargetName }} will leave the public catalogue. Existing
           purchase history is kept, and you can restore the lesson later.
           Unfinished bookings containing this lesson will need to be revised.
         </p>
@@ -522,13 +546,13 @@
             v-on:click="cancelDelete"
             autofocus
           >
-            Keep lesson</button
+            Keep {{ deleteEntity === 'teacher' ? 'teacher' : 'lesson' }}</button
           ><button
             class="button danger"
             type="button"
             v-on:click="confirmDelete"
           >
-            Delete lesson
+            Delete {{ deleteEntity === 'teacher' ? 'teacher' : 'lesson' }}
           </button>
         </div>
       </dialog>

@@ -12,6 +12,7 @@
     <title>AfterClass | Make room for something new</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./experience.css" />
+    <link rel="stylesheet" href="./lesson-detail.css" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <script src="./config.js"></script>
     <script type="module" src="./app.js"></script>
@@ -93,10 +94,9 @@
             <a
               v-for="(lesson,index) in spotlight"
               v-bind:key="lesson._id"
-              href="#catalogue"
+              v-bind:href="lessonHash(lesson._id)"
               class="spotlight-card"
               v-bind:class="'spotlight-' + index"
-              v-on:click="searchTerm = lesson.topic"
               ><span class="spotlight-art" v-bind:class="artTone(lesson._id)"
                 ><img
                   v-bind:src="imageUrl(lesson.image)"
@@ -308,12 +308,13 @@
               </div>
               <div class="card-body">
                 <p class="location">{{ lesson.location }}</p>
-                <h3>{{ lesson.topic }}</h3>
+                <h3><a v-bind:href="lessonHash(lesson._id)" class="lesson-title-link">{{ lesson.topic }}</a></h3>
                 <p class="teacher-credit" v-if="teacherNames(lesson._id)">
                   <span class="teacher-avatar" aria-hidden="true"
                     >{{ teacherNames(lesson._id).slice(0,1) }}</span
                   >With {{ teacherNames(lesson._id) }}
                 </p>
+                <a class="lesson-details-link" v-bind:href="lessonHash(lesson._id)" v-bind:aria-label="'View details for ' + lesson.topic">Explore this lesson <span aria-hidden="true">↗</span></a>
                 <div class="card-bottom">
                   <p class="price">
                     {{ formatPrice(lesson.price) }} <span>/ place</span>
@@ -397,6 +398,25 @@
               </div>
             </li>
           </ol>
+        </section>
+        <section v-show="view === 'detail'" id="lesson-detail" class="detail-page wrap" aria-labelledby="detail-heading" tabindex="-1">
+          <a class="detail-back" href="#catalogue">← Back to all activities</a>
+          <p v-if="detailLoading" class="empty-state" role="status">Getting to know this activity…</p>
+          <div v-else-if="detailError" class="notice" role="alert"><h1 id="detail-heading">This activity is unavailable.</h1><p>{{ detailError }}</p><button v-if="detailId" class="button" type="button" v-on:click="syncRoute">Try again</button></div>
+          <template v-else-if="detailLesson">
+            <header class="detail-heading">
+              <div class="detail-art" v-bind:class="artTone(detailLesson._id)"><span class="art-orbit" aria-hidden="true"></span><img v-if="!imageFailures[detailLesson._id]" v-bind:src="imageUrl(detailLesson.image)" v-bind:alt="detailLesson.topic + ' activity illustration'" width="100" height="100" v-on:error="imageFailures[detailLesson._id] = true"><span v-else class="image-fallback" aria-hidden="true">{{ detailLesson.topic.slice(0,1) }}</span><span class="art-label">A LITTLE SPACE TO GROW</span></div>
+              <div><p class="eyebrow">{{ category(detailLesson.topic) }} · {{ detailLesson.location }}</p><h1 id="detail-heading">{{ detailLesson.topic }}</h1><p class="detail-intro">A closer look at their next discovery. Explore the programme, meet the teaching team and choose the places that fit your family.</p><ul class="detail-meta" aria-label="Lesson at a glance"><li>{{ detailLesson.location }}</li><li v-if="detailLesson.ageGroup">{{ detailLesson.ageGroup }}</li><li v-if="detailLesson.durationMinutes">{{ detailLesson.durationMinutes }} minutes</li><li>Small-group activity</li></ul></div>
+            </header>
+            <div class="detail-layout">
+              <div class="detail-copy">
+                <section aria-labelledby="overview-heading"><p class="eyebrow">FOLLOW THEIR CURIOSITY</p><h2 id="overview-heading">A little more about this lesson.</h2><p v-if="detailLesson.description" class="overview-text">{{ detailLesson.description }}</p><p v-else class="empty-content">More about this activity will be available soon.</p></section>
+                <section aria-labelledby="outcomes-heading"><p class="eyebrow">SMALL STEPS. REAL DISCOVERIES.</p><h2 id="outcomes-heading">What they’ll explore.</h2><ul v-if="detailLesson.learningOutcomes?.length" class="outcome-list"><li v-for="(outcome,index) in detailLesson.learningOutcomes" v-bind:key="index"><span aria-hidden="true">✓</span>{{ outcome }}</li></ul><p v-else class="empty-content">The learning programme is being prepared.</p></section>
+                <section aria-labelledby="detail-teachers-heading"><p class="eyebrow">A FRIENDLY FACE, A LITTLE ENCOURAGEMENT</p><h2 id="detail-teachers-heading">Meet the teaching team.</h2><div class="detail-teachers" v-if="detailData.teachers.length"><article class="detail-teacher" v-for="teacher in detailData.teachers" v-bind:key="teacher._id"><div class="detail-teacher-head"><span class="teacher-avatar" aria-hidden="true">{{ teacher.firstName.slice(0,1) }}</span><div><h3>{{ teacher.firstName }} {{ teacher.lastName }}</h3><small v-if="teacher.specialism">{{ teacher.specialism }}</small></div></div><p v-if="teacher.bio">{{ teacher.bio }}</p><p v-else>More about this teacher will be available soon.</p><a href="#catalogue" v-on:click="browseTeacher(teacher._id)">Explore lessons with {{ teacher.firstName }} ↗</a></article></div><p v-else class="empty-content">The teaching team for this activity will be announced soon.</p></section>
+              </div>
+              <aside class="detail-booking" aria-labelledby="detail-booking-heading"><p class="eyebrow">MAKE ROOM FOR SOMETHING NEW</p><h2 id="detail-booking-heading">{{ formatPrice(detailLesson.price) }}</h2><p class="detail-price-note">per place · {{ detailLesson.topic }}</p><p class="detail-availability" role="status">{{ detailLesson.available === 0 ? 'Fully booked for your current selection' : detailLesson.available + (detailLesson.available === 1 ? ' place available' : ' places available') }}</p><p v-if="cart[detailLesson._id]" class="detail-basket-note">{{ cart[detailLesson._id] }} {{ cart[detailLesson._id] === 1 ? 'place' : 'places' }} for this lesson in your basket.</p><button class="button" type="button" v-bind:disabled="detailLesson.available === 0 || cartLocked" v-on:click="addPlace(detailLesson._id)" v-bind:aria-label="'Add one place for ' + detailLesson.topic">Add one place +</button><button v-if="cart[detailLesson._id]" class="remove-button" type="button" v-bind:disabled="cartLocked" v-on:click="removePlace(detailLesson._id)">Remove one place</button><button class="button secondary" type="button" v-bind:disabled="cartCount === 0 || busy" v-on:click="toggleCart">View basket ({{ cartCount }}) →</button><button class="clear-button" type="button" v-bind:aria-pressed="savedIds.includes(detailLesson._id)" v-on:click="toggleSaved(detailLesson._id)">{{ savedIds.includes(detailLesson._id) ? 'Saved to your shortlist' : 'Save for another day' }}</button><div class="enrolment-row"><button type="button" class="enrolment-button" v-bind:disabled="enrolmentBusy[detailLesson._id]" v-on:click="showEnrolment(detailLesson._id)">Check purchased places</button><span v-if="enrolments[detailLesson._id] !== undefined">{{ enrolments[detailLesson._id] }} purchased</span></div><p v-if="enrolmentErrors[detailLesson._id]" class="field-error" role="alert">{{ enrolmentErrors[detailLesson._id] }}</p><p class="detail-example-note">This is an illustrative coursework programme. Places are confirmed at checkout; browsing and basket selections do not reserve them.</p></aside>
+            </div>
+          </template>
         </section>
         <section
           v-show="view === 'cart'"

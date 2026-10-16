@@ -6,6 +6,7 @@ import {
   changeCart,
   cartLines,
   contactErrors,
+  availableSpace,
 } from "./state.mjs";
 import {
   createAttempt,
@@ -21,6 +22,11 @@ import {
   restoreSaved,
   SAVED_KEY,
 } from "./discovery.mjs";
+import {
+  lessonHash,
+  lessonRoute,
+  createLessonLoader,
+} from "./lesson-route.mjs";
 
 createApp({
   data() {
@@ -60,9 +66,20 @@ createApp({
       savedOnly: false,
       availableOnly: false,
       selectedCategory: "",
+      detailId: null,
+      detailData: null,
+      detailLoading: false,
+      detailError: "",
+      detailLoader: null,
+      routeListener: null,
     };
   },
   computed: {
+    detailLesson() {
+      if (!this.detailData) return null;
+      const lesson = this.lessons[this.detailId] || this.detailData.lesson;
+      return { ...lesson, available: availableSpace(lesson, this.cart) };
+    },
     visibleLessons() {
       return discoveryFilter(
         sortLessons(
@@ -147,6 +164,49 @@ createApp({
     formatPrice,
     category,
     artTone,
+    lessonHash,
+    async syncRoute() {
+      const route = lessonRoute(window.location.hash);
+      if (route.view !== "detail") {
+        this.detailLoader?.cancel();
+        // In-page catalogue anchors preserve all basket and filter state.
+        this.view = "catalogue";
+        if (window.location.hash === "#catalogue") this.focusView();
+        return;
+      }
+      this.view = "detail";
+      this.detailId = route.id;
+      this.detailData = null;
+      this.detailError = "";
+      this.detailLoading = true;
+      this.focusView();
+      if (!route.id || !this.detailLoader) {
+        this.detailLoading = false;
+        this.detailError = route.id
+          ? "The lesson service is unavailable. Please try again."
+          : "This lesson link is invalid.";
+        return;
+      }
+      try {
+        const result = await this.detailLoader.load(route.id);
+        if (!result) return;
+        this.detailData = result;
+        this.mergeLessons([result.lesson]);
+        this.detailLoading = false;
+        if (this.view === "detail") this.focusView();
+      } catch (error) {
+        this.detailError = error.message;
+        this.detailLoading = false;
+        if (error.status === 404) {
+          delete this.lessons[route.id];
+          this.resultIds = this.resultIds.filter((id) => id !== route.id);
+        }
+      }
+    },
+    browseTeacher(id) {
+      this.clearFilters();
+      this.teacherId = id;
+    },
     teacherNames(id) {
       return this.teachers
         .filter((teacher) => teacher.lessonIds.includes(id))
@@ -204,7 +264,7 @@ createApp({
       if (this.cartLocked) return;
       this.cart = changeCart(this.lessons, this.cart, id, -1);
       this.announcement = "One place removed from your basket.";
-      if (!this.cartCount) {
+      if (!this.cartCount && this.view === "cart") {
         this.view = "catalogue";
         this.focusView();
       }
@@ -212,13 +272,23 @@ createApp({
     focusView() {
       this.$nextTick(() =>
         document
-          .getElementById(this.view === "cart" ? "cart" : "catalogue")
+          .getElementById(
+            this.view === "detail"
+              ? "lesson-detail"
+              : this.view === "cart"
+                ? "cart"
+                : "catalogue",
+          )
           ?.focus(),
       );
     },
     toggleCart() {
       if (!this.cartCount && this.view !== "cart") return;
       this.view = this.view === "cart" ? "catalogue" : "cart";
+      if (window.location.hash.startsWith("#/lessons")) {
+        this.detailLoader?.cancel();
+        window.history.replaceState(null, "", "#catalogue");
+      }
       this.focusView();
     },
     mergeLessons(lessons) {
@@ -361,10 +431,20 @@ createApp({
       this.view = "cart";
     }
     this.loadLessons();
-    if (this.api) this.loadTeachers();
+    if (this.api) {
+      this.loadTeachers();
+      this.detailLoader = createLessonLoader(this.api);
+    }
+    this.routeListener = () => this.syncRoute();
+    window.addEventListener("hashchange", this.routeListener);
+    if (!this.attempt) this.syncRoute();
+    else if (window.location.hash.startsWith("#/lessons"))
+      window.history.replaceState(null, "", "#catalogue");
   },
   beforeUnmount() {
     clearTimeout(this.searchTimer);
     this.searchController?.abort();
+    this.detailLoader?.cancel();
+    window.removeEventListener("hashchange", this.routeListener);
   },
 }).mount("#app");

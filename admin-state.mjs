@@ -8,6 +8,10 @@ export function emptyLesson() {
     space: 5,
     image: "/images/art.svg",
     teacherIds: [],
+    description: "",
+    ageGroup: "",
+    durationMinutes: 60,
+    outcomesText: "",
   };
 }
 
@@ -41,6 +45,33 @@ export function lessonErrors(draft) {
     errors.space = "Enter a nonnegative whole number of spaces.";
   if (!/^\/images\/[a-z0-9-]+\.svg$/.test(draft.image))
     errors.image = "Choose a lesson illustration.";
+  if (
+    draft.description !== undefined &&
+    (typeof draft.description !== "string" ||
+      draft.description.trim().length > 2000)
+  )
+    errors.description = "Use up to 2,000 characters.";
+  if (
+    draft.ageGroup !== undefined &&
+    (typeof draft.ageGroup !== "string" || draft.ageGroup.trim().length > 60)
+  )
+    errors.ageGroup = "Use up to 60 characters.";
+  if (
+    draft.durationMinutes !== undefined &&
+    draft.durationMinutes !== "" &&
+    draft.durationMinutes !== null &&
+    (!Number.isInteger(Number(draft.durationMinutes)) ||
+      Number(draft.durationMinutes) < 1 ||
+      Number(draft.durationMinutes) > 480)
+  )
+    errors.durationMinutes = "Use 1–480 whole minutes, or leave blank.";
+  const outcomes = (draft.outcomesText || "")
+    .split("\n")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  if (outcomes.length > 8 || outcomes.some((value) => value.length > 160))
+    errors.outcomesText =
+      "Use up to eight outcomes, each up to 160 characters.";
   return errors;
 }
 
@@ -62,10 +93,21 @@ export function mutationAttempt(
       price: Number(draft.price),
       space: Number(draft.space),
       image: draft.image,
+      description: (draft.description || "").trim(),
+      ageGroup: (draft.ageGroup || "").trim(),
+      durationMinutes:
+        draft.durationMinutes === "" || draft.durationMinutes == null
+          ? null
+          : Number(draft.durationMinutes),
+      learningOutcomes: (draft.outcomesText || "")
+        .split("\n")
+        .map((value) => value.trim())
+        .filter(Boolean),
     };
     body.teacherIds = [...draft.teacherIds];
   }
   return {
+    entity: "lesson",
     action,
     method:
       action === "update" ? "PUT" : action === "delete" ? "DELETE" : "POST",
@@ -89,7 +131,14 @@ export function restoreAdminAttempt(storage) {
     };
     if (
       methods[value.action] !== value.method ||
-      !/^\/admin\/lessons(?:\/[a-f0-9]{24}(?:\/restore)?)?$/.test(value.path) ||
+      !/^\/admin\/(?:lessons|teachers)(?:\/[a-f0-9]{24}(?:\/restore)?)?$/.test(
+        value.path,
+      ) ||
+      !value.path.startsWith(
+        (value.entity || "lesson") === "teacher"
+          ? "/admin/teachers"
+          : "/admin/lessons",
+      ) ||
       !/^[a-f0-9-]{36}$/.test(value.body?.requestId)
     )
       throw new Error();
@@ -143,7 +192,7 @@ export function saveAdminAttempt(storage, attempt) {
     storage.setItem(ADMIN_ATTEMPT_KEY, JSON.stringify(attempt));
   } catch {
     throw new Error(
-      "Allow session storage to safely save and retry lesson changes.",
+      "Allow session storage to safely save and retry management changes.",
     );
   }
 }
@@ -154,16 +203,82 @@ export async function submitAdminAttempt(client, attempt) {
     body: attempt.body,
   });
   const expectedId = attempt.path.split("/")[3];
+  const entity = attempt.entity === "teacher" ? "teacher" : "lesson";
+  const record = result?.[entity];
   if (
-    !result?.lesson ||
-    !/^[a-f0-9]{24}$/i.test(result.lesson._id) ||
-    (expectedId && result.lesson._id !== expectedId) ||
-    result.lesson.revision !== (attempt.body.revision || 0) + 1 ||
-    result.lesson.deleted !== (attempt.action === "delete")
+    !record ||
+    !/^[a-f0-9]{24}$/i.test(record._id) ||
+    (expectedId && record._id !== expectedId) ||
+    record.revision !== (attempt.body.revision || 0) + 1 ||
+    record.deleted !== (attempt.action === "delete")
   ) {
     throw new Error(
-      "The lesson change could not be verified. Retry the saved request to check its status.",
+      "The management change could not be verified. Retry the saved request to check its status.",
     );
   }
   return result;
+}
+
+export function emptyTeacher() {
+  return {
+    firstName: "",
+    lastName: "",
+    specialism: "",
+    bio: "",
+    lessonIds: [],
+  };
+}
+export function teacherErrors(draft) {
+  const errors = {};
+  for (const key of ["firstName", "lastName"])
+    if (
+      typeof draft[key] !== "string" ||
+      !/^[\p{L}\p{M}][\p{L}\p{M}'’ -]{0,59}$/u.test(draft[key].trim())
+    )
+      errors[key] =
+        "Use letters, spaces, apostrophes or hyphens (up to 60 characters).";
+  for (const [key, max] of [
+    ["specialism", 100],
+    ["bio", 2000],
+  ])
+    if (typeof draft[key] !== "string" || draft[key].trim().length > max)
+      errors[key] = "Use up to " + max + " characters.";
+  if (
+    !Array.isArray(draft.lessonIds) ||
+    draft.lessonIds.length > 100 ||
+    new Set(draft.lessonIds).size !== draft.lessonIds.length
+  )
+    errors.lessonIds = "Choose up to 100 different lessons.";
+  return errors;
+}
+export function teacherMutationAttempt(
+  action,
+  teacher,
+  draft,
+  requestId = crypto.randomUUID(),
+) {
+  const body = { requestId };
+  if (action !== "create") body.revision = teacher.revision || 0;
+  if (["create", "update"].includes(action)) {
+    if (Object.keys(teacherErrors(draft)).length)
+      throw new Error("Check the highlighted teacher details.");
+    body.teacher = Object.fromEntries(
+      ["firstName", "lastName", "specialism", "bio"].map((key) => [
+        key,
+        draft[key].trim(),
+      ]),
+    );
+    body.lessonIds = [...draft.lessonIds];
+  }
+  return {
+    entity: "teacher",
+    action,
+    method:
+      action === "update" ? "PUT" : action === "delete" ? "DELETE" : "POST",
+    path:
+      "/admin/teachers" +
+      (teacher?._id ? "/" + teacher._id : "") +
+      (action === "restore" ? "/restore" : ""),
+    body,
+  };
 }

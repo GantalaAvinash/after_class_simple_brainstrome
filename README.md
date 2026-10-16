@@ -38,11 +38,19 @@ Open admin.html from the footer. admin-app.js is a separate Vue Options API entr
 
 admin-state.mjs holds the token in a closure, never in browser storage. The password is cleared after login attempts. Reload requires signing in again; expiry/401 clears access and logout revokes the server session. Only management mutation payloads and UUIDs persist in sessionStorage for retry recovery.
 
-The editor creates or updates all fields and teacher membership together. Revision checks stop stale forms overwriting purchases. A native confirmation dialog protects deletion; the Deleted lessons view supports restore. Insights display confirmed quantities, available places, saved-price booking value and audit events, with no customer contact details or payment processing.
+The lesson editor creates or updates core fields, programme overview, age guidance, duration, learning outcomes and teacher membership together. Revision checks stop stale forms overwriting purchases. A native confirmation dialog protects deletion; the Deleted lessons view supports restore. Insights display confirmed quantities, available places, saved-price booking value and audit events, with no customer contact details or payment processing.
 
 experience.css supplies the richer landing composition, activity cards, teacher credits and responsive layouts. discovery.mjs derives topic categories with a More to discover fallback. These client filters intersect after the required backend search. Saved IDs alone are held in localStorage. Cart quantities remain separate.
 
 Extension tests cover admin validation, revisions, memory-only access, session expiry, saved shortlists, combined discovery filters and bearer headers. Latest native Chrome review covers desktop, 375px phone and 768px tablet. The earlier 1024/1440 checks above predate this redesign.
+
+## Lesson details and teaching team
+
+Select a lesson title or Explore this lesson to open its shareable #/lessons/:id page. It displays programme content, learning outcomes, age guidance, duration, location, teacher profiles, availability and basket controls. Details and catalogue share the same cart owner. Direct reload retrieves the lesson again; ordinary browsing carts remain in memory. lesson-route.mjs validates IDs and cancels superseded requests; missing/deleted lessons show an explicit error. lesson-detail.css supplies the responsive layout.
+
+In Studio choose Teaching team, then Create teacher. Enter a first/last name, optional specialism and biography, and tick every lesson they teach. Edit profile & assignments changes that relationship from the teacher side; the lesson editor also supports teacher selection. Search profiles, filter deleted teachers, and restore them. Deleted profiles disappear publicly while their saved associations remain available for restoration. Changes use the existing protected session, revision checks, transaction and UUID retry mechanism.
+
+Names accept Unicode letters, spaces, apostrophes and hyphens. Profile content remains plain text rendered through Vue; no HTML is executed. Example seed profiles are explicitly fictitious. Assignment edits advance revisions on both sides so a stale editor cannot silently undo another change.
 
 ## GitHub Pages setup
 
