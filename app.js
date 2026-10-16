@@ -1,5 +1,6 @@
-/* global Vue */
-Vue.createApp({
+import { createApp } from './vendor/vue.esm-browser.prod.js';
+
+createApp({
   data() {
     return { lessons: [], loading: true, error: '' };
   },
