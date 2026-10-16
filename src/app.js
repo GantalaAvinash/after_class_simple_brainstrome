@@ -2,6 +2,7 @@ import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { cors, requestLogger } from './middleware.js';
 import { HttpError } from './errors.js';
+import { registerCatalogueRoutes } from './catalogue.js';
 
 export function createApp({ db, allowedOrigins, logger }) {
   const app = express();
@@ -23,10 +24,7 @@ export function createApp({ db, allowedOrigins, logger }) {
     }
   });
 
-  app.get('/lessons', async (_req, res) => {
-    const lessons = await db.collection('lesson').find({}).toArray();
-    res.json(lessons);
-  });
+  registerCatalogueRoutes(app, db);
 
   app.use((_req, res) => res.status(404).json({ error: 'Route not found.' }));
   app.use((error, _req, res, _next) => {
