@@ -1,0 +1,22 @@
+{
+  "lessons": [
+    { "_id": "100000000000000000000001", "topic": "Maths Explorers", "location": "Hendon", "price": 9, "space": 5, "image": "/images/maths.svg" },
+    { "_id": "100000000000000000000002", "topic": "Creative Writing", "location": "Colindale", "price": 15, "space": 5, "image": "/images/writing.svg" },
+    { "_id": "100000000000000000000003", "topic": "Coding Club", "location": "Brent Cross", "price": 25, "space": 5, "image": "/images/coding.svg" },
+    { "_id": "100000000000000000000004", "topic": "Drama Studio", "location": "Golders Green", "price": 18, "space": 5, "image": "/images/drama.svg" },
+    { "_id": "100000000000000000000005", "topic": "Science Lab", "location": "Hendon", "price": 30, "space": 5, "image": "/images/science.svg" },
+    { "_id": "100000000000000000000006", "topic": "Junior Chess", "location": "Colindale", "price": 12, "space": 5, "image": "/images/chess.svg" },
+    { "_id": "100000000000000000000007", "topic": "Art Workshop", "location": "Brent Cross", "price": 20, "space": 5, "image": "/images/art.svg" },
+    { "_id": "100000000000000000000008", "topic": "Guitar Basics", "location": "Golders Green", "price": 28, "space": 5, "image": "/images/guitar.svg" },
+    { "_id": "100000000000000000000009", "topic": "Football Skills", "location": "Hendon", "price": 16, "space": 5, "image": "/images/football.svg" },
+    { "_id": "10000000000000000000000a", "topic": "Ballet Beginners", "location": "Colindale", "price": 22, "space": 5, "image": "/images/ballet.svg" },
+    { "_id": "10000000000000000000000b", "topic": "French Discovery", "location": "Brent Cross", "price": 19, "space": 5, "image": "/images/french.svg" },
+    { "_id": "10000000000000000000000c", "topic": "Robotics Lab", "location": "Golders Green", "price": 100, "space": 5, "image": "/images/robotics.svg" }
+  ],
+  "teachers": [
+    { "_id": "200000000000000000000001", "firstName": "Mina", "lastName": "Patel", "lessonIds": ["100000000000000000000001", "100000000000000000000005", "100000000000000000000006"] },
+    { "_id": "200000000000000000000002", "firstName": "Theo", "lastName": "Reed", "lessonIds": ["100000000000000000000002", "100000000000000000000004", "10000000000000000000000b"] },
+    { "_id": "200000000000000000000003", "firstName": "Sarah", "lastName": "Khan", "lessonIds": ["100000000000000000000007", "100000000000000000000008", "10000000000000000000000a"] },
+    { "_id": "200000000000000000000004", "firstName": "Leo", "lastName": "Grant", "lessonIds": ["100000000000000000000003", "100000000000000000000009", "10000000000000000000000c"] }
+  ]
+}

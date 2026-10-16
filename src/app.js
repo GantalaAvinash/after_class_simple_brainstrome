@@ -1,0 +1,36 @@
+import express from 'express';
+import { cors, requestLogger } from './middleware.js';
+
+export function createApp({ db, allowedOrigins, logger }) {
+  const app = express();
+  app.disable('x-powered-by');
+  app.use(requestLogger(logger));
+  app.use(cors(allowedOrigins));
+  app.use(express.json({ limit: '20kb' }));
+
+  app.get('/health', async (_req, res) => {
+    try {
+      await db.command({ ping: 1 });
+      res.json({ status: 'ok', database: 'connected' });
+    } catch {
+      res.status(503).json({ error: 'The database is temporarily unavailable.' });
+    }
+  });
+
+  app.get('/lessons', async (_req, res) => {
+    const lessons = await db.collection('lesson').find({}).toArray();
+    res.json(lessons);
+  });
+
+  app.use((_req, res) => res.status(404).json({ error: 'Route not found.' }));
+  app.use((error, _req, res, _next) => {
+    if (error.type === 'entity.parse.failed') {
+      return res.status(400).json({ error: 'The request body must be valid JSON.' });
+    }
+    if (error.type === 'entity.too.large') {
+      return res.status(413).json({ error: 'The request body is too large.' });
+    }
+    res.status(500).json({ error: 'The request could not be completed.' });
+  });
+  return app;
+}
