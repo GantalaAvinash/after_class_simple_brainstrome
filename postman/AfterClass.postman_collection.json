@@ -1,0 +1,485 @@
+{
+  "info": {
+    "name": "AfterClass CST3144",
+    "description": "Import into Postman. Set baseUrl to the real Render service for the assessed demonstration. Mutating requests change persistent data: practise against a test database first. Run New order before Confirm order. Seed IDs are included. No credentials are exported.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "lessonId",
+      "value": "100000000000000000000001"
+    },
+    {
+      "key": "teacherId",
+      "value": "200000000000000000000001"
+    },
+    {
+      "key": "requestId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "orderUpdates",
+      "value": "[]"
+    }
+  ],
+  "item": [
+    {
+      "name": "Core API and checkout",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "All lessons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/lessons"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                  "pm.test(\"At least ten lessons\", () => pm.expect(pm.response.json().length).to.be.at.least(10));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "New order — saves pending order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/orders",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava\",\n  \"phone\": \"007123456\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"requestId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(201));",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"orderId\", data.orderId);",
+                  "pm.collectionVariables.set(\"orderUpdates\", JSON.stringify(data.updates));",
+                  "pm.test(\"Pending order\", () => pm.expect(data.status).to.equal(\"pending\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirm order — absolute space PUT",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/lessons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"orderId\":\"{{orderId}}\",\"updates\":{{orderUpdates}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Confirmed order\", () => pm.expect(pm.response.json().status).to.equal(\"confirmed\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Replay the same POST — no duplicate order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/orders",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava\",\n  \"phone\": \"007123456\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Same order ID\", () => pm.expect(pm.response.json().orderId).to.equal(pm.collectionVariables.get(\"orderId\")));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Challenges",
+      "item": [
+        {
+          "name": "Search all four fields — numeric example",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/lessons?q=9"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Case-insensitive location search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/lessons?q=HENDON"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teachers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/teachers"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lessons taught by Mina Patel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/lessons?teacherId={{teacherId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Combined teacher and search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/lessons?teacherId={{teacherId}}&q=math"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enrolment — confirmed purchased quantities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/enrolment/{{lessonId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Nonnegative enrolment\", () => pm.expect(pm.response.json().enrolment).to.be.at.least(0));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Manual attribute update — changes persistent stock",
+      "item": [
+        {
+          "name": "Set absolute spaces to 5 and price to 9",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/lessons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"updates\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"changes\": {\n        \"space\": 5,\n        \"price\": 9\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Middleware and invalid requests",
+      "item": [
+        {
+          "name": "Existing image",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/images/maths.svg"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Missing image",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/images/not-present.svg"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Malformed lesson ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/enrolment/bad-id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid name",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/orders",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava2\",\n  \"phone\": \"007123456\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forbidden field update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/lessons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"updates\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"changes\": {\n        \"_id\": \"forbidden\"\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
