@@ -1,36 +1,48 @@
-# AfterClass frontend — foundation milestone
+# AfterClass frontend
 
-This is a staged CST3144 implementation, not a complete coursework submission.
+Vue 3.5.44 standalone browser ESM, Options API, plain JavaScript and CSS. There is no build step and no frontend JavaScript library beyond Vue.
 
-## Current behaviour
+## Local use
 
-Vue 3.5.44's production browser build is pinned in `index.html`. The Options API manages loading, error, empty-result, and lesson-list states. The list uses `v-for`; the retry button uses `v-on`. Data is retrieved using native promise-based `fetch`, not Axios or XMLHttpRequest.
+The real application requires the configured Express/Atlas backend. Serve this folder:
 
-Sorting, cart, checkout, teacher filtering, search, and final lesson images are pending later reviewed stages.
-
-## Run locally
-
-Start the configured backend first. From this folder run:
-
-```sh
+~~~sh
 python3 -m http.server 8080 --bind 127.0.0.1
-```
+~~~
 
-Open `http://127.0.0.1:8080`. With a blank `apiBaseUrl` in `config.js`, localhost development uses `http://localhost:3000`.
+Open http://127.0.0.1:8080. Blank apiBaseUrl in config.js uses http://localhost:3000 only during localhost development.
+
+For a separate, explicitly labelled fixture preview, run npm run preview:test from the sibling backend folder and open http://127.0.0.1:8081. This is test data, not an assessment deployment or MongoDB substitute.
+
+## Tests
+
+~~~sh
+node --test test/*.test.mjs
+~~~
+
+Tests cover eight sort combinations, numeric comparisons, cart capacity/removal, contact validation, request errors, persistence and lost-response retries. Manual Chrome checks cover a complete fixture purchase, numeric search plus teacher filtering, enrolment, empty-cart behaviour, and layouts at 375/768/1024/1440 pixels. See the workspace verification log for limits.
+
+## Behaviour
+
+- state.mjs derives sorted lessons and displayed availability without mutating server stock. Cart quantities are independent of the currently filtered results.
+- api.mjs uses promise-based fetch, checks HTTP success, retains error status for recovery, and supports cancellation and a 90-second timeout for cold starts.
+- checkout.mjs saves a checkout request ID before submission and retries the same order. Only an unfinished checkout is saved in session storage; ordinary browsing carts are in memory.
+- app.js connects these functions with Vue computed state, methods, watchers and lifecycle hooks. Version checks and cancellation prevent an old search response overwriting a newer one.
+- Search uses stored server availability. Unsaved basket selections do not reserve database places.
+- Names contain A–Z letters only; phones contain digits only, preserving leading zeros. The form follows the brief's literal rule.
+- Uncertain submissions lock basket/contact edits until retried. Confirmed orders clear the cart; definitive input or stock conflicts preserve the basket for correction.
 
 ## GitHub Pages
 
-Set the public `apiBaseUrl` in `config.js` to the actual HTTPS Render address. Do not enter database credentials here. Publish the separate frontend repository's `main` branch and root folder. `index.html`, relative asset references, and `.nojekyll` are already present.
+Set config.js apiBaseUrl to the actual HTTPS Render origin. Publish this repository's main branch and root folder. Relative paths and .nojekyll support project Pages URLs. The production configuration must not enable testPreview.
 
-The repository URL and GitHub Pages URL have not yet been created or verified.
+Configure the backend's FRONTEND_ORIGINS as the GitHub Pages origin without a repository path, for example https://ACCOUNT.github.io. Do not store database credentials in this frontend.
 
-## Third-party software
+## Attribution
 
-- Vue 3.5.44: https://vuejs.org/ — MIT licence: https://github.com/vuejs/core/blob/main/LICENSE
-- Pinned production script: https://cdn.jsdelivr.net/npm/vue@3.5.44/dist/vue.global.prod.js
+- Vue 3.5.44: official npm browser runtime, locally vendored. Source/integrity: vendor/VERSION.md; MIT licence: vendor/LICENSE.vue.
+- Lesson SVGs are served by the backend and attributed there.
+- favicon.svg is the unmodified Lucide palette SVG from version 0.468.0, under the ISC licence in vendor/LICENSE.lucide.
+- No remote font service, CSS framework, icon JavaScript library, or generated raster image is required.
 
-There are no third-party lesson images in this milestone. Seeded image paths identify assets still to be added and checked.
-
-## Explanation check
-
-Before the next implementation stage, explain what `mounted`, `data`, `v-for`, `v-on`, `await fetch`, and `response.ok` do, and trace one request through Express to Atlas.
+The workspace AI_ACKNOWLEDGEMENT.md records actual assistance. Student explanation review and real hosted verification remain pending.
