@@ -1,6 +1,7 @@
 import { createApp } from './vendor/vue.esm-browser.prod.js';
 import { createApi, resolveApiBase } from './api.mjs';
-import { sortLessons, formatPrice, changeCart, cartLines } from './state.mjs';
+import { sortLessons, formatPrice, changeCart, cartLines, contactErrors } from './state.mjs';
+import { createAttempt, restoreAttempt, saveAttempt, submitAttempt, STORAGE_KEY } from './checkout.mjs';
 
 createApp({
   data() {
@@ -8,6 +9,8 @@ createApp({
       lessons: {}, resultIds: [], cart: {}, loading: true, error: '', api: null, apiBase: '',
       sortField: 'topic', sortDirection: 'asc', announcement: '',
       view: 'catalogue', busy: false,
+      name: '', phone: '', touched: false, checkoutError: '', confirmation: '',
+      attempt: null, storage: null,
     };
   },
   computed: {
@@ -18,18 +21,23 @@ createApp({
     cartCount() { return this.cartItems.reduce((sum, item) => sum + item.quantity, 0); },
     cartTotal() { return this.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0); },
     cartConflict() { return this.cartItems.some((item) => item.missing || item.quantity > item.space); },
+    contactError() { return contactErrors(this.name, this.phone); },
+    cartLocked() { return this.busy || Boolean(this.attempt); },
+    canCheckout() {
+      return this.cartCount > 0 && !this.busy && !this.contactError.name && !this.contactError.phone && (Boolean(this.attempt) || !this.cartConflict);
+    },
   },
   methods: {
     formatPrice,
     imageUrl(path) { return this.apiBase + path; },
     addPlace(id) {
-      if (this.busy) return;
+      if (this.cartLocked) return;
       const before = this.cart[id] || 0;
       this.cart = changeCart(this.lessons, this.cart, id, 1);
       if (this.cart[id] !== before) this.announcement = 'One place for ' + this.lessons[id].topic + ' added to your basket.';
     },
     removePlace(id) {
-      if (this.busy) return;
+      if (this.cartLocked) return;
       this.cart = changeCart(this.lessons, this.cart, id, -1);
       this.announcement = 'One place removed from your basket.';
       if (!this.cartCount) { this.view = 'catalogue'; this.focusView(); }
@@ -42,6 +50,45 @@ createApp({
       this.view = this.view === 'cart' ? 'catalogue' : 'cart';
       this.focusView();
     },
+    mergeLessons(lessons) {
+      if (!Array.isArray(lessons)) throw new Error('The lesson service returned an unexpected response.');
+      for (const lesson of lessons) this.lessons[lesson._id] = lesson;
+    },
+    async refreshAll() { this.mergeLessons(await this.api('/lessons')); },
+    forgetAttempt() {
+      this.attempt = null;
+      try { this.storage?.removeItem(STORAGE_KEY); } catch { this.announcement = 'Your browser could not clear the saved checkout.'; }
+    },
+    async checkout() {
+      this.touched = true;
+      if (!this.canCheckout) return;
+      this.busy = true;
+      this.checkoutError = '';
+      try {
+        if (!this.attempt) {
+          const attempt = createAttempt(this.name, this.phone, this.cartItems);
+          saveAttempt(this.storage, attempt);
+          this.attempt = attempt;
+        }
+        const result = await submitAttempt(this.api, this.attempt, (attempt) => saveAttempt(this.storage, attempt));
+        if (result.lessons) this.mergeLessons(result.lessons);
+        this.forgetAttempt();
+        this.cart = {};
+        this.name = ''; this.phone = ''; this.touched = false;
+        this.confirmation = 'Your order has been submitted. Reference: ' + result.orderId;
+        this.announcement = this.confirmation;
+        this.view = 'catalogue';
+        this.focusView();
+        try { await this.refreshAll(); await this.loadLessons(); }
+        catch { this.error = 'Your order is confirmed, but activities could not be refreshed. Please try again.'; }
+      } catch (error) {
+        this.checkoutError = error.message;
+        if ([400, 404, 409].includes(error.status)) {
+          this.forgetAttempt();
+          try { await this.refreshAll(); } catch { /* Preserve the checkout error and basket. */ }
+        }
+      } finally { this.busy = false; }
+    },
     async loadLessons() {
       this.loading = true;
       this.error = '';
@@ -49,12 +96,21 @@ createApp({
         this.apiBase = resolveApiBase(window.AFTERCLASS_CONFIG?.apiBaseUrl, window.location);
         this.api ||= createApi(this.apiBase);
         const lessons = await this.api('/lessons');
-        if (!Array.isArray(lessons)) throw new Error('The lesson service returned an unexpected response.');
-        for (const lesson of lessons) this.lessons[lesson._id] = lesson;
+        this.mergeLessons(lessons);
         this.resultIds = lessons.map((lesson) => lesson._id);
       } catch (error) { this.error = error.message; }
       finally { this.loading = false; }
     },
   },
-  mounted() { this.loadLessons(); },
+  mounted() {
+    try { this.storage = window.sessionStorage; } catch { /* Checkout reports unavailable storage on submit. */ }
+    if (this.storage) this.attempt = restoreAttempt(this.storage);
+    if (this.attempt) {
+      this.name = this.attempt.payload.name;
+      this.phone = this.attempt.payload.phone;
+      this.cart = Object.fromEntries(this.attempt.payload.items.map((item) => [item.lessonId, item.quantity]));
+      this.view = 'cart';
+    }
+    this.loadLessons();
+  },
 }).mount('#app');

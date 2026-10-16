@@ -24,13 +24,15 @@ export function restoreAttempt(storage) {
     if (!attempt) return null;
     const body = attempt.payload;
     const errors = contactErrors(body?.name, body?.phone);
-    if (attempt.version !== 1 || errors.name || errors.phone || !/^[a-f0-9-]{36}$/i.test(body.requestId) || !Array.isArray(body.items) || !body.items.length ||
+    if (attempt.version !== 1 || errors.name || errors.phone || !/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId) || !Array.isArray(body.items) || !body.items.length || body.items.length > 100 ||
       !body.items.every((item) => validId(item.lessonId) && Number.isSafeInteger(item.quantity) && item.quantity > 0) ||
       new Set(body.items.map((item) => item.lessonId)).size !== body.items.length) throw new Error('Invalid stored checkout');
     // Re-fetch by the same requestId after reload; storage is not authoritative
     // for the order's status or the server's proposed stock values.
-    attempt.order = null;
-    return attempt;
+    return { version: 1, order: null, payload: {
+      requestId: body.requestId, name: body.name.trim(), phone: body.phone.trim(),
+      items: body.items.map((item) => ({ lessonId: item.lessonId, quantity: item.quantity })),
+    } };
   } catch {
     try { storage.removeItem(STORAGE_KEY); } catch { /* Storage may be blocked. */ }
     return null;
