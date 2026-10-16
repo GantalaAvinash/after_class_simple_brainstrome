@@ -220,21 +220,85 @@ test("login throttling includes invalid usernames and is shared through the data
   assert.ok(Number(blocked.headers.get("retry-after")) > 0);
 });
 
-test('teacher management is protected and its assignment appears on public lesson details', async t => {
-  const {request} = await setup(t);
-  for (const [path,method] of [['/admin/teachers','GET'],['/admin/teachers','POST'],['/admin/teachers/200000000000000000000001','PUT'],['/admin/teachers/200000000000000000000001','DELETE'],['/admin/teachers/200000000000000000000001/restore','POST']]) assert.equal((await request(path,method,method === 'GET' ? undefined : {})).status,401);
-  assert.equal((await request('/lessons/bad')).status,400);
-  assert.equal((await request('/lessons/ffffffffffffffffffffffff')).status,404);
-  const {data:{token}} = await request('/admin/session','POST',{username:'operator',password});
-  const body = {requestId:crypto.randomUUID(),teacher:{firstName:'Alex',lastName:'Morgan',specialism:'Creative technology',bio:'Fictitious teacher profile.'},lessonIds:['100000000000000000000003']};
-  const created = await request('/admin/teachers','POST',body,token);
-  assert.equal(created.status,201);
+test("teacher management is protected and its assignment appears on public lesson details", async (t) => {
+  const { request } = await setup(t);
+  for (const [path, method] of [
+    ["/admin/teachers", "GET"],
+    ["/admin/teachers", "POST"],
+    ["/admin/teachers/200000000000000000000001", "PUT"],
+    ["/admin/teachers/200000000000000000000001", "DELETE"],
+    ["/admin/teachers/200000000000000000000001/restore", "POST"],
+  ])
+    assert.equal(
+      (await request(path, method, method === "GET" ? undefined : {})).status,
+      401,
+    );
+  assert.equal((await request("/lessons/bad")).status, 400);
+  assert.equal(
+    (await request("/lessons/ffffffffffffffffffffffff")).status,
+    404,
+  );
+  const {
+    data: { token },
+  } = await request("/admin/session", "POST", {
+    username: "operator",
+    password,
+  });
+  const body = {
+    requestId: crypto.randomUUID(),
+    teacher: {
+      firstName: "Alex",
+      lastName: "Morgan",
+      specialism: "Creative technology",
+      bio: "Fictitious teacher profile.",
+    },
+    lessonIds: ["100000000000000000000003"],
+  };
+  const created = await request("/admin/teachers", "POST", body, token);
+  assert.equal(created.status, 201);
   const id = created.data.teacher._id;
-  assert.ok((await request('/lessons/100000000000000000000003')).data.teachers.some(t => t._id === id));
-  assert.equal((await request('/admin/teachers/'+id,'PUT',{...body,requestId:crypto.randomUUID(),revision:1,lessonIds:[]},token)).status,200);
-  assert.equal((await request('/admin/teachers/'+id,'DELETE',{requestId:crypto.randomUUID(),revision:2},token)).status,200);
-  assert.equal((await request('/admin/teachers/'+id+'/restore','POST',{requestId:crypto.randomUUID(),revision:3},token)).status,200);
-  assert.equal((await request('/admin/teachers','GET',undefined,token)).data.length,5);
+  assert.ok(
+    (await request("/lessons/100000000000000000000003")).data.teachers.some(
+      (t) => t._id === id,
+    ),
+  );
+  assert.equal(
+    (
+      await request(
+        "/admin/teachers/" + id,
+        "PUT",
+        { ...body, requestId: crypto.randomUUID(), revision: 1, lessonIds: [] },
+        token,
+      )
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await request(
+        "/admin/teachers/" + id,
+        "DELETE",
+        { requestId: crypto.randomUUID(), revision: 2 },
+        token,
+      )
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await request(
+        "/admin/teachers/" + id + "/restore",
+        "POST",
+        { requestId: crypto.randomUUID(), revision: 3 },
+        token,
+      )
+    ).status,
+    200,
+  );
+  assert.equal(
+    (await request("/admin/teachers", "GET", undefined, token)).data.length,
+    5,
+  );
 });
 
 test("credential rotation invalidates sessions even before their expiry", async () => {

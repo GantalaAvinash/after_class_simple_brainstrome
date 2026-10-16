@@ -12,7 +12,7 @@
     "seed:details": "node --env-file-if-exists=.env scripts/seed-details.js",
     "check:atlas": "node --env-file-if-exists=.env scripts/check-atlas.js",
     "test": "node --test test/*.test.js",
-    "test:atlas": "node --env-file-if-exists=.env --test test/atlas.test.js test/admin-atlas.test.js",
+    "test:atlas": "node --env-file-if-exists=.env --test test/atlas.test.js test/admin-atlas.test.js test/teachers-atlas.test.js",
     "preview:test": "node --env-file-if-exists=.env support/preview.js",
     "admin:setup": "node scripts/setup-admin.js",
     "postman": "node scripts/generate-postman.js",

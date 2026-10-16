@@ -15,8 +15,10 @@ export async function listAdminLessons(db, session) {
       ...lesson,
       revision: lesson.revision || 0,
       teacherIds: teachers
-        .filter((teacher) =>
-          teacher.deleted !== true && teacher.lessonIds.some((id) => id.equals(lesson._id)),
+        .filter(
+          (teacher) =>
+            teacher.deleted !== true &&
+            teacher.lessonIds.some((id) => id.equals(lesson._id)),
         )
         .map((teacher) => teacher._id),
     }))
@@ -73,7 +75,10 @@ export async function mutateLesson(db, client, username, action, id, body) {
       if (input.teacherIds)
         for (const teacherId of input.teacherIds) {
           requireValue(
-            teachers.some((teacher) => teacher.deleted !== true && teacher._id.equals(teacherId)),
+            teachers.some(
+              (teacher) =>
+                teacher.deleted !== true && teacher._id.equals(teacherId),
+            ),
             "A selected teacher was not found.",
             404,
           );
@@ -123,7 +128,10 @@ export async function mutateLesson(db, client, username, action, id, body) {
               .collection("teacher")
               .updateOne(
                 { _id: teacher._id },
-                { $set: { lessonIds: ids, updatedAt: now }, $inc: { revision: 1 } },
+                {
+                  $set: { lessonIds: ids, updatedAt: now },
+                  $inc: { revision: 1 },
+                },
                 { session },
               );
           }
@@ -131,8 +139,10 @@ export async function mutateLesson(db, client, username, action, id, body) {
       const teacherIds =
         input.teacherIds ||
         teachers
-          .filter((teacher) =>
-            teacher.deleted !== true && teacher.lessonIds.some((value) => value.equals(lessonId)),
+          .filter(
+            (teacher) =>
+              teacher.deleted !== true &&
+              teacher.lessonIds.some((value) => value.equals(lessonId)),
           )
           .map((teacher) => teacher._id);
       const result = { lesson: { ...after, teacherIds } };

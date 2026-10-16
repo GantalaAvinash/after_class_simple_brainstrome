@@ -77,6 +77,12 @@ const savedLesson = (code = 200) => [
   'pm.collectionVariables.set("adminLessonId", lesson._id);',
   'pm.collectionVariables.set("adminRevision", lesson.revision);',
 ];
+const savedTeacher = (code = 200) => [
+  ...status(code),
+  "const teacher = pm.response.json().teacher;",
+  'pm.collectionVariables.set("managedTeacherId", teacher._id);',
+  'pm.collectionVariables.set("teacherRevision", teacher.revision);',
+];
 const collection = {
   info: {
     name: "AfterClass CST3144",
@@ -96,12 +102,24 @@ const collection = {
     { key: "adminLessonId", value: "" },
     { key: "adminRevision", value: "0" },
     { key: "adminRequestId", value: "" },
+    { key: "managedTeacherId", value: "" },
+    { key: "teacherRevision", value: "0" },
   ],
   item: [
     {
       name: "Core API and checkout",
       item: [
         request("Health", "GET", "/health"),
+        request(
+          "Lesson detail and teaching team",
+          "GET",
+          "/lessons/{{lessonId}}",
+          undefined,
+          [
+            ...status(200),
+            'pm.test("Detail includes lesson and teachers", () => { const data = pm.response.json(); pm.expect(data.lesson._id).to.equal(pm.collectionVariables.get("lessonId")); pm.expect(data.teachers).to.be.an("array"); });',
+          ],
+        ),
         request("All lessons", "GET", "/lessons", undefined, [
           ...array,
           'pm.test("At least ten lessons", () => pm.expect(pm.response.json().length).to.be.at.least(10));',
@@ -268,6 +286,73 @@ const collection = {
           status(400),
         ),
         protectedRequest(
+          "Manage teaching team",
+          "GET",
+          "/admin/teachers",
+          undefined,
+          array,
+        ),
+        protectedRequest(
+          "Create and assign a teacher",
+          "POST",
+          "/admin/teachers",
+          {
+            requestId: "{{adminRequestId}}",
+            teacher: {
+              firstName: "Alex",
+              lastName: "Morgan",
+              specialism: "Creative technology",
+              bio: "Fictitious Postman verification profile.",
+            },
+            lessonIds: ["{{adminLessonId}}"],
+          },
+          savedTeacher(201),
+          freshAdminId,
+        ),
+        protectedRequest(
+          "Replay teacher create",
+          "POST",
+          "/admin/teachers",
+          {
+            requestId: "{{adminRequestId}}",
+            teacher: {
+              firstName: "Alex",
+              lastName: "Morgan",
+              specialism: "Creative technology",
+              bio: "Fictitious Postman verification profile.",
+            },
+            lessonIds: ["{{adminLessonId}}"],
+          },
+          [
+            ...status(201),
+            'pm.test("Same teacher on replay", () => pm.expect(pm.response.json().teacher._id).to.equal(pm.collectionVariables.get("managedTeacherId")));',
+          ],
+        ),
+        protectedRequest(
+          "Edit teacher and assignments",
+          "PUT",
+          "/admin/teachers/{{managedTeacherId}}",
+          '{"requestId":"{{adminRequestId}}","revision":{{teacherRevision}},"teacher":{"firstName":"Alex","lastName":"Morgan","specialism":"Creative coding","bio":"Updated fictitious verification profile."},"lessonIds":["{{adminLessonId}}","{{lessonId}}"]}',
+          savedTeacher(),
+          freshAdminId,
+        ),
+        protectedRequest(
+          "Delete teacher — retain associations for restore",
+          "DELETE",
+          "/admin/teachers/{{managedTeacherId}}",
+          '{"requestId":"{{adminRequestId}}","revision":{{teacherRevision}}}',
+          savedTeacher(),
+          freshAdminId,
+        ),
+        protectedRequest(
+          "Restore teacher",
+          "POST",
+          "/admin/teachers/{{managedTeacherId}}/restore",
+          '{"requestId":"{{adminRequestId}}","revision":{{teacherRevision}}}',
+          savedTeacher(),
+          freshAdminId,
+        ),
+        protectedRequest(
           "Sign out and clear local token",
           "DELETE",
           "/admin/session",
@@ -278,6 +363,13 @@ const collection = {
           "Anonymous management denied",
           "GET",
           "/admin/lessons",
+          undefined,
+          status(401),
+        ),
+        request(
+          "Anonymous teacher management denied",
+          "GET",
+          "/admin/teachers",
           undefined,
           status(401),
         ),

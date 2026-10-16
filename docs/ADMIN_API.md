@@ -25,6 +25,11 @@ Browser tokens live only in a JavaScript closure, with no cookie, localStorage o
 | PUT /admin/lessons/:id | Full create body plus `revision` | 200 `{lesson}` | 400 invalid DTO/ID; 401 invalid session; 404 missing record/teacher; 409 stale revision/deleted record/request-ID conflict |
 | DELETE /admin/lessons/:id | `{requestId,revision}` | 200 `{lesson}` with `deleted:true` | 400 invalid DTO/ID; 401 invalid session; 404 missing record; 409 stale revision/already deleted/request-ID conflict |
 | POST /admin/lessons/:id/restore | `{requestId,revision}` | 200 `{lesson}` with `deleted:false` | 400 invalid DTO/ID; 401 invalid session; 404 missing record; 409 stale revision/already active/request-ID conflict |
+| GET /admin/teachers | Bearer header | 200 teacher array including deleted profiles and revisions | 401 invalid session |
+| POST /admin/teachers | Teacher create body below | 201 `{teacher}`; exact UUID replay returns original result | 400 invalid fields; 401 invalid session; 404 missing lesson; 409 UUID conflict |
+| PUT /admin/teachers/:id | Full teacher create body plus `revision` | 200 `{teacher}` | 400 invalid fields/ID; 401 invalid session; 404 missing record/lesson; 409 stale revision/deleted profile/UUID conflict |
+| DELETE /admin/teachers/:id | `{requestId,revision}` | 200 `{teacher}` with `deleted:true` | 400 invalid request/ID; 401 invalid session; 404 missing record; 409 stale/already deleted/UUID conflict |
+| POST /admin/teachers/:id/restore | `{requestId,revision}` | 200 `{teacher}` with `deleted:false` | 400 invalid request/ID; 401 invalid session; 404 missing record/lesson; 409 stale/already active/UUID conflict |
 | PUT /lessons (no orderId) | Existing coursework batch DTO, Bearer header | 200 `{lessons}`; absolute values, all editable fields | 400 invalid DTO; 401 invalid session; 404 missing/deleted lesson; 409 write conflict |
 
 All routes can also return 403 for a disallowed browser Origin, 413 for a JSON body above 20KB, safe 500 for unexpected database failures, or 503 when transactional writes cannot start. Errors are `{error: "Readable message."}`. Identifiers are native MongoDB ObjectIds represented as 24-character hexadecimal strings on the wire. No customer names or phones are returned by overview.
@@ -39,7 +44,27 @@ Create example:
 }
 ```
 
-Update the complete editable lesson fields and current teacher membership together. Subject/location are nonempty text up to 100 characters; price is nonnegative with at most two decimal places; spaces are a nonnegative safe integer. Images must be one of the twelve supplied SVG paths. Arbitrary fields, URLs and MongoDB operators are rejected. Teacher IDs must exist and be unique. Empty teacher membership is permitted.
+Update the complete editable lesson fields and current teacher membership together. Subject/location are nonempty text up to 100 characters; price is nonnegative with at most two decimal places; spaces are a nonnegative safe integer. Images must be one of the twelve supplied SVG paths. Arbitrary fields, URLs and MongoDB operators are rejected. Teacher IDs must exist, be active and be unique. Empty teacher membership is permitted.
+
+## Detail content and teacher contracts
+
+Optional editable lesson fields: description (plain text up to 2,000 characters), ageGroup (up to 60), durationMinutes (integer 1–480 or null), learningOutcomes (up to eight nonempty strings, each up to 160). Empty text/arrays intentionally clear content. Existing records can omit these fields; public pages show a missing-content state. Public `GET /lessons/:id` returns `{lesson,teachers}` for active lessons; invalid IDs return 400 and missing/deleted lessons return 404. Public `GET /teachers` excludes deleted profiles; a deleted teacher filter returns 404.
+
+Teacher create example; updates add the current revision and send the full profile/assignment set:
+
+```json
+{
+  "requestId": "00000000-0000-4000-8000-000000000003",
+  "teacher": {"firstName":"Alex","lastName":"Morgan","specialism":"Creative technology","bio":"A fictitious example profile."},
+  "lessonIds": ["100000000000000000000003"]
+}
+```
+
+First/last names are required, up to 60 characters with Unicode letters/marks, spaces, apostrophes and hyphens. Optional specialism is up to 100 characters and bio up to 2,000. All are plain text. Choose up to 100 unique existing lesson IDs; deleted lesson associations may be retained but never expose deleted lessons publicly. Delete/restore accepts only requestId and revision.
+
+Teacher membership has one owner: teacher.lessonIds. Lesson views derive teacher IDs. Changes to membership on either editor advance the affected record revisions on the other side. Native transaction conflicts and expected revisions prevent two stale forms silently overwriting assignments. Teacher changes never set spaces, prices or order history. Soft deletion hides the teacher publicly, retains associations, and restore makes the active memberships visible again.
+
+For older seeded databases, `npm run seed:details` fills only missing descriptive fields, not authored blanks, spaces, associations or orders. It is scoped to existing seed IDs and advances changed revisions. It has been tested against the adapter; it has not been run on Atlas.
 
 ## Transactions, revisions and recovery
 
@@ -49,7 +74,7 @@ The admin audit UUID is a unique operation key. An audit entry and its lesson/te
 
 Delete is a soft deletion: public GET/search/teacher results exclude the record; new orders reject it. Confirmation checks deletion, expected stock and saved unit price inside the transaction. Deleting or changing price during an unfinished checkout produces a conflict with no partial stock deductions. Confirmed-order replay never deducts again. Enrolment remains based on confirmed quantities and can be queried for a deleted lesson. Restore preserves stock, history and teacher membership.
 
-`adminAudit` records operator, operation, time and lesson changes. `adminSession` contains token digests, never plaintext tokens; `adminLoginAttempt` contains counters. Both operational collections are excluded from Atlas exports and refused by packaging. `adminAudit` remains assessment evidence. No customer contact details, password hashes or bearer tokens are placed in audit records or request logs.
+`adminAudit` records operator, operation, time, lesson changes and teacher profile/assignment changes. `adminSession` contains token digests, never plaintext tokens; `adminLoginAttempt` contains counters. Both operational collections are excluded from Atlas exports and refused by packaging. `adminAudit` remains assessment evidence. No customer contact details, password hashes or bearer tokens are placed in audit records or request logs.
 
 Overview is a small-catalogue reporting read, not a transactional accounting statement. It excludes pending orders and calculates booking value from saved unit prices using integer pence. It may reflect adjacent concurrent reads while bookings are happening; refresh for the latest view. No payment is taken by this fictitious service.
 
@@ -57,6 +82,6 @@ Overview is a small-catalogue reporting read, not a transactional accounting sta
 
 `npm test` verifies sessions, permissions, revisions, replay, CRUD, associations, rollback, price conflicts, history and export exclusions using an explicit adapter and real HTTP. `npm run test:atlas` runs isolated native MongoDB concurrency/rollback tests only with a separate `_test` database configured. These are distinct levels of evidence; local adapter passes do not prove Atlas behaviour.
 
-This is an educational single-operator implementation, not a claim of external security certification. The coursework stack is preserved. Architecture decision: [001-admin-extension.md](adr/001-admin-extension.md).
+This is an educational single-operator implementation, not a claim of external security certification. The coursework stack is preserved. Architecture decisions: [001-admin-extension.md](adr/001-admin-extension.md) and [002-details-and-teachers.md](adr/002-details-and-teachers.md).
 
 Implementation references: [Node crypto](https://nodejs.org/docs/latest-v24.x/api/crypto.html), [OWASP password storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html), [OWASP session management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html), [MongoDB compound operations](https://www.mongodb.com/docs/drivers/node/current/crud/compound-operations/).
