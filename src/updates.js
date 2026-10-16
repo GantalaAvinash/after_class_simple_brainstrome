@@ -66,6 +66,11 @@ export async function confirmOrder(db, client, orderId, updates) {
   });
 }
 
-export function registerUpdateRoute(app, db, client) {
-  app.put('/lessons', async (req, res) => res.json(await updateLessons(db, client, req.body)));
+export function registerUpdateRoute(app, db, client, guard) {
+  app.put('/lessons', async (req, res, next) => {
+    // An order ID never grants arbitrary edit permission: confirmOrder checks
+    // the complete, saved set of absolute space targets before writing.
+    if (req.body?.orderId !== undefined) return next();
+    await guard(req, res, next);
+  }, async (req, res) => res.json(await updateLessons(db, client, req.body)));
 }

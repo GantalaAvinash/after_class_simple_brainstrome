@@ -1,0 +1,16 @@
+# 001 — Protected administration within the coursework stack
+
+Accepted 16 October 2026. The user authorises lesson administration and a richer interface while retaining Vue Options API, native fetch, Express and the native MongoDB driver.
+
+1. **Ownership:** lesson management owns catalogue changes; checkout owns purchased quantities. Lesson states are active → deleted → active (restore). Deletion is reversible and never erases order history.
+2. **Events:** no broker, worker or event consumers are introduced. Admin mutations and their audit records commit in one native MongoDB transaction.
+3. **API:** `/admin/session` creates/revokes a short-lived opaque bearer session. `/admin/lessons` lists/creates; `/admin/lessons/:id` updates/deletes; `/admin/lessons/:id/restore` restores. `/admin/overview` returns aggregate booking data without customer names/phones. General `PUT /lessons` now requires admin authorisation; complete order confirmation remains public and strictly constrained.
+4. **Documentation:** the API contract and Postman collection document success, validation, unauthorised, unavailable, missing and conflict responses. Nest decorators, Scalar containers and three enterprise audience specs do not apply to this Express coursework app and are deliberately excluded.
+5. **Security:** salted scrypt password hash in environment only; random tokens stored hashed in MongoDB, held only in browser memory; server expiry/revocation and credential-rotation checks; atomic database login throttling; no public registration. Mutations have UUID request IDs, replay protection and audit entries.
+6. **Data:** add `adminSession`, `adminLoginAttempt` (TTL operational data) and `adminAudit` (assessment evidence, no secrets). Operational auth collections are excluded from exports. Prices retain the required numeric GBP interface; dashboard totals use integer pence.
+7. **Races:** tests cover unauthorised access, expiry/logout, duplicate admin requests, stale edits after bookings, deletion during multi-lesson checkout and transaction rollback. Application adapter tests and separate native Atlas tests are distinguished.
+8. **Operations:** existing request logging excludes headers/bodies; admin endpoints use no-store responses. Missing credentials disable admin access. Restart reads environment; rotating the hash invalidates old sessions. No background jobs or caches required.
+9. **Future scope:** a single operator is appropriate here; federation, MFA, multi-role workflows and enterprise scaling are separate future work. No Redis/Postgres/Nest migration is justified by this request.
+10. **Quality gates:** run backend and frontend suites, inspect desktop/mobile UI, refresh assessment evidence, acknowledgement and rehearsal questions. Real Atlas/deployment checks remain pending until configured; do not simulate passes.
+
+Folder additions: `src/admin-auth.js` (sessions), `src/admin.js` (management), `src/admin-validation.js` (strict DTOs), `scripts/setup-admin.js`, dedicated tests and this decision record. These are bounded modules within the existing deployable app. Ride-hailing-specific API skill rules and tools are inapplicable; this decision records their deliberate exclusion.

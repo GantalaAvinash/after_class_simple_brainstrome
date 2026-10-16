@@ -1,3 +1,14 @@
+import { validPasswordHash } from './admin-auth.js';
+
+export function readAdminConfig(env = process.env) {
+  const username = env.ADMIN_USERNAME?.trim() || '';
+  const passwordHash = env.ADMIN_PASSWORD_HASH?.trim() || '';
+  if ((username || passwordHash) && (!/^[a-z0-9_-]{3,40}$/.test(username) || !validPasswordHash(passwordHash))) {
+    throw new Error('Admin credentials are invalid. Run npm run admin:setup or configure both ADMIN_USERNAME and ADMIN_PASSWORD_HASH.');
+  }
+  return { username, passwordHash };
+}
+
 export function readConfig(env = process.env) {
   const uri = env.MONGODB_URI?.trim();
   if (!uri || !/^mongodb(?:\+srv)?:\/\//.test(uri)) {
@@ -23,5 +34,5 @@ export function readConfig(env = process.env) {
     }
   }
 
-  return { uri, port, databaseName, allowedOrigins };
+  return { uri, port, databaseName, allowedOrigins, admin: readAdminConfig(env) };
 }

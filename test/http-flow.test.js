@@ -42,7 +42,7 @@ test('HTTP workflow covers catalogue, teachers, search, POST, PUT, replay and en
   assert.equal((await request('/enrolment/' + a)).data.enrolment, 2);
   assert.equal((await request('/enrolment/' + b)).data.enrolment, 1);
   const general = await request('/lessons', 'PUT', { updates: [{ lessonId: a, changes: { price: 100, space: 12 } }] });
-  assert.equal(general.data.lessons[0].space, 12);
+  assert.equal(general.status, 401);
   assert.equal((await request('/enrolment/' + a)).data.enrolment, 2);
 });
 
@@ -51,7 +51,7 @@ test('HTTP invalid input and oversized payloads return explicit safe errors', as
   for (const path of ['/lessons?teacherId=bad', '/lessons?q=a&q=b', '/enrolment/bad']) assert.equal((await request(path)).status, 400);
   assert.equal((await request('/enrolment/ffffffffffffffffffffffff')).status, 404);
   assert.equal((await request('/orders', 'POST', { ...payload(), name: 'Ava Smith' })).status, 400);
-  assert.equal((await request('/lessons', 'PUT', { updates: [{ lessonId: a, changes: { $inc: { space: 1 } } }] })).status, 400);
+  assert.equal((await request('/lessons', 'PUT', { updates: [{ lessonId: a, changes: { $inc: { space: 1 } } }] })).status, 401);
   assert.equal((await request('/orders', 'POST', { text: 'x'.repeat(21000) })).status, 413);
   assert.equal((await request('/images/missing.svg')).status, 404);
 });

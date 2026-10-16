@@ -12,7 +12,12 @@ function equal(a, b) { return a instanceof ObjectId ? a.equals(b) : a === b; }
 function matches(doc, query) {
   return Object.entries(query).every(([key, expected]) => {
     const values = key === 'items.lessonId' ? (doc.items || []).map((item) => item.lessonId) : [doc[key]];
-    return values.some((value) => expected?.$in ? expected.$in.some((item) => equal(value, item)) : equal(value, expected));
+    return values.some((value) => {
+      if (expected?.$in) return expected.$in.some((item) => equal(value, item));
+      if (expected && '$exists' in Object(expected)) return (value !== undefined) === expected.$exists;
+      if (expected && '$ne' in Object(expected)) return !equal(value, expected.$ne);
+      return equal(value, expected);
+    });
   });
 }
 export function testDatabase(seed = {}) {
@@ -27,7 +32,7 @@ export function testDatabase(seed = {}) {
         find: (query = {}) => ({ toArray: async () => clone(state[name].filter((doc) => matches(doc, query))) }),
         findOne: async (query) => clone(state[name].find((doc) => matches(doc, query)) || null),
         insertOne: async (doc) => {
-          if (doc.requestId && state[name].some((item) => item.requestId === doc.requestId)) {
+          if (state[name].some((item) => (doc._id && equal(item._id, doc._id)) || (doc.requestId && item.requestId === doc.requestId))) {
             const error = new Error('Duplicate request ID'); error.code = 11000; throw error;
           }
           const record = clone({ ...doc, _id: doc._id || new ObjectId() });
@@ -40,7 +45,16 @@ export function testDatabase(seed = {}) {
           const doc = state[name].find((item) => matches(item, query));
           if (!doc) return { matchedCount: 0, modifiedCount: 0 };
           Object.assign(doc, clone(update.$set));
+          for (const [key, value] of Object.entries(update.$inc || {})) doc[key] = (doc[key] || 0) + value;
           return { matchedCount: 1, modifiedCount: 1 };
+        },
+        findOneAndUpdate: async (query, update, options = {}) => {
+          let doc = state[name].find((item) => matches(item, query));
+          if (!doc && options.upsert) { doc = clone({ ...query, ...update.$setOnInsert }); state[name].push(doc); }
+          if (!doc) return null;
+          Object.assign(doc, clone(update.$set));
+          for (const [key, value] of Object.entries(update.$inc || {})) doc[key] = (doc[key] || 0) + value;
+          return clone(doc);
         },
         createIndex: async () => {},
       };

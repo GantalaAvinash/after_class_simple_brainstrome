@@ -56,7 +56,7 @@ test('CORS preflight allows JSON POST and PUT', async (t) => {
   const response = await fetch(`${url}/lessons`, { method: 'OPTIONS', headers: { Origin: 'http://localhost:8080' } });
   assert.equal(response.status, 204);
   assert.match(response.headers.get('access-control-allow-methods'), /PUT/);
-  assert.equal(response.headers.get('access-control-allow-headers'), 'Content-Type');
+  assert.equal(response.headers.get('access-control-allow-headers'), 'Content-Type, Authorization');
 });
 
 test('health reports a database outage as 503 without leaking details', async (t) => {

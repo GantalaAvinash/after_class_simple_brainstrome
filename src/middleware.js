@@ -20,8 +20,8 @@ export function cors(allowedOrigins) {
       return res.status(403).json({ error: 'This browser origin is not allowed.' });
     }
     if (origin) res.set('Access-Control-Allow-Origin', origin);
-    res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.sendStatus(204);
     next();
   };

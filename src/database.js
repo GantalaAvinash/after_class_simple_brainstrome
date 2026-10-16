@@ -7,6 +7,8 @@ export async function connectDatabase({ uri, databaseName }) {
     const db = client.db(databaseName);
     await db.command({ ping: 1 });
     await db.collection('order').createIndex({ requestId: 1 }, { unique: true });
+    await db.collection('adminSession').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    await db.collection('adminLoginAttempt').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
     return { client, db };
   } catch {
     await client.close();

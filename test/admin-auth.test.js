@@ -1,0 +1,74 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import { createApp } from '../src/app.js';
+import { hashPassword, createAdminAuth } from '../src/admin-auth.js';
+import { fixtures } from '../support/fixtures.js';
+import { testDatabase } from '../support/test-database.js';
+
+const password = 'OnlyForAutomatedTests!472';
+const admin = { username: 'operator', passwordHash: await hashPassword(password) };
+async function setup(t, credentials = admin) {
+  const data = testDatabase(await fixtures());
+  const server = createApp({ ...data, admin: credentials, allowedOrigins: ['http://localhost:8080'], logger: () => {} }).listen(0, '127.0.0.1');
+  await new Promise((resolve) => server.once('listening', resolve));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const request = async (path, method = 'GET', body, token) => {
+    const response = await fetch('http://127.0.0.1:' + server.address().port + path, {
+      method, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+    return { status: response.status, data: await response.json().catch(() => null), headers: response.headers };
+  };
+  return { ...data, request };
+}
+
+test('admin access fails closed without credentials; public browsing remains available', async (t) => {
+  const { request } = await setup(t, {});
+  assert.equal((await request('/admin/session', 'POST', { username: 'operator', password })).status, 503);
+  assert.equal((await request('/lessons')).status, 200);
+  assert.equal((await request('/admin/session')).status, 401);
+});
+
+test('admin login, hashed session, server expiry and logout are enforced', async (t) => {
+  const { request, state } = await setup(t);
+  assert.equal((await request('/admin/session', 'POST', { username: 'operator', password: 'wrong' })).status, 401);
+  const login = await request('/admin/session', 'POST', { username: 'operator', password });
+  assert.equal(login.status, 201);
+  assert.equal(login.headers.get('cache-control'), 'no-store');
+  assert.equal(login.data.token.length, 64);
+  assert.ok(!JSON.stringify(state.adminSession).includes(login.data.token));
+  assert.equal((await request('/admin/session', 'GET', undefined, login.data.token)).status, 200);
+  state.adminSession[0].expiresAt = new Date(0);
+  assert.equal((await request('/admin/session', 'GET', undefined, login.data.token)).status, 401);
+  const next = await request('/admin/session', 'POST', { username: 'operator', password });
+  assert.equal((await request('/admin/session', 'DELETE', undefined, next.data.token)).status, 200);
+  assert.equal((await request('/admin/session', 'GET', undefined, next.data.token)).status, 401);
+});
+
+test('all unbound lesson updates require admin authorisation; CORS supports bearer headers', async (t) => {
+  const { request } = await setup(t);
+  const body = { updates: [{ lessonId: '100000000000000000000001', changes: { space: 100 } }] };
+  assert.equal((await request('/lessons', 'PUT', body)).status, 401);
+  const login = await request('/admin/session', 'POST', { username: 'operator', password });
+  assert.equal((await request('/lessons', 'PUT', body, login.data.token)).status, 200);
+  const preflight = await request('/lessons', 'OPTIONS');
+  assert.match(preflight.headers.get('access-control-allow-headers'), /Authorization/);
+  assert.match(preflight.headers.get('access-control-allow-methods'), /DELETE/);
+});
+
+test('login throttling includes invalid usernames and is shared through the database', async (t) => {
+  const { request } = await setup(t);
+  for (let i = 0; i < 10; i++) assert.equal((await request('/admin/session', 'POST', { username: 'unknown', password: 'bad' })).status, 401);
+  const blocked = await request('/admin/session', 'POST', { username: 'operator', password });
+  assert.equal(blocked.status, 429);
+  assert.ok(Number(blocked.headers.get('retry-after')) > 0);
+});
+
+test('credential rotation invalidates sessions even before their expiry', async () => {
+  const { db, state } = testDatabase();
+  const auth = createAdminAuth(db, admin);
+  const session = await auth.login({ username: 'operator', password });
+  assert.equal(state.adminSession.length, 1);
+  const rotated = createAdminAuth(db, { ...admin, passwordHash: await hashPassword('RotatedOnlyForTests!452') });
+  await assert.rejects(rotated.authenticate('Bearer ' + session.token), (error) => error.status === 401);
+});

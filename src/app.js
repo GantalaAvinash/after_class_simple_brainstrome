@@ -6,8 +6,9 @@ import { registerCatalogueRoutes } from './catalogue.js';
 import { registerOrderRoutes } from './orders.js';
 import { registerUpdateRoute } from './updates.js';
 import { registerEnrolmentRoute } from './enrolment.js';
+import { createAdminAuth, registerAdminSessionRoutes } from './admin-auth.js';
 
-export function createApp({ db, client, allowedOrigins, logger }) {
+export function createApp({ db, client, allowedOrigins, logger, admin }) {
   const app = express();
   app.disable('x-powered-by');
   app.use(requestLogger(logger));
@@ -29,12 +30,17 @@ export function createApp({ db, client, allowedOrigins, logger }) {
 
   registerCatalogueRoutes(app, db);
   registerOrderRoutes(app, db);
-  registerUpdateRoute(app, db, client);
+  const auth = createAdminAuth(db, admin);
+  registerAdminSessionRoutes(app, db, auth);
+  registerUpdateRoute(app, db, client, auth.guard);
   registerEnrolmentRoute(app, db);
 
   app.use((_req, res) => res.status(404).json({ error: 'Route not found.' }));
   app.use((error, _req, res, _next) => {
-    if (error instanceof HttpError) return res.status(error.status).json({ error: error.message });
+    if (error instanceof HttpError) {
+      if (error.retryAfter) res.set('Retry-After', String(error.retryAfter));
+      return res.status(error.status).json({ error: error.message });
+    }
     if (error.type === 'entity.parse.failed') {
       return res.status(400).json({ error: 'The request body must be valid JSON.' });
     }
