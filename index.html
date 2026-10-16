@@ -59,7 +59,8 @@
           <ul v-else class="lesson-grid" aria-label="After-school activities">
             <li v-for="(lesson, index) in visibleLessons" v-bind:key="lesson._id" class="lesson-card">
               <div class="card-art" v-bind:class="'tone-' + (index % 4)">
-                <img v-bind:src="imageUrl(lesson.image)" v-bind:alt="lesson.topic + ' activity illustration'" width="64" height="64" loading="lazy">
+                <img v-if="!imageFailures[lesson._id]" v-bind:src="imageUrl(lesson.image)" v-bind:alt="lesson.topic + ' activity illustration'" width="64" height="64" loading="lazy" v-on:error="imageFailures[lesson._id] = true">
+                <span v-else class="image-fallback" aria-hidden="true">{{ lesson.topic.slice(0, 1) }}</span>
                 <span class="space-badge" v-bind:class="{ 'sold-out': lesson.available === 0 }">{{ lesson.available === 0 ? 'Fully booked' : lesson.available + ' spaces left' }}</span>
               </div>
               <div class="card-body">
@@ -69,6 +70,11 @@
                   <p class="price">{{ formatPrice(lesson.price) }} <span>/ place</span></p>
                   <button class="button" type="button" v-bind:disabled="lesson.available === 0 || cartLocked" v-on:click="addPlace(lesson._id)" v-bind:aria-label="'Add one place for ' + lesson.topic">Add to cart <span aria-hidden="true">+</span></button>
                 </div>
+                <div class="enrolment-row">
+                  <button class="enrolment-button" type="button" v-bind:disabled="enrolmentBusy[lesson._id]" v-on:click="showEnrolment(lesson._id)" v-bind:aria-label="'View purchased places for ' + lesson.topic">{{ enrolmentBusy[lesson._id] ? 'Checking…' : enrolments[lesson._id] === undefined ? 'View enrolment' : 'Refresh enrolment' }}</button>
+                  <span v-if="enrolments[lesson._id] !== undefined">{{ enrolments[lesson._id] }} purchased</span>
+                </div>
+                <p v-if="enrolmentErrors[lesson._id]" class="field-error" role="alert">{{ enrolmentErrors[lesson._id] }}</p>
               </div>
             </li>
           </ul>

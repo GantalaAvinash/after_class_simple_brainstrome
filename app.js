@@ -13,6 +13,7 @@ createApp({
       attempt: null, storage: null,
       searchTerm: '', teacherId: '', teachers: [], teacherError: '',
       searchTimer: null, searchController: null, requestVersion: 0,
+      enrolments: {}, enrolmentErrors: {}, enrolmentBusy: {}, imageFailures: {},
     };
   },
   computed: {
@@ -39,6 +40,18 @@ createApp({
   methods: {
     formatPrice,
     imageUrl(path) { return this.apiBase + path; },
+    async showEnrolment(id) {
+      if (this.enrolmentBusy[id]) return;
+      this.enrolmentBusy[id] = true;
+      delete this.enrolmentErrors[id];
+      try {
+        const result = await this.api('/enrolment/' + encodeURIComponent(id));
+        if (!Number.isSafeInteger(result.enrolment) || result.enrolment < 0) throw new Error('Enrolment could not be verified.');
+        this.enrolments[id] = result.enrolment;
+        this.announcement = result.enrolment + ' places already purchased for ' + this.lessons[id].topic + '.';
+      } catch (error) { this.enrolmentErrors[id] = error.message; }
+      finally { this.enrolmentBusy[id] = false; }
+    },
     addPlace(id) {
       if (this.cartLocked) return;
       const before = this.cart[id] || 0;
@@ -92,6 +105,7 @@ createApp({
         if (result.lessons) this.mergeLessons(result.lessons);
         this.forgetAttempt();
         this.cart = {};
+        this.enrolments = {};
         this.name = ''; this.phone = ''; this.touched = false;
         this.confirmation = 'Your order has been submitted. Reference: ' + result.orderId;
         this.announcement = this.confirmation;
