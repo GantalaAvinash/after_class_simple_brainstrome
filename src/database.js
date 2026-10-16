@@ -6,6 +6,7 @@ export async function connectDatabase({ uri, databaseName }) {
     await client.connect();
     const db = client.db(databaseName);
     await db.command({ ping: 1 });
+    await db.collection('order').createIndex({ requestId: 1 }, { unique: true });
     return { client, db };
   } catch {
     await client.close();
