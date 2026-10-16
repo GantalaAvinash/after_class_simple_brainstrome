@@ -15,7 +15,7 @@ export function resolveApiBase(configured, location) {
 }
 
 export function createApi(base, fetcher = fetch, timeoutMs = 90000) {
-  return async function request(path, { method = 'GET', body, signal } = {}) {
+  return async function request(path, { method = 'GET', body, signal, token } = {}) {
     const controller = new AbortController();
     const abort = () => controller.abort();
     signal?.addEventListener('abort', abort, { once: true });
@@ -24,7 +24,7 @@ export function createApi(base, fetcher = fetch, timeoutMs = 90000) {
     try {
       const response = await fetcher(base + path, {
         method, signal: controller.signal,
-        headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
+        headers: { ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(token ? { Authorization: 'Bearer ' + token } : {}) },
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       });
       const data = await response.json().catch(() => null);
