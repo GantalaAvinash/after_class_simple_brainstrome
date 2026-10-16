@@ -25,7 +25,7 @@ Seeding inserts missing lesson/teacher IDs using $setOnInsert and never resets p
 | GET /lessons?q=9&teacherId=ID | Optional server-side literal search and teacher filtering |
 | GET /teachers | Teacher names and associated lesson IDs |
 | POST /orders | Validate and save/replay a pending order |
-| PUT /lessons | Absolute updates; optionally confirm an entire pending order |
+| PUT /lessons | Public constrained order confirmation; admin bearer required for general absolute updates |
 | GET /enrolment/:lessonid | Sum quantities in confirmed orders for an existing lesson |
 | GET /images/NAME.svg | Static lesson image or explicit missing-image error |
 
@@ -61,7 +61,17 @@ Enrolment reads confirmed orders matching the lesson and sums quantities, rather
 
 Errors use a JSON error message: 400 invalid input, 403 disallowed browser origin, 404 missing record/image, 409 checkout conflict, 413 oversized body, and safe 500/503 server responses. Logs contain timestamp, method, URL, status and duration, without request bodies or database credentials.
 
-## Verification
+## Protected administration
+
+Run npm run admin:setup once, read ignored mode-0600 .admin-local.txt privately, save its generated password and remove the file. Restart the service. On Render set ADMIN_USERNAME and ADMIN_PASSWORD_HASH through environment settings. No default password or public registration exists. Rotate with npm run admin:setup -- --rotate and restart.
+
+Studio includes create/edit/soft-delete/restore, teacher assignment, booking insights and audit history. Every management endpoint requires a valid opaque bearer session. Passwords use salted native scrypt; token digests and atomic login counters live in MongoDB with TTL indexes. See [docs/ADMIN_API.md](docs/ADMIN_API.md) for contracts, errors, recovery, tradeoffs and primary references.
+
+Lesson writes, teacher membership and audit entries share a transaction. Revisions advance on purchases, general PUT and admin changes. Public results exclude deleted lessons; confirmed purchase quantities survive deletion. Checkout also checks saved unit price before confirming. General coursework PUT now requires authorisation and is audited; its complete saved-order confirmation branch remains public and cannot perform arbitrary changes.
+
+The native test command now runs both booking and admin suites in a separate _test database. Neither has run without a test URI. Cleanup removes only each test's own records, never an existing database.
+
+## Local verification
 
 ~~~sh
 npm test
@@ -94,7 +104,11 @@ npm run export:atlas
 
 Import postman/AfterClass.postman_collection.json into Postman. Set baseUrl to the real Render URL for the demonstration. New order generates a fresh UUID; Confirm order reuses its saved ID/updates. The replay request tests duplicate safety. General PUT intentionally changes persistent attributes, so practise against test data.
 
+The collection now contains 29 requests. For the protected folder set adminUsername/adminPassword as private local environment variables, then run Admin sign-in. CRUD uses a separate test lesson and revision values. Never export a populated password/token. The generated artifact contains neither.
+
 The export command reads every nonsystem assessment collection in a snapshot transaction and writes canonical Extended JSON to the sibling exports folder. ObjectIds and dates are preserved for re-import. The manifest records actual collection names, counts and SHA-256 checksums. Seed data is not presented as an Atlas export.
+
+Operational adminSession/adminLoginAttempt collections are excluded from exports and refused by packaging. adminAudit remains assessment evidence. The packager additionally refuses .admin-local.txt.
 
 ## Render and submission
 

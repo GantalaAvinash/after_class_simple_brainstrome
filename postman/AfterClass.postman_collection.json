@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "AfterClass CST3144",
-    "description": "Import into Postman. Set baseUrl to the real Render service for the assessed demonstration. Mutating requests change persistent data: practise against a test database first. Run New order before Confirm order. Seed IDs are included. No credentials are exported.",
+    "description": "Import into Postman. Set baseUrl to the real service. Practise mutations against test data. Run New order before Confirm order. For administration, set adminUsername/adminPassword as private local environment variables, then run Admin sign-in. Never export populated passwords/tokens. The administration folder creates a new test lesson, edits it, deletes/restores it and signs out.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -28,6 +28,22 @@
     {
       "key": "orderUpdates",
       "value": "[]"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "adminLessonId",
+      "value": ""
+    },
+    {
+      "key": "adminRevision",
+      "value": "0"
+    },
+    {
+      "key": "adminRequestId",
+      "value": ""
     }
   ],
   "item": [
@@ -316,8 +332,348 @@
       ]
     },
     {
-      "name": "Manual attribute update — changes persistent stock",
+      "name": "Protected administration — use private environment credentials",
       "item": [
+        {
+          "name": "Admin sign-in",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/session",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"adminToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify session",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/session"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Manage catalogue",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/lessons"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Booking overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/overview"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create test lesson",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/lessons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{adminRequestId}}\",\n  \"lesson\": {\n    \"topic\": \"Postman test club\",\n    \"location\": \"Hendon\",\n    \"price\": 9.5,\n    \"space\": 5,\n    \"image\": \"/images/art.svg\"\n  },\n  \"teacherIds\": [\n    \"{{teacherId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"adminRequestId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(201));",
+                  "const lesson = pm.response.json().lesson;",
+                  "pm.collectionVariables.set(\"adminLessonId\", lesson._id);",
+                  "pm.collectionVariables.set(\"adminRevision\", lesson.revision);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Replay create — same lesson",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/lessons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{adminRequestId}}\",\n  \"lesson\": {\n    \"topic\": \"Postman test club\",\n    \"location\": \"Hendon\",\n    \"price\": 9.5,\n    \"space\": 5,\n    \"image\": \"/images/art.svg\"\n  },\n  \"teacherIds\": [\n    \"{{teacherId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Same ID on replay\", () => pm.expect(pm.response.json().lesson._id).to.equal(pm.collectionVariables.get(\"adminLessonId\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Edit test lesson — absolute price and spaces",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/lessons/{{adminLessonId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{adminRequestId}}\",\"revision\":{{adminRevision}},\"lesson\":{\"topic\":\"Postman test club\",\"location\":\"Hendon\",\"price\":19,\"space\":2,\"image\":\"/images/art.svg\"},\"teacherIds\":[\"{{teacherId}}\"]}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"adminRequestId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "const lesson = pm.response.json().lesson;",
+                  "pm.collectionVariables.set(\"adminLessonId\", lesson._id);",
+                  "pm.collectionVariables.set(\"adminRevision\", lesson.revision);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete test lesson — preserve history",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/lessons/{{adminLessonId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{adminRequestId}}\",\"revision\":{{adminRevision}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"adminRequestId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "const lesson = pm.response.json().lesson;",
+                  "pm.collectionVariables.set(\"adminLessonId\", lesson._id);",
+                  "pm.collectionVariables.set(\"adminRevision\", lesson.revision);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Restore test lesson",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/lessons/{{adminLessonId}}/restore",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{adminRequestId}}\",\"revision\":{{adminRevision}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"adminRequestId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "const lesson = pm.response.json().lesson;",
+                  "pm.collectionVariables.set(\"adminLessonId\", lesson._id);",
+                  "pm.collectionVariables.set(\"adminRevision\", lesson.revision);"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Set absolute spaces to 5 and price to 9",
           "request": {
@@ -326,6 +682,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/lessons",
@@ -346,6 +706,120 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forbidden field update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/lessons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"updates\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"changes\": {\n        \"_id\": \"forbidden\"\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sign out and clear local token",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/session"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.unset(\"adminToken\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous management denied",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/lessons"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous general PUT denied",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/lessons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"updates\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"changes\": {\n        \"price\": 1\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(401));"
                 ]
               }
             }
@@ -427,39 +901,6 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava2\",\n  \"phone\": \"007123456\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(400));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Forbidden field update",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/lessons",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"updates\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"changes\": {\n        \"_id\": \"forbidden\"\n      }\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

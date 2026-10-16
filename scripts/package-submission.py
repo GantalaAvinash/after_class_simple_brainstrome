@@ -65,6 +65,15 @@ def main():
     files.append((acknowledgement, "AI_ACKNOWLEDGEMENT.md"))
     postman = ROOT / "backend" / "postman" / "AfterClass.postman_collection.json"
     require(postman.is_file(), "Generate the Postman collection.")
+    collection = json.loads(postman.read_text())
+    for variable in collection.get("variable", []):
+        if any(word in variable.get("key", "").lower() for word in ["token", "password", "secret"]):
+            require(not variable.get("value"), "Never package populated Postman credentials.")
+    for group in collection.get("item", []):
+        for item in group.get("item", []):
+            if item.get("request", {}).get("url", "").endswith("/admin/session") and item["request"].get("method") == "POST":
+                body = json.loads(item["request"]["body"]["raw"])
+                require(body.get("password") == "{{adminPassword}}", "Keep the Postman password as a private environment placeholder.")
     files.append((postman, "AfterClass.postman_collection.json"))
     readme = "# AfterClass — CST3144\n\n" + "\n".join("- " + key + ": " + links[key] for key in keys)
     readme += "\n\nStudent number: " + number + "\n\nBackend: Node 24; npm ci; configure .env; npm start. Frontend: serve its folder or open the GitHub Pages link. See both application READMEs for tests, API behaviour and attribution. Review and include the actual GenAI record. Paste the same four links into the submission text area.\n"
