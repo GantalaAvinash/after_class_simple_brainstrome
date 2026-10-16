@@ -32,7 +32,19 @@ Tests cover eight sort combinations, numeric comparisons, cart capacity/removal,
 - Names contain A–Z letters only; phones contain digits only, preserving leading zeros. The form follows the brief's literal rule.
 - Uncertain submissions lock basket/contact edits until retried. Confirmed orders clear the cart; definitive input or stock conflicts preserve the basket for correction.
 
-## GitHub Pages
+## Protected Studio and design extension
+
+Open admin.html from the footer. admin-app.js is a separate Vue Options API entry point using the same API origin. The backend must have ADMIN_USERNAME and ADMIN_PASSWORD_HASH configured; see its admin guide. Every management request is checked by the server.
+
+admin-state.mjs holds the token in a closure, never in browser storage. The password is cleared after login attempts. Reload requires signing in again; expiry/401 clears access and logout revokes the server session. Only management mutation payloads and UUIDs persist in sessionStorage for retry recovery.
+
+The editor creates or updates all fields and teacher membership together. Revision checks stop stale forms overwriting purchases. A native confirmation dialog protects deletion; the Deleted lessons view supports restore. Insights display confirmed quantities, available places, saved-price booking value and audit events, with no customer contact details or payment processing.
+
+experience.css supplies the richer landing composition, activity cards, teacher credits and responsive layouts. discovery.mjs derives topic categories with a More to discover fallback. These client filters intersect after the required backend search. Saved IDs alone are held in localStorage. Cart quantities remain separate.
+
+Extension tests cover admin validation, revisions, memory-only access, session expiry, saved shortlists, combined discovery filters and bearer headers. Latest native Chrome review covers desktop, 375px phone and 768px tablet. The earlier 1024/1440 checks above predate this redesign.
+
+## GitHub Pages setup
 
 Set config.js apiBaseUrl to the actual HTTPS Render origin. Publish this repository's main branch and root folder. Relative paths and .nojekyll support project Pages URLs. The production configuration must not enable testPreview.
 

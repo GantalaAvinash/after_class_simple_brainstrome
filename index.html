@@ -1,140 +1,561 @@
 <!doctype html>
 <html lang="en-GB">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Discover fictitious after-school classes and activities in North London.">
-    <meta name="theme-color" content="#173f35"><meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Discover fictitious after-school classes and activities in North London."
+    />
+    <meta name="theme-color" content="#173f35" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>AfterClass | Make room for something new</title>
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="./experience.css">
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./experience.css" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <script src="./config.js"></script>
     <script type="module" src="./app.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#catalogue">Skip to activities</a>
+    <!-- Keep in-DOM Vue expressions intact: an HTML-only formatter cannot parse them. -->
+    <!-- prettier-ignore -->
     <div id="app" v-cloak>
-      <div v-if="testPreview" class="preview-banner" role="status">Local test preview · example data resets when the preview restarts.</div>
+      <div v-if="testPreview" class="preview-banner" role="status">
+        Local test preview · example data resets when the preview restarts.
+      </div>
       <nav class="site-nav wrap" aria-label="Main navigation">
-        <a class="wordmark" href="./" aria-label="AfterClass home">AfterClass<span>.</span></a>
-        <div class="nav-links"><a href="#catalogue">Explore activities</a><a href="#how-it-works">How it works</a><button type="button" v-on:click="savedOnly = !savedOnly; view = 'catalogue'; focusView()" v-bind:aria-pressed="savedOnly">Saved <span>{{ savedIds.length }}</span></button></div>
-        <button class="button secondary cart-toggle" type="button" v-bind:disabled="cartCount === 0 || busy" v-on:click="toggleCart">{{ view === 'cart' ? 'Back to activities' : 'Your basket (' + cartCount + ')' }}</button>
+        <a class="wordmark" href="./" aria-label="AfterClass home"
+          >AfterClass<span>.</span></a
+        >
+        <div class="nav-links">
+          <a href="#catalogue" v-on:click="view = 'catalogue'; focusView()"
+            >Explore activities</a
+          ><a href="#how-it-works" v-on:click="view = 'catalogue'"
+            >How it works</a
+          ><button
+            type="button"
+            v-on:click="savedOnly = !savedOnly; view = 'catalogue'; focusView()"
+            v-bind:aria-pressed="savedOnly"
+          >
+            Saved <span>{{ savedIds.length }}</span>
+          </button>
+        </div>
+        <button
+          class="button secondary cart-toggle"
+          type="button"
+          v-bind:disabled="cartCount === 0 || busy"
+          v-on:click="toggleCart"
+        >
+          {{ view === 'cart' ? 'Back to activities' : 'Your basket (' + cartCount + ')' }}
+        </button>
       </nav>
       <main>
-        <div v-if="confirmation" class="success wrap" role="status">{{ confirmation }}</div>
+        <div v-if="confirmation" class="success wrap" role="status">
+          {{ confirmation }}
+        </div>
         <header v-show="view === 'catalogue'" class="hero wrap">
           <div class="hero-copy">
-            <p class="eyebrow"><span class="status-dot"></span> BIG POSSIBILITIES. CLOSE TO HOME.</p>
-            <h1>Good afternoons.<br><em>Great beginnings.</em></h1>
-            <p class="hero-description">For the makers, the movers and the wonderfully curious.<br class="desktop-break"> Discover small-group activities that turn after school into something to look forward to.</p>
-            <div class="hero-cta"><a class="button" href="#catalogue">Find their next favourite thing <span aria-hidden="true">↗</span></a><span>Made for curious minds.</span></div>
-            <div class="hero-meta"><div><strong>{{ totalActivities || '—' }}</strong><span>activities to discover</span></div><div><strong>North London</strong><span>room to grow, closer to home</span></div></div>
+            <p class="eyebrow">
+              <span class="status-dot"></span> BIG POSSIBILITIES. CLOSE TO HOME.
+            </p>
+            <h1>Good afternoons.<br /><em>Great beginnings.</em></h1>
+            <p class="hero-description">
+              For the makers, the movers and the wonderfully curious.<br
+                class="desktop-break"
+              />
+              Discover small-group activities that turn after school into
+              something to look forward to.
+            </p>
+            <div class="hero-cta">
+              <a class="button" href="#catalogue"
+                >Find their next favourite thing
+                <span aria-hidden="true">↗</span></a
+              ><span>Made for curious minds.</span>
+            </div>
+            <div class="hero-meta">
+              <div>
+                <strong>{{ totalActivities || '—' }}</strong
+                ><span>activities to discover</span>
+              </div>
+              <div>
+                <strong>North London</strong
+                ><span>room to grow, closer to home</span>
+              </div>
+            </div>
           </div>
           <aside class="hero-scene" aria-label="A few things to discover">
-            <div class="scene-orbit" aria-hidden="true"></div><span class="scene-spark" aria-hidden="true">✳</span>
-            <p class="scene-caption">A little curiosity.<br>A whole world of possibility.</p>
-            <a v-for="(lesson,index) in spotlight" v-bind:key="lesson._id" href="#catalogue" class="spotlight-card" v-bind:class="'spotlight-' + index" v-on:click="searchTerm = lesson.topic"><span class="spotlight-art" v-bind:class="artTone(lesson._id)"><img v-bind:src="imageUrl(lesson.image)" alt="" width="64" height="64"></span><span><small>{{ category(lesson.topic) }}</small><strong>{{ lesson.topic }}</strong><em>{{ lesson.location }} · {{ formatPrice(lesson.price) }}</em></span><span class="spotlight-arrow" aria-hidden="true">↗</span></a>
-            <div class="scene-stamp"><span>AFTER SCHOOL</span><strong>their time<br>to shine.</strong><span>AFTERCLASS</span></div>
+            <div class="scene-orbit" aria-hidden="true"></div>
+            <span class="scene-spark" aria-hidden="true">✳</span>
+            <p class="scene-caption">
+              A little curiosity.<br />A whole world of possibility.
+            </p>
+            <a
+              v-for="(lesson,index) in spotlight"
+              v-bind:key="lesson._id"
+              href="#catalogue"
+              class="spotlight-card"
+              v-bind:class="'spotlight-' + index"
+              v-on:click="searchTerm = lesson.topic"
+              ><span class="spotlight-art" v-bind:class="artTone(lesson._id)"
+                ><img
+                  v-bind:src="imageUrl(lesson.image)"
+                  alt=""
+                  width="64"
+                  height="64" /></span
+              ><span
+                ><small>{{ category(lesson.topic) }}</small
+                ><strong>{{ lesson.topic }}</strong
+                ><em
+                  >{{ lesson.location }} · {{ formatPrice(lesson.price) }}</em
+                ></span
+              ><span class="spotlight-arrow" aria-hidden="true">↗</span></a
+            >
+            <div class="scene-stamp">
+              <span>AFTER SCHOOL</span><strong>their time<br />to shine.</strong
+              ><span>AFTERCLASS</span>
+            </div>
           </aside>
         </header>
-        <div v-show="view === 'catalogue'" class="values-strip"><div class="wrap"><span><strong>01</strong> Small groups, big discoveries</span><span><strong>02</strong> Creative minds, active afternoons</span><span><strong>03</strong> Your neighbourhood, their next chapter</span></div></div>
-        <section v-show="view === 'catalogue'" id="catalogue" class="catalogue wrap" aria-labelledby="catalogue-heading" tabindex="-1">
+        <div v-show="view === 'catalogue'" class="values-strip">
+          <div class="wrap">
+            <span><strong>01</strong> Small groups, big discoveries</span
+            ><span><strong>02</strong> Creative minds, active afternoons</span
+            ><span
+              ><strong>03</strong> Your neighbourhood, their next chapter</span
+            >
+          </div>
+        </div>
+        <section
+          v-show="view === 'catalogue'"
+          id="catalogue"
+          class="catalogue wrap"
+          aria-labelledby="catalogue-heading"
+          tabindex="-1"
+        >
           <div class="section-heading">
-            <div><p class="eyebrow">THE AFTER-SCHOOL EDIT</p><h2 id="catalogue-heading">Find what lights them up.</h2><p class="section-description">A little more doing. A little more discovering. A lot more possibility.</p></div>
-            <p class="result-count" v-if="!loading && !error">{{ visibleLessons.length }} {{ visibleLessons.length === 1 ? 'activity' : 'activities' }} to explore</p>
+            <div>
+              <p class="eyebrow">THE AFTER-SCHOOL EDIT</p>
+              <h2 id="catalogue-heading">Find what lights them up.</h2>
+              <p class="section-description">
+                A little more doing. A little more discovering. A lot more
+                possibility.
+              </p>
+            </div>
+            <p class="result-count" v-if="!loading && !error">
+              {{ visibleLessons.length }} {{ visibleLessons.length === 1 ? 'activity' : 'activities' }} to explore
+            </p>
           </div>
-          <div class="category-tabs" aria-label="Activity categories"><button type="button" v-bind:class="{ active: !selectedCategory }" v-bind:aria-pressed="!selectedCategory" v-on:click="selectedCategory = ''">All activities</button><button v-for="group in ['STEM & strategy','Arts & expression','Move & play','Language & discovery']" v-bind:key="group" type="button" v-bind:class="{ active: selectedCategory === group }" v-bind:aria-pressed="selectedCategory === group" v-on:click="selectedCategory = group">{{ group }}</button></div>
+          <div class="category-tabs" aria-label="Activity categories">
+            <button
+              type="button"
+              v-bind:class="{ active: !selectedCategory }"
+              v-bind:aria-pressed="!selectedCategory"
+              v-on:click="selectedCategory = ''"
+            >
+              All activities</button
+            ><button
+              v-for="group in categories"
+              v-bind:key="group"
+              type="button"
+              v-bind:class="{ active: selectedCategory === group }"
+              v-bind:aria-pressed="selectedCategory === group"
+              v-on:click="selectedCategory = group"
+            >
+              {{ group }}
+            </button>
+          </div>
           <div class="filter-controls">
-            <div class="search-field"><label for="lesson-search">What would they love to try?</label><input id="lesson-search" v-model="searchTerm" type="search" maxlength="100" placeholder="Search subject, location, price or spaces…" autocomplete="off"></div>
-            <div class="teacher-field"><label for="teacher-filter">Learn with</label><select id="teacher-filter" v-model="teacherId" v-bind:disabled="teachers.length === 0"><option value="">All teachers</option><option v-for="teacher in teachers" v-bind:key="teacher._id" v-bind:value="teacher._id">{{ teacher.firstName }} {{ teacher.lastName }}</option></select></div>
-            <button class="clear-button" type="button" v-on:click="clearFilters" v-bind:disabled="!searchTerm && !teacherId && !selectedCategory && !savedOnly && !availableOnly">Reset filters</button>
+            <div class="search-field">
+              <label for="lesson-search">What would they love to try?</label
+              ><input
+                id="lesson-search"
+                v-model="searchTerm"
+                type="search"
+                maxlength="100"
+                placeholder="Search subject, location, price or spaces…"
+                autocomplete="off"
+              />
+            </div>
+            <div class="teacher-field">
+              <label for="teacher-filter">Learn with</label
+              ><select
+                id="teacher-filter"
+                v-model="teacherId"
+                v-bind:disabled="teachers.length === 0"
+              >
+                <option value="">All teachers</option>
+                <option
+                  v-for="teacher in teachers"
+                  v-bind:key="teacher._id"
+                  v-bind:value="teacher._id"
+                >
+                  {{ teacher.firstName }} {{ teacher.lastName }}
+                </option>
+              </select>
+            </div>
+            <button
+              class="clear-button"
+              type="button"
+              v-on:click="clearFilters"
+              v-bind:disabled="!searchTerm && !teacherId && !selectedCategory && !savedOnly && !availableOnly"
+            >
+              Reset filters
+            </button>
           </div>
-          <p v-if="teacherError" class="field-error" role="status">{{ teacherError }} <button type="button" class="clear-button" v-on:click="loadTeachers">Retry teachers</button></p>
+          <p v-if="teacherError" class="field-error" role="status">
+            {{ teacherError }}
+            <button
+              type="button"
+              class="clear-button"
+              v-on:click="loadTeachers"
+            >
+              Retry teachers
+            </button>
+          </p>
           <div class="sort-controls">
             <label for="sort-field">Sort by</label>
             <select id="sort-field" v-model="sortField">
-              <option value="topic">Subject</option><option value="location">Location</option><option value="price">Price</option><option value="space">Spaces</option>
+              <option value="topic">Subject</option>
+              <option value="location">Location</option>
+              <option value="price">Price</option>
+              <option value="space">Spaces</option>
             </select>
             <label for="sort-direction">Order</label>
-            <select id="sort-direction" v-model="sortDirection"><option value="asc">Ascending</option><option value="desc">Descending</option></select>
-            <div class="discovery-toggles"><label><input type="checkbox" v-model="availableOnly">Available places only</label><button class="saved-filter" type="button" v-bind:aria-pressed="savedOnly" v-on:click="savedOnly = !savedOnly">{{ savedOnly ? 'Showing saved' : 'My shortlist' }} <span>{{ savedIds.length }}</span></button></div>
+            <select id="sort-direction" v-model="sortDirection">
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+            <div class="discovery-toggles">
+              <label
+                ><input type="checkbox" v-model="availableOnly" />Available
+                places only</label
+              ><button
+                class="saved-filter"
+                type="button"
+                v-bind:aria-pressed="savedOnly"
+                v-on:click="savedOnly = !savedOnly"
+              >
+                {{ savedOnly ? 'Showing saved' : 'My shortlist' }}
+                <span>{{ savedIds.length }}</span>
+              </button>
+            </div>
           </div>
-          <p v-if="loading" role="status" class="empty-state">Finding your next adventure…</p>
-          <div v-else-if="error" role="alert" class="notice"><p>{{ error }}</p><button class="button" type="button" v-on:click="loadLessons">Try again</button></div>
-          <p v-else-if="!visibleLessons.length" role="status" class="empty-state">No activities match those filters. Try another search or clear the filters.</p>
+          <p v-if="loading" role="status" class="empty-state">
+            Finding your next adventure…
+          </p>
+          <div v-else-if="error" role="alert" class="notice">
+            <p>{{ error }}</p>
+            <button class="button" type="button" v-on:click="loadLessons">
+              Try again
+            </button>
+          </div>
+          <p
+            v-else-if="!visibleLessons.length"
+            role="status"
+            class="empty-state"
+          >
+            No activities match those filters. Try another search or clear the
+            filters.
+          </p>
           <ul v-else class="lesson-grid" aria-label="After-school activities">
-            <li v-for="lesson in visibleLessons" v-bind:key="lesson._id" class="lesson-card">
+            <li
+              v-for="lesson in visibleLessons"
+              v-bind:key="lesson._id"
+              class="lesson-card"
+            >
               <div class="card-art" v-bind:class="artTone(lesson._id)">
-                <span class="art-orbit" aria-hidden="true"></span><span class="art-label">{{ category(lesson.topic) }}</span>
-                <img v-if="!imageFailures[lesson._id]" v-bind:src="imageUrl(lesson.image)" v-bind:alt="lesson.topic + ' activity illustration'" width="64" height="64" loading="lazy" v-on:error="imageFailures[lesson._id] = true">
-                <span v-else class="image-fallback" aria-hidden="true">{{ lesson.topic.slice(0, 1) }}</span>
-                <span class="space-badge" v-bind:class="{ 'sold-out': lesson.available === 0 }">{{ lesson.available === 0 ? 'Fully booked' : lesson.available + (lesson.available === 1 ? ' space left' : ' spaces left') }}</span>
-                <button class="save-button" type="button" v-bind:aria-pressed="savedIds.includes(lesson._id)" v-bind:aria-label="(savedIds.includes(lesson._id) ? 'Unsave ' : 'Save ') + lesson.topic" v-on:click="toggleSaved(lesson._id)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+                <span class="art-orbit" aria-hidden="true"></span
+                ><span class="art-label">{{ category(lesson.topic) }}</span>
+                <img
+                  v-if="!imageFailures[lesson._id]"
+                  v-bind:src="imageUrl(lesson.image)"
+                  v-bind:alt="lesson.topic + ' activity illustration'"
+                  width="64"
+                  height="64"
+                  loading="lazy"
+                  v-on:error="imageFailures[lesson._id] = true"
+                />
+                <span v-else class="image-fallback" aria-hidden="true"
+                  >{{ lesson.topic.slice(0, 1) }}</span
+                >
+                <span
+                  class="space-badge"
+                  v-bind:class="{ 'sold-out': lesson.available === 0 }"
+                  >{{ lesson.available === 0 ? 'Fully booked' : lesson.available + (lesson.available === 1 ? ' space left' : ' spaces left') }}</span
+                >
+                <button
+                  class="save-button"
+                  type="button"
+                  v-bind:aria-pressed="savedIds.includes(lesson._id)"
+                  v-bind:aria-label="(savedIds.includes(lesson._id) ? 'Unsave ' : 'Save ') + lesson.topic"
+                  v-on:click="toggleSaved(lesson._id)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M6 3h12v18l-6-4-6 4z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                    />
+                  </svg>
+                </button>
               </div>
               <div class="card-body">
                 <p class="location">{{ lesson.location }}</p>
                 <h3>{{ lesson.topic }}</h3>
-                <p class="teacher-credit" v-if="teacherNames(lesson._id)"><span class="teacher-avatar" aria-hidden="true">{{ teacherNames(lesson._id).slice(0,1) }}</span>With {{ teacherNames(lesson._id) }}</p>
+                <p class="teacher-credit" v-if="teacherNames(lesson._id)">
+                  <span class="teacher-avatar" aria-hidden="true"
+                    >{{ teacherNames(lesson._id).slice(0,1) }}</span
+                  >With {{ teacherNames(lesson._id) }}
+                </p>
                 <div class="card-bottom">
-                  <p class="price">{{ formatPrice(lesson.price) }} <span>/ place</span></p>
-                  <button class="button" type="button" v-bind:disabled="lesson.available === 0 || cartLocked" v-on:click="addPlace(lesson._id)" v-bind:aria-label="'Add one place for ' + lesson.topic">Add to cart <span aria-hidden="true">+</span></button>
+                  <p class="price">
+                    {{ formatPrice(lesson.price) }} <span>/ place</span>
+                  </p>
+                  <button
+                    class="button"
+                    type="button"
+                    v-bind:disabled="lesson.available === 0 || cartLocked"
+                    v-on:click="addPlace(lesson._id)"
+                    v-bind:aria-label="'Add one place for ' + lesson.topic"
+                  >
+                    Add to cart <span aria-hidden="true">+</span>
+                  </button>
                 </div>
                 <div class="enrolment-row">
-                  <button class="enrolment-button" type="button" v-bind:disabled="enrolmentBusy[lesson._id]" v-on:click="showEnrolment(lesson._id)" v-bind:aria-label="'View purchased places for ' + lesson.topic">{{ enrolmentBusy[lesson._id] ? 'Checking…' : enrolments[lesson._id] === undefined ? 'View enrolment' : 'Refresh enrolment' }}</button>
-                  <span v-if="enrolments[lesson._id] !== undefined">{{ enrolments[lesson._id] }} purchased</span>
+                  <button
+                    class="enrolment-button"
+                    type="button"
+                    v-bind:disabled="enrolmentBusy[lesson._id]"
+                    v-on:click="showEnrolment(lesson._id)"
+                    v-bind:aria-label="'View purchased places for ' + lesson.topic"
+                  >
+                    {{ enrolmentBusy[lesson._id] ? 'Checking…' : enrolments[lesson._id] === undefined ? 'View enrolment' : 'Refresh enrolment' }}
+                  </button>
+                  <span v-if="enrolments[lesson._id] !== undefined"
+                    >{{ enrolments[lesson._id] }} purchased</span
+                  >
                 </div>
-                <p v-if="enrolmentErrors[lesson._id]" class="field-error" role="alert">{{ enrolmentErrors[lesson._id] }}</p>
+                <p
+                  v-if="enrolmentErrors[lesson._id]"
+                  class="field-error"
+                  role="alert"
+                >
+                  {{ enrolmentErrors[lesson._id] }}
+                </p>
               </div>
             </li>
           </ul>
         </section>
-        <section v-show="view === 'catalogue'" id="how-it-works" class="how-section wrap" aria-labelledby="how-heading"><div><p class="eyebrow">LESS PLANNING. MORE POSSIBILITY.</p><h2 id="how-heading">Their next adventure,<br>in three little steps.</h2><p>Find a spark. Make a little room for it.</p></div><ol class="how-steps"><li><span>01</span><div><h3>Follow their curiosity.</h3><p>Explore activities, meet the teaching team and save a shortlist.</p></div></li><li><span>02</span><div><h3>Choose their places.</h3><p>Add an activity to your basket. Bring a sibling or a friend, too.</p></div></li><li><span>03</span><div><h3>Make it happen.</h3><p>Submit your details and look out for your order confirmation.</p></div></li></ol></section>
-        <section v-show="view === 'cart'" id="cart" class="cart-section wrap" aria-labelledby="cart-heading" tabindex="-1">
+        <section
+          v-show="view === 'catalogue'"
+          id="how-it-works"
+          class="how-section wrap"
+          aria-labelledby="how-heading"
+        >
+          <div>
+            <p class="eyebrow">LESS PLANNING. MORE POSSIBILITY.</p>
+            <h2 id="how-heading">
+              Their next adventure,<br />in three little steps.
+            </h2>
+            <p>Find a spark. Make a little room for it.</p>
+          </div>
+          <ol class="how-steps">
+            <li>
+              <span>01</span>
+              <div>
+                <h3>Follow their curiosity.</h3>
+                <p>
+                  Explore activities, meet the teaching team and save a
+                  shortlist.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <h3>Choose their places.</h3>
+                <p>
+                  Add an activity to your basket. Bring a sibling or a friend,
+                  too.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <h3>Make it happen.</h3>
+                <p>
+                  Submit your details and look out for your order confirmation.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+        <section
+          v-show="view === 'cart'"
+          id="cart"
+          class="cart-section wrap"
+          aria-labelledby="cart-heading"
+          tabindex="-1"
+        >
           <p class="eyebrow">THEIR NEXT CHAPTER</p>
           <h2 id="cart-heading">A little something to look forward to.</h2>
           <p class="cart-intro">Your selected places, all in one spot.</p>
-          <div v-if="error" class="notice" role="alert"><p>{{ error }}</p><button class="button" type="button" v-on:click="loadLessons">Retry connection</button></div>
+          <div v-if="error" class="notice" role="alert">
+            <p>{{ error }}</p>
+            <button class="button" type="button" v-on:click="loadLessons">
+              Retry connection
+            </button>
+          </div>
           <div class="cart-layout">
             <div>
               <ul class="cart-list" aria-label="Selected activities">
-                <li v-for="item in cartItems" v-bind:key="item._id" class="cart-row">
-                  <img v-if="item.image" v-bind:src="imageUrl(item.image)" alt="" width="40" height="40">
-                  <div class="cart-description"><p class="location">{{ item.location }}</p><h3>{{ item.topic }}</h3><p>{{ item.quantity }} {{ item.quantity === 1 ? 'place' : 'places' }} · {{ formatPrice(item.price) }} each</p></div>
-                  <div class="cart-actions"><strong>{{ formatPrice(item.quantity * item.price) }}</strong><button class="remove-button" type="button" v-bind:disabled="cartLocked" v-on:click="removePlace(item._id)" v-bind:aria-label="'Remove one place for ' + item.topic">Remove one</button></div>
+                <li
+                  v-for="item in cartItems"
+                  v-bind:key="item._id"
+                  class="cart-row"
+                >
+                  <img
+                    v-if="item.image"
+                    v-bind:src="imageUrl(item.image)"
+                    alt=""
+                    width="40"
+                    height="40"
+                  />
+                  <div class="cart-description">
+                    <p class="location">{{ item.location }}</p>
+                    <h3>{{ item.topic }}</h3>
+                    <p>
+                      {{ item.quantity }} {{ item.quantity === 1 ? 'place' : 'places' }} · {{ formatPrice(item.price) }} each
+                    </p>
+                  </div>
+                  <div class="cart-actions">
+                    <strong
+                      >{{ formatPrice(item.quantity * item.price) }}</strong
+                    ><button
+                      class="remove-button"
+                      type="button"
+                      v-bind:disabled="cartLocked"
+                      v-on:click="removePlace(item._id)"
+                      v-bind:aria-label="'Remove one place for ' + item.topic"
+                    >
+                      Remove one
+                    </button>
+                  </div>
                 </li>
               </ul>
-              <p v-if="cartConflict" class="notice" role="alert">Availability has changed. Please remove unavailable places before continuing.</p>
+              <p v-if="cartConflict" class="notice" role="alert">
+                Availability has changed. Please remove unavailable places
+                before continuing.
+              </p>
             </div>
             <aside class="order-summary" aria-labelledby="summary-heading">
-              <h3 id="summary-heading">Your selection</h3><div class="summary-line"><span>{{ cartCount }} {{ cartCount === 1 ? 'place' : 'places' }}</span><strong>{{ formatPrice(cartTotal) }}</strong></div>
-              <p class="summary-note">Small groups. Room to discover something new.</p>
+              <h3 id="summary-heading">Your selection</h3>
+              <div class="summary-line">
+                <span
+                  >{{ cartCount }} {{ cartCount === 1 ? 'place' : 'places' }}</span
+                ><strong>{{ formatPrice(cartTotal) }}</strong>
+              </div>
+              <p class="summary-note">
+                Small groups. Room to discover something new.
+              </p>
               <form novalidate v-on:submit.prevent="checkout">
                 <h3 class="checkout-heading">Make it happen.</h3>
                 <div class="form-field">
                   <label for="customer-name">Name</label>
-                  <input id="customer-name" v-model="name" type="text" autocomplete="given-name" maxlength="100" v-bind:disabled="cartLocked" v-bind:aria-invalid="Boolean((touched || name) && contactError.name)" v-bind:aria-describedby="(touched || name) && contactError.name ? 'name-hint name-error' : 'name-hint'">
-                  <small id="name-hint">Letters A–Z only, without spaces.</small>
-                  <p v-if="(touched || name) && contactError.name" id="name-error" class="field-error">{{ contactError.name }}</p>
+                  <input
+                    id="customer-name"
+                    v-model="name"
+                    type="text"
+                    autocomplete="given-name"
+                    maxlength="100"
+                    v-bind:disabled="cartLocked"
+                    v-bind:aria-invalid="Boolean((touched || name) && contactError.name)"
+                    v-bind:aria-describedby="(touched || name) && contactError.name ? 'name-hint name-error' : 'name-hint'"
+                  />
+                  <small id="name-hint"
+                    >Letters A–Z only, without spaces.</small
+                  >
+                  <p
+                    v-if="(touched || name) && contactError.name"
+                    id="name-error"
+                    class="field-error"
+                  >
+                    {{ contactError.name }}
+                  </p>
                 </div>
                 <div class="form-field">
                   <label for="customer-phone">Phone number</label>
-                  <input id="customer-phone" v-model="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="30" v-bind:disabled="cartLocked" v-bind:aria-invalid="Boolean((touched || phone) && contactError.phone)" v-bind:aria-describedby="(touched || phone) && contactError.phone ? 'phone-hint phone-error' : 'phone-hint'">
-                  <small id="phone-hint">Digits only. Keep your leading zero.</small>
-                  <p v-if="(touched || phone) && contactError.phone" id="phone-error" class="field-error">{{ contactError.phone }}</p>
+                  <input
+                    id="customer-phone"
+                    v-model="phone"
+                    type="tel"
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    maxlength="30"
+                    v-bind:disabled="cartLocked"
+                    v-bind:aria-invalid="Boolean((touched || phone) && contactError.phone)"
+                    v-bind:aria-describedby="(touched || phone) && contactError.phone ? 'phone-hint phone-error' : 'phone-hint'"
+                  />
+                  <small id="phone-hint"
+                    >Digits only. Keep your leading zero.</small
+                  >
+                  <p
+                    v-if="(touched || phone) && contactError.phone"
+                    id="phone-error"
+                    class="field-error"
+                  >
+                    {{ contactError.phone }}
+                  </p>
                 </div>
-                <p v-if="attempt && !busy" class="summary-note">A submission is unfinished. Retry checkout to check its status before starting another.</p>
-                <p v-if="checkoutError" role="alert" class="field-error">{{ checkoutError }}</p>
-                <button class="button checkout-button" type="submit" v-bind:disabled="!canCheckout">{{ busy ? 'Submitting…' : attempt ? 'Retry checkout' : 'Submit order' }}</button>
-                <p class="summary-note">Places are confirmed when your order is submitted. This is a fictitious booking service.</p>
+                <p v-if="attempt && !busy" class="summary-note">
+                  A submission is unfinished. Retry checkout to check its status
+                  before starting another.
+                </p>
+                <p v-if="checkoutError" role="alert" class="field-error">
+                  {{ checkoutError }}
+                </p>
+                <button
+                  class="button checkout-button"
+                  type="submit"
+                  v-bind:disabled="!canCheckout"
+                >
+                  {{ busy ? 'Submitting…' : attempt ? 'Retry checkout' : 'Submit order' }}
+                </button>
+                <p class="summary-note">
+                  Places are confirmed when your order is submitted. This is a
+                  fictitious booking service.
+                </p>
               </form>
             </aside>
           </div>
         </section>
       </main>
-      <footer class="site-footer wrap"><div><a class="wordmark" href="./">AfterClass<span>.</span></a><p>A little curiosity goes a long way.</p></div><div class="footer-links"><a href="#catalogue">Explore activities</a><a href="./admin.html">AfterClass Studio ↗</a><small>A fictitious after-school activities service.</small></div></footer>
+      <footer class="site-footer wrap">
+        <div>
+          <a class="wordmark" href="./">AfterClass<span>.</span></a>
+          <p>A little curiosity goes a long way.</p>
+        </div>
+        <div class="footer-links">
+          <a href="#catalogue" v-on:click="view = 'catalogue'; focusView()"
+            >Explore activities</a
+          ><a href="./admin.html">AfterClass Studio ↗</a
+          ><small>A fictitious after-school activities service.</small>
+        </div>
+      </footer>
       <p class="sr-only" role="status" aria-live="polite">{{ announcement }}</p>
     </div>
-    <noscript><p class="empty-state">Please enable JavaScript to browse AfterClass activities.</p></noscript>
+    <noscript
+      ><p class="empty-state">
+        Please enable JavaScript to browse AfterClass activities.
+      </p></noscript
+    >
   </body>
 </html>
