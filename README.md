@@ -70,7 +70,7 @@ Studio includes create/edit/soft-delete/restore, teacher creation/profile editin
 
 Lesson writes, teacher membership and audit entries share a transaction. Revisions advance on purchases, general PUT and admin changes. Public results exclude deleted lessons; confirmed purchase quantities survive deletion. Checkout also checks saved unit price before confirming. General coursework PUT now requires authorisation and is audited; its complete saved-order confirmation branch remains public and cannot perform arbitrary changes.
 
-The native test command runs booking, admin and opposite-side teacher assignment suites in a separate _test database. All three remain skipped without a test URI. Cleanup removes only each test's own records, never an existing database.
+The native test command runs booking, admin and opposite-side teacher assignment suites sequentially in a separate _test database. The explicit test:atlas command now fails before running if its URI is missing or its database is unsafe; regular npm test still reports native suites as skipped when not configured. Cleanup removes only each test's own records, never an existing database.
 
 ## Local verification
 
@@ -86,7 +86,7 @@ To run the real Atlas test, set MONGODB_TEST_URI and MONGODB_TEST_DATABASE=after
 npm run test:atlas
 ~~~
 
-The test refuses the assessment database or a name without the _test suffix. It creates unique fixture IDs and removes only its own lesson/order records; it does not drop existing databases. It checks rollback, competing purchases, idempotency and enrolment. Without a test URI it is explicitly skipped.
+The test refuses the assessment database or a name without the _test suffix. It creates unique fixture IDs and removes only its own lesson/order records; it does not drop existing databases. It checks rollback, competing purchases, idempotency and enrolment. Without a test URI, npm run test:atlas fails clearly instead of reporting an all-skipped success.
 
 ## Fixture browser preview
 
@@ -110,6 +110,10 @@ The collection now contains 37 requests. For the protected folder set adminUsern
 The export command reads every nonsystem assessment collection in a snapshot transaction and writes canonical Extended JSON to the sibling exports folder. ObjectIds and dates are preserved for re-import. The manifest records actual collection names, counts and SHA-256 checksums. Seed data is not presented as an Atlas export.
 
 Operational adminSession/adminLoginAttempt collections are excluded from exports and refused by packaging. adminAudit remains assessment evidence. The packager additionally refuses .admin-local.txt.
+
+## Hosted verification
+
+After the real addresses are saved in the workspace submission-links.json, run npm run check:deployment. This read-only check verifies GitHub Pages assets and API configuration, Render database health, catalogue/detail/teacher/enrolment/image routes, the Pages CORS origin and anonymous rejection on protected administration routes. It refuses missing/invalid hosted addresses and makes no orders or stock changes. Complete hosted browser checkout, admin sign-in and restart-persistence checks separately.
 
 ## Render and submission
 
