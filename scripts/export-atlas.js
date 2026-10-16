@@ -1,4 +1,5 @@
 import { mkdir, writeFile, rename } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { readConfig } from '../src/config.js';
 import { connectDatabase } from '../src/database.js';
 import { serialiseCollection, exportFilename } from '../src/export-data.js';
@@ -22,9 +23,10 @@ try {
   const manifest = { source: 'MongoDB Atlas', database: config.databaseName, exportedAt: new Date().toISOString(), collections: [] };
   for (const collection of snapshot) {
     const file = exportFilename(collection.name);
-    await writeFile(new URL(file + '.tmp', output), serialiseCollection(collection.data));
+    const contents = serialiseCollection(collection.data);
+    await writeFile(new URL(file + '.tmp', output), contents);
     await rename(new URL(file + '.tmp', output), new URL(file, output));
-    manifest.collections.push({ name: collection.name, file, count: collection.data.length });
+    manifest.collections.push({ name: collection.name, file, count: collection.data.length, sha256: createHash('sha256').update(contents).digest('hex') });
   }
   await writeFile(new URL('manifest.json.tmp', output), JSON.stringify(manifest, null, 2) + '\n');
   await rename(new URL('manifest.json.tmp', output), new URL('manifest.json', output));

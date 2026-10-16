@@ -12,9 +12,10 @@
     "check:atlas": "node --env-file-if-exists=.env scripts/check-atlas.js",
     "test": "node --test test/*.test.js",
     "test:atlas": "node --env-file-if-exists=.env --test test/atlas.test.js",
-    "preview:test": "node support/preview.js"
-    ,"postman": "node scripts/generate-postman.js",
-    "export:atlas": "node --env-file-if-exists=.env scripts/export-atlas.js"
+    "preview:test": "node support/preview.js",
+    "postman": "node scripts/generate-postman.js",
+    "export:atlas": "node --env-file-if-exists=.env scripts/export-atlas.js",
+    "package:submission": "python3 scripts/package-submission.py"
   },
   "dependencies": {
     "express": "5.3.0",

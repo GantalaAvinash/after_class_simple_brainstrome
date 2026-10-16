@@ -1,54 +1,109 @@
-# AfterClass backend — foundation milestone
+# AfterClass backend
 
-This is a staged CST3144 implementation, not a complete coursework submission.
+Node 24, Express 5.3.0 and official MongoDB Node driver 7.7.0. Production connects to MongoDB Atlas; there is no local MongoDB or fixture fallback.
 
-## Current behaviour
+## Setup
 
-- Express 5 with the official MongoDB driver; no Mongoose or local database fallback.
-- `GET /lessons` reads the Atlas `lesson` collection.
-- `GET /health` checks database connectivity and returns 503 during a database outage.
-- Request logs include timestamp, method, URL, status, and duration, but not request bodies or credentials.
-- CORS allows only configured frontend origins, including JSON POST/PUT preflight.
-- Configuration is checked before startup; the server does not start with missing database credentials.
-- The seed adds twelve lessons with five initial spaces and four teachers. Re-running it preserves existing lessons, teacher records, and purchases.
+Run npm ci. Configure the ignored .env file with MONGODB_URI, DATABASE_NAME (default afterclass), and FRONTEND_ORIGINS. Use a database user with read/write access to the assessment database and a restricted Atlas IP access list. URI-encode reserved password characters. Keep credentials out of chat, Git, the frontend, Postman exports and ZIP files.
 
-Order routes, lesson updates, image middleware, search, teacher routes, enrolment, and checkout transactions are pending later reviewed stages.
+Run these separately:
 
-## Local setup
-
-Use Node 24. Run `npm ci` in this folder. Enter the Atlas connection string into the ignored `.env` file's `MONGODB_URI` value. Replace the connection string's credential placeholders with your database user's actual values, URI-encoding reserved password characters. Never paste the value into chat, commit it, or include it in an export.
-
-The Atlas database user must have read/write access to the `afterclass` database. Atlas network access must permit the connection source. Keep the access list restricted to your development IP and the hosting service's documented outbound IP ranges.
-
-Run these separately, checking each result:
-
-```sh
+~~~sh
 npm seed
 npm run check:atlas
 npm start
-```
+~~~
 
-The connection probe attempts a transaction write and deliberately aborts it. It does not create a purchased order. Open `http://localhost:3000/health` and `http://localhost:3000/lessons` after startup.
+Seeding inserts missing lesson/teacher IDs using $setOnInsert and never resets purchased stock. Startup creates the unique requestId index. The connection probe performs a transaction write and aborts it.
+
+## API
+
+| Method and path | Behaviour |
+|---|---|
+| GET /health | Database ping; 503 during a database outage |
+| GET /lessons | JSON lesson array |
+| GET /lessons?q=9&teacherId=ID | Optional server-side literal search and teacher filtering |
+| GET /teachers | Teacher names and associated lesson IDs |
+| POST /orders | Validate and save/replay a pending order |
+| PUT /lessons | Absolute updates; optionally confirm an entire pending order |
+| GET /enrolment/:lessonid | Sum quantities in confirmed orders for an existing lesson |
+| GET /images/NAME.svg | Static lesson image or explicit missing-image error |
+
+POST body:
+
+~~~json
+{
+  "requestId": "00000000-0000-4000-8000-000000000001",
+  "name": "Ava",
+  "phone": "007123456",
+  "items": [{"lessonId": "100000000000000000000001", "quantity": 2}]
+}
+~~~
+
+POST returns orderId, status and the exact updates required for PUT. A repeated request ID with the same normalised payload returns the existing order; changed details return 409. Pending orders do not reduce spaces or contribute to enrolment.
+
+Checkout PUT body uses the returned values:
+
+~~~json
+{
+  "orderId": "REPLACE_WITH_RETURNED_ORDER_ID",
+  "updates": [{"lessonId": "100000000000000000000001", "changes": {"space": 3}}]
+}
+~~~
+
+Within a native-driver transaction, the server verifies every target, compares current stock with the saved snapshot, updates all lessons and confirms the order. A later failure rolls the whole transaction back. Repeated confirmation returns success without deducting stock again. Session operations are sequential.
+
+A general PUT omits orderId and supports topic, location, price, space and image. IDs and MongoDB operators cannot be changed or injected. Spaces are set to any valid nonnegative integer, including zero. Multiple general updates are atomic too.
+
+Search executes in Node after the database query, using case-insensitive literal substrings of topic, location and stringified price/space. This intentionally simple scan fits the twelve-lesson coursework catalogue and uses no extra libraries. Teacher membership is restricted by the database query before searching. For a substantially larger catalogue, move the matching into indexed database queries.
+
+Enrolment reads confirmed orders matching the lesson and sums quantities, rather than deriving purchases from available spaces. An order index supports this lookup. Pending/abandoned orders remain excluded.
+
+Errors use a JSON error message: 400 invalid input, 403 disallowed browser origin, 404 missing record/image, 409 checkout conflict, 413 oversized body, and safe 500/503 server responses. Logs contain timestamp, method, URL, status and duration, without request bodies or database credentials.
 
 ## Verification
 
-```sh
+~~~sh
 npm test
-```
+~~~
 
-The foundation tests use an isolated database stub and real local HTTP requests. They verify HTTP behaviour and do **not** prove that Atlas is connected. `npm run check:atlas` is a separate real-Atlas check. Integration/concurrency tests against a separate Atlas test database are pending.
+Local tests use real HTTP requests with an explicit test-only database adapter. Its rollback/serialisation checks application logic; it does not prove MongoDB engine behaviour.
 
-## Render configuration
+To run the real Atlas test, set MONGODB_TEST_URI and MONGODB_TEST_DATABASE=afterclass_test in the ignored .env, using credentials permitted to write that separate test database:
 
-- Connect the separate backend repository.
-- Use a web service with Node 24, build command `npm ci`, start command `npm start`, and health-check path `/health`.
-- The service name must include the real student number.
-- Add `MONGODB_URI`, `DATABASE_NAME`, and `FRONTEND_ORIGINS` as Render environment variables. Let Render provide `PORT`.
-- For GitHub Pages, the allowed origin is `https://ACCOUNT.github.io`, without the repository path or trailing slash.
-- Seed explicitly from the development machine; startup never resets the database.
+~~~sh
+npm run test:atlas
+~~~
 
-The GitHub repository and Render URL have not yet been created or verified.
+The test refuses the assessment database or a name without the _test suffix. It creates unique fixture IDs and removes only its own lesson/order records; it does not drop existing databases. It checks rollback, competing purchases, idempotency and enrolment. Without a test URI it is explicitly skipped.
 
-## Assistance record
+## Fixture browser preview
 
-The root workspace contains `AI_ACKNOWLEDGEMENT.md`. Copy the completed record into the final submission and keep it accurate as development progresses. Student review of this foundation is pending.
+~~~sh
+npm run preview:test
+~~~
+
+Open http://127.0.0.1:8081. This serves the sibling frontend using test fixtures and shows a visible warning. The data resets on restart. support/preview.js is never loaded by npm start.
+
+## Postman and actual Atlas exports
+
+~~~sh
+npm run postman
+npm run export:atlas
+~~~
+
+Import postman/AfterClass.postman_collection.json into Postman. Set baseUrl to the real Render URL for the demonstration. New order generates a fresh UUID; Confirm order reuses its saved ID/updates. The replay request tests duplicate safety. General PUT intentionally changes persistent attributes, so practise against test data.
+
+The export command reads every nonsystem assessment collection in a snapshot transaction and writes canonical Extended JSON to the sibling exports folder. ObjectIds and dates are preserved for re-import. The manifest records actual collection names, counts and SHA-256 checksums. Seed data is not presented as an Atlas export.
+
+## Render and submission
+
+Connect the separate backend repository. Use Node 24, npm ci, npm start, health path /health, and the provider's PORT. Name the service with the actual student number. Supply credentials through Render environment settings. For GitHub Pages, FRONTEND_ORIGINS must be the origin without its repository path or trailing slash.
+
+Once real links, tests and exports are ready, enter the root submission-links.json and run npm run package:submission. The package command checks both repositories and exports before producing a ZIP under 10MB. Actual deployment and export remain pending.
+
+## Images and assistance
+
+public/images contains twelve unmodified Lucide 0.468.0 SVGs. Mapping/source: public/images/ATTRIBUTION.md. Licence: public/images/LICENSE.lucide. No icon JavaScript library is used.
+
+The root AI_ACKNOWLEDGEMENT.md records actual assistance. Review the code independently before the assessed demonstration.
