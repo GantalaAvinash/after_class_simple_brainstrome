@@ -42,7 +42,7 @@ The lesson editor creates or updates core fields, programme overview, age guidan
 
 experience.css supplies the richer landing composition, activity cards, teacher credits and responsive layouts. discovery.mjs derives topic categories with a More to discover fallback. These client filters intersect after the required backend search. Saved IDs alone are held in localStorage. Cart quantities remain separate.
 
-Extension tests cover admin validation, revisions, memory-only access, session expiry, saved shortlists, combined discovery filters and bearer headers. Latest native Chrome review covers desktop, 375px phone and 768px tablet. The earlier 1024/1440 checks above predate this redesign.
+Extension tests cover admin validation, revisions, memory-only access, session expiry, saved shortlists, combined discovery filters and bearer headers. The completed responsive pass covers full lesson booking and teacher CRUD/assignments at 375px and 768px, with long-content overflow checks at 320/375/768/1024px and desktop detail checks at 1440px. Fixed narrow-screen wrapping, 16px reading/input text, tap targets, dialog content and invalid teacher-form focus. These are Chromium viewport checks, not physical-device tests; see the workspace verification log and screenshots.
 
 ## Lesson details and teaching team
 

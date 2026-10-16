@@ -308,12 +308,22 @@ createApp({
     },
     saveTeacher() {
       this.teacherTouched = true;
-      if (
-        this.busy ||
-        this.pending ||
-        Object.keys(this.teacherValidation).length
-      )
+      if (this.busy || this.pending) return;
+      const invalidField = Object.keys(this.teacherValidation)[0];
+      if (invalidField) {
+        // The submit button can be below the fold on phones. Bring the error
+        // into view through the field's normal keyboard focus behaviour.
+        this.$nextTick(() =>
+          document
+            .getElementById(
+              invalidField === "lessonIds"
+                ? "teacher-firstName"
+                : "teacher-" + invalidField,
+            )
+            ?.focus(),
+        );
         return;
+      }
       return this.perform(
         teacherMutationAttempt(
           this.teacherEditing ? "update" : "create",

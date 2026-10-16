@@ -90,6 +90,9 @@
 }
 .studio-sidebar .wordmark {
   font-size: 27px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 .studio-label {
   color: #cbd99e;
@@ -171,8 +174,16 @@
   margin-left: auto;
 }
 .studio-main {
+  overflow-wrap: anywhere;
   padding: 0 38px;
   min-width: 0;
+}
+.panel-heading > div {
+  min-width: 0;
+}
+.panel-heading > .button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .studio-topbar {
   min-height: 88px;
@@ -281,6 +292,7 @@
 }
 .library-head,
 .library-row {
+  overflow-wrap: anywhere;
   display: grid;
   grid-template-columns: minmax(180px, 2fr) minmax(90px, 1fr) 75px 75px 125px;
   align-items: center;
@@ -317,6 +329,9 @@
   padding: 10px;
   border-radius: 10px;
   flex-shrink: 0;
+}
+.library-lesson > div {
+  min-width: 0;
 }
 .library-lesson h3 {
   font-size: 13px;
@@ -394,6 +409,7 @@
   border-radius: 8px;
 }
 .teacher-picker {
+  min-inline-size: 0;
   border: 1px solid #d8dfcc;
   border-radius: 8px;
   margin: 20px 0;
@@ -490,6 +506,7 @@
   margin-bottom: 20px;
 }
 dialog {
+  overflow-wrap: anywhere;
   width: min(500px, calc(100% - 32px));
   background: #fffefa;
   color: #223a32;
@@ -770,6 +787,10 @@ textarea:disabled {
   flex-shrink: 0;
   margin-top: 3px;
 }
+.lesson-assignment-picker label span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .lesson-assignment-picker small {
   display: block;
   font-size: 10px;
@@ -870,6 +891,24 @@ textarea:disabled {
 @media (max-width: 1000px) {
   .teacher-profile-grid {
     grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 1024px) {
+  .form-field input,
+  .form-field textarea,
+  .library-filters input,
+  .library-filters select {
+    font-size: 16px;
+  }
+  .profile-bio,
+  .teacher-picker label,
+  .teacher-picker .summary-note {
+    font-size: 16px;
+  }
+  .profile-specialism,
+  .profile-assignments,
+  .lesson-assignment-picker small {
+    font-size: 13px;
   }
 }
 @media (max-width: 600px) {
