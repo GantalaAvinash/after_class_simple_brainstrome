@@ -2,6 +2,7 @@ import { createApp } from './vendor/vue.esm-browser.prod.js';
 import { createApi, resolveApiBase } from './api.mjs';
 import { sortLessons, formatPrice, changeCart, cartLines, contactErrors } from './state.mjs';
 import { createAttempt, restoreAttempt, saveAttempt, submitAttempt, STORAGE_KEY } from './checkout.mjs';
+import { category, artTone, discoveryFilter, restoreSaved, SAVED_KEY } from './discovery.mjs';
 
 createApp({
   data() {
@@ -15,12 +16,15 @@ createApp({
       searchTimer: null, searchController: null, requestVersion: 0,
       enrolments: {}, enrolmentErrors: {}, enrolmentBusy: {}, imageFailures: {},
       testPreview: window.AFTERCLASS_CONFIG?.testPreview === true,
+      savedIds: [], savedOnly: false, availableOnly: false, selectedCategory: '',
     };
   },
   computed: {
     visibleLessons() {
-      return sortLessons(this.resultIds.map((id) => this.lessons[id]).filter(Boolean), this.cart, this.sortField, this.sortDirection);
+      return discoveryFilter(sortLessons(this.resultIds.map((id) => this.lessons[id]).filter(Boolean), this.cart, this.sortField, this.sortDirection), this);
     },
+    totalActivities() { return Object.values(this.lessons).filter((lesson) => !lesson.deleted).length; },
+    spotlight() { return Object.values(this.lessons).filter((lesson) => ['Art Workshop', 'Coding Club', 'Guitar Basics'].includes(lesson.topic)).slice(0, 3); },
     cartItems() { return cartLines(this.lessons, this.cart); },
     cartCount() { return this.cartItems.reduce((sum, item) => sum + item.quantity, 0); },
     cartTotal() { return this.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0); },
@@ -40,6 +44,13 @@ createApp({
   },
   methods: {
     formatPrice,
+    category, artTone,
+    teacherNames(id) { return this.teachers.filter((teacher) => teacher.lessonIds.includes(id)).map((teacher) => teacher.firstName + ' ' + teacher.lastName).join(' & '); },
+    toggleSaved(id) {
+      this.savedIds = this.savedIds.includes(id) ? this.savedIds.filter((value) => value !== id) : [...this.savedIds, id];
+      try { window.localStorage.setItem(SAVED_KEY, JSON.stringify(this.savedIds)); this.announcement = this.savedIds.includes(id) ? 'Activity saved to your shortlist.' : 'Activity removed from your shortlist.'; }
+      catch { this.announcement = 'Your shortlist works for this visit, but could not be saved on this device.'; }
+    },
     imageUrl(path) { return this.apiBase + path; },
     async showEnrolment(id) {
       if (this.enrolmentBusy[id]) return;
@@ -80,7 +91,7 @@ createApp({
       if (!Array.isArray(lessons)) throw new Error('The lesson service returned an unexpected response.');
       for (const lesson of lessons) this.lessons[lesson._id] = lesson;
     },
-    async refreshAll() { this.mergeLessons(await this.api('/lessons')); },
+    async refreshAll() { const lessons = await this.api('/lessons'); this.lessons = {}; this.mergeLessons(lessons); },
     async loadTeachers() {
       try {
         const teachers = await this.api('/teachers');
@@ -89,7 +100,7 @@ createApp({
         this.teacherError = '';
       } catch { this.teacherError = 'Teachers could not be loaded. You can still browse all activities.'; }
     },
-    clearFilters() { this.searchTerm = ''; this.teacherId = ''; },
+    clearFilters() { this.searchTerm = ''; this.teacherId = ''; this.selectedCategory = ''; this.savedOnly = false; this.availableOnly = false; },
     forgetAttempt() {
       this.attempt = null;
       try { this.storage?.removeItem(STORAGE_KEY); } catch { this.announcement = 'Your browser could not clear the saved checkout.'; }
@@ -141,6 +152,7 @@ createApp({
         if (this.teacherId) params.set('teacherId', this.teacherId);
         const lessons = await this.api('/lessons' + (params.size ? '?' + params : ''), { signal: controller.signal });
         if (version !== this.requestVersion) return;
+        if (!params.size) this.lessons = {};
         this.mergeLessons(lessons);
         this.resultIds = lessons.map((lesson) => lesson._id);
       } catch (error) {
@@ -149,6 +161,7 @@ createApp({
     },
   },
   mounted() {
+    try { this.savedIds = restoreSaved(window.localStorage); } catch { /* Shortlisting remains usable without persistent storage. */ }
     try { this.storage = window.sessionStorage; } catch { /* Checkout reports unavailable storage on submit. */ }
     if (this.storage) this.attempt = restoreAttempt(this.storage);
     if (this.attempt) {
