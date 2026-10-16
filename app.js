@@ -14,6 +14,7 @@ createApp({
       searchTerm: '', teacherId: '', teachers: [], teacherError: '',
       searchTimer: null, searchController: null, requestVersion: 0,
       enrolments: {}, enrolmentErrors: {}, enrolmentBusy: {}, imageFailures: {},
+      testPreview: window.AFTERCLASS_CONFIG?.testPreview === true,
     };
   },
   computed: {
@@ -27,7 +28,7 @@ createApp({
     contactError() { return contactErrors(this.name, this.phone); },
     cartLocked() { return this.busy || Boolean(this.attempt); },
     canCheckout() {
-      return this.cartCount > 0 && !this.busy && !this.contactError.name && !this.contactError.phone && (Boolean(this.attempt) || !this.cartConflict);
+      return this.cartCount > 0 && Boolean(this.api) && !this.busy && !this.contactError.name && !this.contactError.phone && (Boolean(this.attempt) || !this.cartConflict);
     },
   },
   watch: {
@@ -56,7 +57,10 @@ createApp({
       if (this.cartLocked) return;
       const before = this.cart[id] || 0;
       this.cart = changeCart(this.lessons, this.cart, id, 1);
-      if (this.cart[id] !== before) this.announcement = 'One place for ' + this.lessons[id].topic + ' added to your basket.';
+      if (this.cart[id] !== before) {
+        this.confirmation = '';
+        this.announcement = 'One place for ' + this.lessons[id].topic + ' added to your basket.';
+      }
     },
     removePlace(id) {
       if (this.cartLocked) return;
