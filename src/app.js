@@ -1,5 +1,7 @@
 import express from 'express';
+import { fileURLToPath } from 'node:url';
 import { cors, requestLogger } from './middleware.js';
+import { HttpError } from './errors.js';
 
 export function createApp({ db, allowedOrigins, logger }) {
   const app = express();
@@ -7,6 +9,10 @@ export function createApp({ db, allowedOrigins, logger }) {
   app.use(requestLogger(logger));
   app.use(cors(allowedOrigins));
   app.use(express.json({ limit: '20kb' }));
+  app.use('/images', express.static(fileURLToPath(new URL('../public/images/', import.meta.url)), {
+    index: false, dotfiles: 'deny', redirect: false,
+  }));
+  app.use('/images', (_req, res) => res.status(404).json({ error: 'Lesson image not found.' }));
 
   app.get('/health', async (_req, res) => {
     try {
@@ -24,6 +30,7 @@ export function createApp({ db, allowedOrigins, logger }) {
 
   app.use((_req, res) => res.status(404).json({ error: 'Route not found.' }));
   app.use((error, _req, res, _next) => {
+    if (error instanceof HttpError) return res.status(error.status).json({ error: error.message });
     if (error.type === 'entity.parse.failed') {
       return res.status(400).json({ error: 'The request body must be valid JSON.' });
     }
