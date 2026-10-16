@@ -5,6 +5,7 @@ import { HttpError } from './errors.js';
 import { registerCatalogueRoutes } from './catalogue.js';
 import { registerOrderRoutes } from './orders.js';
 import { registerUpdateRoute } from './updates.js';
+import { registerEnrolmentRoute } from './enrolment.js';
 
 export function createApp({ db, client, allowedOrigins, logger }) {
   const app = express();
@@ -29,6 +30,7 @@ export function createApp({ db, client, allowedOrigins, logger }) {
   registerCatalogueRoutes(app, db);
   registerOrderRoutes(app, db);
   registerUpdateRoute(app, db, client);
+  registerEnrolmentRoute(app, db);
 
   app.use((_req, res) => res.status(404).json({ error: 'Route not found.' }));
   app.use((error, _req, res, _next) => {

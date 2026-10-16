@@ -21,6 +21,7 @@ try {
     await db.collection(name).bulkWrite(operations);
   }
   await db.collection('order').createIndex({ requestId: 1 }, { unique: true });
+  await db.collection('order').createIndex({ status: 1, 'items.lessonId': 1 });
   console.info('Seed complete: 12 lesson IDs and 4 teacher IDs are present. Existing records were preserved.');
 } finally {
   await client.close();
