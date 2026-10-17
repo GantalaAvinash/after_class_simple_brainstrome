@@ -1,6 +1,6 @@
 # AfterClass Studio API and operating notes
 
-All admin routes return `Cache-Control: no-store`. Send JSON with `Content-Type: application/json`. After sign-in, send `Authorization: Bearer TOKEN`. Tokens have a fixed 30-minute lifetime; the server checks expiry and the current credential fingerprint on every protected request. No public registration exists.
+All admin routes return `Cache-Control: no-store`. Management requests use JSON with `Content-Type: application/json`. Sign-in also accepts `application/x-www-form-urlencoded` fields `username`/`password`, which the browser uses to avoid the login preflight; existing JSON sign-in clients remain supported. After sign-in, send `Authorization: Bearer TOKEN`. Tokens have a fixed 30-minute lifetime; the server checks expiry and the current credential fingerprint on every protected request. No public registration exists.
 
 ## Configure and recover access
 
@@ -85,3 +85,7 @@ Overview is a small-catalogue reporting read, not a transactional accounting sta
 This is an educational single-operator implementation, not a claim of external security certification. The coursework stack is preserved. Architecture decisions: [001-admin-extension.md](adr/001-admin-extension.md) and [002-details-and-teachers.md](adr/002-details-and-teachers.md).
 
 Implementation references: [Node crypto](https://nodejs.org/docs/latest-v24.x/api/crypto.html), [OWASP password storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html), [OWASP session management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html), [MongoDB compound operations](https://www.mongodb.com/docs/drivers/node/current/crud/compound-operations/).
+
+## Timing diagnostics
+
+Responses carry a generated X-Request-Id and Server-Timing values. Login separates database counter access, unchanged scrypt verification and session storage from total app time. These headers and log durations contain no credentials, tokens or customer fields. Cross-origin timing visibility is restricted to the configured origins. CORS preflight permissions can be reused for 600 seconds; this does not cache session validation, protected responses or availability.

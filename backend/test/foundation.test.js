@@ -88,7 +88,11 @@ test("CORS preflight allows JSON POST and PUT", async (t) => {
     method: "OPTIONS",
     headers: { Origin: "http://localhost:8080" },
   });
-  assert.equal(response.status, 204);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("content-length"), "0");
+  assert.equal(await response.text(), "");
+  assert.equal(response.headers.get("etag"), null);
+  assert.equal(response.headers.get("access-control-max-age"), "600");
   assert.match(response.headers.get("access-control-allow-methods"), /PUT/);
   assert.equal(
     response.headers.get("access-control-allow-headers"),

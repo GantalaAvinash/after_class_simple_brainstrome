@@ -145,3 +145,9 @@ The service is configured from this combined repository. Hosted verification and
 ## Executed Postman checks
 
 The official Newman 6.2.3 runner executed the actual collection: 37 requests/52 assertions passed on real Atlas test data; 14 read-only hosted requests/23 assertions passed. The runner injects ephemeral test credentials in memory, allocates fresh fixture IDs and removes its own records. It saves only allowlisted evidence, never raw reports or populated environments. Install Newman separately from production dependencies and follow root SUBMISSION_GUIDE.md.
+
+## Request timing and Safari login transport
+
+POST /admin/session accepts either the existing JSON object or application/x-www-form-urlencoded fields username/password. Both use the same validation, salted scrypt verification, global rate limit and session handling. Browser login uses form encoding to avoid a cross-origin preflight before verifying a password. All coursework order/PUT requests retain their JSON contracts.
+
+CORS returns an explicit empty 200 permission response with Content-Length: 0 and no entity ETag; Access-Control-Max-Age: 600 lets the browser reuse permission decisions. Every protected request still checks its bearer session in MongoDB. Allowed origins remain exact matches. X-Request-Id links a response to its log entry, and Server-Timing reports application duration and login phases auth_db, password and session_db. Logs contain start/end times and durations, never credentials, tokens or request bodies. Timing-Allow-Origin/Expose-Headers apply only to allowed origins.

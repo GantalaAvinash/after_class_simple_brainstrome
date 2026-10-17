@@ -38,7 +38,7 @@ async function setup(t, credentials = admin) {
       headers: response.headers,
     };
   };
-  return { ...data, request };
+  return { ...data, request, base: "http://127.0.0.1:" + server.address().port };
 }
 
 test("admin access fails closed without credentials; public browsing remains available", async (t) => {
@@ -314,4 +314,29 @@ test("credential rotation invalidates sessions even before their expiry", async 
     rotated.authenticate("Bearer " + session.token),
     (error) => error.status === 401,
   );
+});
+
+
+test("form login preserves authentication, throttling and credential-free timing headers", async (t) => {
+  const { request, base, state } = await setup(t);
+  const post = async body => fetch(base + "/admin/session", {
+    method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8", Origin: "http://localhost:8080" },
+    body: new URLSearchParams(body).toString(),
+  });
+  const response = await post({ username: "operator", password });
+  assert.equal(response.status, 201);
+  const session = await response.json();
+  assert.equal((await request("/admin/lessons", "GET", undefined, session.token)).status, 200);
+  const timing = response.headers.get("server-timing");
+  for (const name of ["auth_db", "password", "session_db", "app"]) assert.match(timing, new RegExp(name + ";dur=\\d"));
+  assert.equal(response.headers.get("timing-allow-origin"), "http://localhost:8080");
+  assert.match(response.headers.get("x-request-id"), /^[a-f0-9-]{36}$/);
+  assert.ok(!timing.includes(password) && !timing.includes(session.token));
+  assert.equal((await post({ username: "operator", password: "wrong" })).status, 401);
+  assert.equal((await post({ username: "operator", password, extra: "forbidden" })).status, 401);
+  const duplicate = await fetch(base + "/admin/session", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "username=operator&username=other&password=wrong" });
+  assert.equal(duplicate.status, 401);
+  assert.equal(state.adminLoginAttempt[0].count, 4);
+  assert.equal((await request("/admin/session", "DELETE", undefined, session.token)).status, 200);
+  assert.equal((await request("/admin/lessons", "GET", undefined, session.token)).status, 401);
 });

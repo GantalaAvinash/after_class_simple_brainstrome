@@ -32,13 +32,18 @@ export function createAdminAuth(db, { username = "", passwordHash = "" } = {}) {
   const configured =
     /^[a-z0-9_-]{3,40}$/.test(username) && validPasswordHash(passwordHash);
   const credentialVersion = digest(username + ":" + passwordHash);
-  async function login(body) {
+  async function login(body, timings = []) {
+    const timed = async (name, operation) => {
+      const start = performance.now();
+      try { return await operation(); }
+      finally { timings.push({ name, durationMs: Number((performance.now() - start).toFixed(1)) }); }
+    };
     requireValue(configured, "Admin sign-in has not been configured.", 503);
     const now = Date.now();
     const bucket = Math.floor(now / LOGIN_WINDOW_MS);
     // A database counter remains effective across processes and restarts. Count
     // every attempt, including unknown usernames; never trust proxy IP headers.
-    const count = await db
+    const count = await timed('auth_db', () => db
       .collection("adminLoginAttempt")
       .findOneAndUpdate(
         { _id: "login:" + bucket },
@@ -47,7 +52,7 @@ export function createAdminAuth(db, { username = "", passwordHash = "" } = {}) {
           $setOnInsert: { expiresAt: new Date((bucket + 1) * LOGIN_WINDOW_MS) },
         },
         { upsert: true, returnDocument: "after" },
-      );
+      ));
     if (count.count > LOGIN_LIMIT) {
       const error = new HttpError(
         429,
@@ -70,7 +75,7 @@ export function createAdminAuth(db, { username = "", passwordHash = "" } = {}) {
       401,
     );
     const [, salt, expected] = passwordHash.split(":");
-    const key = await derive(body.password, salt, 64, SCRYPT);
+    const key = await timed('password', () => derive(body.password, salt, 64, SCRYPT));
     const correctPassword = timingSafeEqual(key, Buffer.from(expected, "hex"));
     requireValue(
       correctPassword && body.username === username,
@@ -79,14 +84,14 @@ export function createAdminAuth(db, { username = "", passwordHash = "" } = {}) {
     );
     const token = randomBytes(32).toString("hex");
     const expiresAt = new Date(now + SESSION_MS);
-    await db
+    await timed('session_db', () => db
       .collection("adminSession")
       .insertOne({
         _id: digest(token),
         username,
         credentialVersion,
         expiresAt,
-      });
+      }));
     return { token, username, expiresAt };
   }
   async function authenticate(header) {
@@ -123,7 +128,7 @@ export function registerAdminSessionRoutes(app, db, auth) {
     next();
   });
   app.post("/admin/session", async (req, res) =>
-    res.status(201).json(await auth.login(req.body)),
+    res.status(201).json(await auth.login(req.body, req.timings)),
   );
   app.get("/admin/session", auth.guard, (req, res) =>
     res.json({ username: req.admin.username, expiresAt: req.admin.expiresAt }),

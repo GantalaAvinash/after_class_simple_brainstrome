@@ -15,6 +15,9 @@ export function createApp({ db, client, allowedOrigins, logger, admin }) {
   app.disable("x-powered-by");
   app.use(requestLogger(logger));
   app.use(cors(allowedOrigins));
+  // Simple form encoding avoids a needless preflight before password checking.
+  // Existing JSON clients remain supported; both paths use the same validator.
+  app.use('/admin/session', express.urlencoded({ extended: false, limit: '20kb', parameterLimit: 3 }));
   app.use(express.json({ limit: "20kb" }));
   app.use(
     "/images",
@@ -66,7 +69,7 @@ export function createApp({ db, client, allowedOrigins, logger, admin }) {
         .status(400)
         .json({ error: "The request body must be valid JSON." });
     }
-    if (error.type === "entity.too.large") {
+    if (["entity.too.large", "parameters.too.many"].includes(error.type)) {
       return res.status(413).json({ error: "The request body is too large." });
     }
     res.status(500).json({ error: "The request could not be completed." });
