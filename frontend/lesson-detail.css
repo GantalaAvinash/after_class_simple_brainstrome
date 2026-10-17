@@ -1,0 +1,327 @@
+.lesson-title-link {
+  text-decoration: none;
+}
+.lesson-title-link:hover {
+  color: #8c4127;
+}
+.lesson-details-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin: -8px 0 12px;
+  color: #3f5b39;
+  font-size: 12px;
+  text-decoration: none;
+}
+.lesson-details-link:hover {
+  text-decoration: underline;
+}
+.detail-page {
+  overflow-wrap: anywhere;
+  padding-block: 24px 72px;
+  min-height: 65vh;
+}
+.detail-back {
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+  border-bottom: 1px solid #b9c7a8;
+  margin-bottom: 30px;
+}
+.detail-back:hover {
+  color: #8c4127;
+}
+.detail-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 46px;
+}
+.detail-art {
+  min-height: 330px;
+  border-radius: 110px 18px 18px 18px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.detail-art img {
+  width: 100px;
+  height: 100px;
+  opacity: 0.75;
+  transform: rotate(-7deg);
+}
+.detail-art .art-orbit {
+  width: 210px;
+  height: 210px;
+  top: calc(50% - 105px);
+  left: calc(50% - 105px);
+  box-shadow:
+    0 0 0 40px #ffffff26,
+    0 0 0 80px #ffffff16;
+}
+.detail-art .art-label {
+  left: 28px;
+  bottom: 24px;
+}
+.detail-heading h1 {
+  font-size: clamp(38px, 4.5vw, 64px);
+  letter-spacing: -2px;
+  margin: 18px 0;
+}
+.detail-heading .eyebrow {
+  color: #667c53;
+}
+.detail-heading .detail-intro {
+  max-width: 600px;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0;
+  margin: 25px 0 0;
+  list-style: none;
+}
+.detail-meta li {
+  font-size: 11px;
+  background: #eef2e7;
+  border: 1px solid #dce4d2;
+  border-radius: 25px;
+  padding: 10px 14px;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
+  gap: 48px;
+  align-items: start;
+}
+.detail-copy section {
+  padding-block: 0 32px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+.detail-copy section:last-child {
+  border: 0;
+}
+.detail-copy h2 {
+  font-size: 30px;
+  margin-bottom: 22px;
+}
+.detail-copy .overview-text {
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.outcome-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+.outcome-list li {
+  display: flex;
+  align-items: start;
+  gap: 14px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.outcome-list li span {
+  color: #506d3d;
+  background: #e9efdf;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+.detail-teachers {
+  display: grid;
+  gap: 16px;
+}
+.detail-teacher {
+  overflow-wrap: anywhere;
+  padding: 22px;
+  border: 1px solid #dce3d3;
+  border-radius: 14px;
+  background: #fffefa;
+}
+.detail-teacher-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.detail-teacher .teacher-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  font-size: 16px;
+}
+.detail-teacher h3 {
+  font-size: 16px;
+  margin: 0 0 7px;
+}
+.detail-teacher small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.detail-teacher p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+  white-space: pre-line;
+}
+.detail-teacher a {
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #3e5b30;
+}
+.detail-booking {
+  background: #edf2e5;
+  border: 1px solid #d5dfc8;
+  padding: 28px;
+  border-radius: 18px;
+  position: sticky;
+  top: 24px;
+}
+.detail-booking h2 {
+  font:
+    32px Georgia,
+    serif;
+  margin: 15px 0 8px;
+}
+.detail-booking .detail-price-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+.detail-booking .detail-availability {
+  padding-block: 18px;
+  border-block: 1px solid #d3dec7;
+  margin: 22px 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.detail-booking .button {
+  width: 100%;
+  margin-bottom: 12px;
+  border-radius: 26px;
+}
+.detail-booking .remove-button {
+  display: block;
+  width: 100%;
+}
+.detail-basket-note {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #42563b;
+  margin-bottom: 18px;
+}
+.detail-booking .enrolment-row {
+  border-top: 1px solid #d3dec7;
+  margin-top: 22px;
+  padding-top: 10px;
+}
+.detail-example-note {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+  padding: 18px 0 0;
+  margin: 0;
+}
+.detail-copy .empty-content {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+@media (max-width: 950px) {
+  .detail-heading {
+    gap: 30px;
+  }
+  .detail-art {
+    min-height: 290px;
+  }
+  .detail-layout {
+    gap: 30px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  }
+  .detail-booking {
+    padding: 24px;
+  }
+  .detail-heading h1 {
+    font-size: 45px;
+  }
+}
+@media (max-width: 700px) {
+  .detail-page {
+    padding-top: 10px;
+  }
+  .detail-back {
+    margin-bottom: 24px;
+  }
+  .detail-heading {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-bottom: 32px;
+  }
+  .detail-art {
+    min-height: 245px;
+    border-top-left-radius: 75px;
+  }
+  .detail-art img {
+    width: 80px;
+    height: 80px;
+  }
+  .detail-art .art-orbit {
+    width: 160px;
+    height: 160px;
+    top: calc(50% - 80px);
+    left: calc(50% - 80px);
+  }
+  .detail-heading h1 {
+    font-size: 42px;
+  }
+  .detail-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .detail-copy,
+  .detail-booking {
+    width: 100%;
+  }
+  .detail-booking {
+    position: static;
+  }
+  .detail-copy h2 {
+    font-size: 28px;
+  }
+  .detail-heading .detail-intro,
+  .detail-copy .overview-text,
+  .detail-copy .empty-content,
+  .outcome-list li,
+  .detail-teacher p {
+    font-size: 16px;
+  }
+  .detail-teacher small,
+  .detail-teacher a,
+  .detail-basket-note,
+  .detail-example-note,
+  .detail-booking .detail-price-note {
+    font-size: 13px;
+  }
+}
