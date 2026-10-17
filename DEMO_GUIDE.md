@@ -61,3 +61,9 @@ Do not change production configuration or reset live orders merely for a rehears
 | Demonstration booked/attended | Not recorded |
 
 Automated passes and developer/Codex walkthroughs are technical evidence. They do not fill this student record or constitute an assessed demonstration.
+
+## Cart and email update — 17 October 2026
+
+Show the visible added notification, the persistent selected-place note and the lesson's View cart action. Increase/decrease quantities in the cart; explain the capacity limit and removal of the last line. Email is optional, validated on browser/server and saved with the order; no message is sent. Old pending checkouts without email still recover with their original request IDs. Use disposable preview/test data for practice purchases, not assessment stock.
+
+For the normal-Safari checks, reload the public catalogue and sign in to Studio after warming the API. API reads bypass caches and retry a transport failure once within a total 90-second budget. Login and checkout submissions do not automatically replay. An intermittent browser connection cause was observed but not conclusively identified; do not claim a hosting upgrade or privacy-setting change was necessary.

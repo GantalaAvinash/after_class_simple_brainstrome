@@ -96,6 +96,8 @@ app.js owns lessons as an ID-indexed dictionary, resultIds for the latest server
 
 availableSpace calculates max(0, stored lesson.space − cart quantity). With stored space five and basket quantity two, the page shows three available to add; Atlas still holds five until checkout confirmation. Basket additions do not reserve places for other users. changeCart accepts a single-place addition/removal, refuses additions at zero and removes zero-quantity entries. Removing the last line returns to the catalogue; an empty basket button stays disabled.
 
+The first add shows a visible notification for six seconds, a selected-quantity note and a View cart action on the lesson. Use the cart's labelled plus/minus controls for additional places; the plus button disables at the server's stock limit. Decreasing to zero removes that line. Quantity controls lock during an unfinished checkout. The detail page uses the same feedback and state.
+
 sortLessons returns a sorted copy. Topic/location use locale-aware text comparison; price and displayed available spaces use subtraction. This is why 9 sorts before 100. There are four fields × two directions. An ID tie-break makes equal values deterministic. v-for renders records, v-on connects controls to methods and v-model binds input values. Computed properties derive visibleLessons, basket lines, totals and checkout eligibility; methods perform actions and requests.
 
 Lesson details use #/lessons/:id. The fragment lets a static Pages deployment load a detail URL without needing a server route for that path. lessonRoute validates it; createLessonLoader cancels superseded loads and checks response shape. Details and catalogue share the same basket. Missing/deleted details receive an error state. Ordinary browsing baskets live in memory and disappear on reload; an unfinished checkout is restored separately.
@@ -114,7 +116,7 @@ GET /enrolment/:lessonid finds confirmed orders containing that lesson and sums 
 
 Use this trace to explain the transaction in your own words. The example assumes a practice lesson has five places and the basket requests two.
 
-1. app.js checkout checks canCheckout. Browser and server require a nonempty letters-only name and digits-only phone; checkout names cannot contain spaces, although teacher profile names have broader Unicode rules. Ava / 007123456 is fictitious valid input.
+1. app.js checkout checks canCheckout. Browser and server require a nonempty letters-only name and digits-only phone; checkout names cannot contain spaces, although teacher profile names have broader Unicode rules. Ava / 007123456 is fictitious valid input. Email is optional; a supplied address is trimmed and validated on both sides, saved with the order and preserved on reload. No email is sent. Blank email is omitted so old retry hashes stay compatible.
 2. createAttempt creates one UUID and a payload with quantities. saveAttempt stores it before the request. Double-click protection and cartLocked prevent concurrent edits while an outcome is uncertain.
 3. submitAttempt POSTs /orders. normaliseOrder checks the UUID, contact fields, nonempty unique lesson items and positive integer quantities. The server reads current stock/price and stores a pending order item with spaceBefore five, spaceAfter three and the current unitPrice. Pending does not deduct stock.
 4. The server returns orderId, pending status and the complete proposed absolute updates. The browser saves the response and PUTs /lessons with that order ID and those targets.
@@ -280,3 +282,11 @@ The student should complete this record personally; blank entries mean no eviden
 | Booked and attended the assessed demonstration without AI | Not recorded |
 
 The technical evidence is supplied to help the student inspect and understand the implementation. The student remains responsible for accurate disclosure, permitted assessment use, independent explanation and their own submission/demonstration actions.
+
+## 17. Safari and cart maintenance update — 17 October 2026
+
+API reads bypass caches and retry a transport failure once using a fresh URL. The first GET has up to 15 seconds; the retry uses the remaining overall 90-second budget. A cancelled search cannot retry and replace newer results. POST/PUT/DELETE are not automatically replayed; checkout and admin workflows still use their explicit saved request IDs. HTTP error responses and malformed JSON are surfaced immediately. API JSON responses prohibit caching; static images retain separate caching. First-party release asset URLs have a version suffix.
+
+The developer observed an intermittent normal-Safari connection stall even when Render was warm. Direct API probes and private Safari worked, and normal Safari subsequently recovered. The precise browser transport cause was not proven. Do not describe a private-window workaround or warm-up as proof that every normal-profile failure is fixed. Verify the public catalogue and a fresh Studio sign-in in normal Safari after deployment. Password hashing and browser security settings are unchanged.
+
+Practice on disposable fixtures: add a lesson, observe the notification/View cart action, increase to five, verify plus disables, decrease and verify totals, then remove the last place. Try invalid and valid optional email, complete a fictitious checkout and explain why the email does not change transaction/duplicate-protection guarantees. The existing PDF pack remains a dated snapshot; this Markdown guide contains this later maintenance update.
