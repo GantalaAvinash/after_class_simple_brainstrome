@@ -10,3 +10,4 @@ exports/
 *.zip
 __pycache__/
 *.pyc
+output/
