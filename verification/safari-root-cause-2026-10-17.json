@@ -1,0 +1,976 @@
+{
+  "baselineLogin": {
+    "method": "POST",
+    "path": "/admin/session",
+    "status": 201,
+    "httpVersion": "",
+    "started": "2026-10-17T12:04:42.136Z",
+    "totalMs": 34088.401641653036,
+    "timings": {
+      "blocked": 31180.46770647925,
+      "dns": -1,
+      "connect": -1,
+      "ssl": -1,
+      "send": 0,
+      "wait": 2906.99880100874,
+      "receive": 0.9351341650472023
+    },
+    "metrics": {}
+  },
+  "beforeListenerFix": {
+    "credentials": "omit",
+    "retries": 0,
+    "results": [
+      {
+        "run": 1,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 12204,
+        "beforeRequestMs": 36,
+        "appMs": 66.8,
+        "result": "12 records"
+      },
+      {
+        "run": 1,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 158,
+        "beforeRequestMs": 1,
+        "appMs": 65.7,
+        "result": "4 records"
+      },
+      {
+        "run": 2,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 158,
+        "beforeRequestMs": 1,
+        "appMs": 64.6,
+        "result": "12 records"
+      },
+      {
+        "run": 2,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 167,
+        "beforeRequestMs": 2,
+        "appMs": 64.6,
+        "result": "4 records"
+      },
+      {
+        "run": 3,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 143,
+        "beforeRequestMs": 2,
+        "appMs": 64.7,
+        "result": "12 records"
+      },
+      {
+        "run": 3,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 154,
+        "beforeRequestMs": 1,
+        "appMs": 64.4,
+        "result": "4 records"
+      },
+      {
+        "run": 4,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 161,
+        "beforeRequestMs": 2,
+        "appMs": 64.5,
+        "result": "12 records"
+      },
+      {
+        "run": 4,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 162,
+        "beforeRequestMs": 1,
+        "appMs": 64.4,
+        "result": "4 records"
+      },
+      {
+        "run": 5,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 145,
+        "beforeRequestMs": 1,
+        "appMs": 64.6,
+        "result": "12 records"
+      },
+      {
+        "run": 5,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 164,
+        "beforeRequestMs": 1,
+        "appMs": 65.1,
+        "result": "4 records"
+      }
+    ]
+  },
+  "formLoginFirstStage": {
+    "encoding": "form",
+    "credentials": "omit",
+    "retries": 0,
+    "results": [
+      {
+        "run": 1,
+        "request": "POST /admin/session",
+        "status": 201,
+        "protocol": "h3",
+        "totalMs": 3010,
+        "beforeRequestMs": 39,
+        "responseWaitMs": 2963,
+        "appMs": 2704.1,
+        "passwordMs": 2551.3,
+        "result": "Success"
+      },
+      {
+        "run": 1,
+        "request": "GET /admin/teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 450,
+        "beforeRequestMs": 2,
+        "responseWaitMs": 275,
+        "appMs": 185.6,
+        "passwordMs": null,
+        "result": "5 records"
+      },
+      {
+        "run": 1,
+        "request": "GET /admin/lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 947,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 701,
+        "appMs": 620.9,
+        "passwordMs": null,
+        "result": "12 lessons"
+      },
+      {
+        "run": 1,
+        "request": "GET /admin/overview",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 1080,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 791,
+        "appMs": 704.5,
+        "passwordMs": null,
+        "result": "12 lessons"
+      },
+      {
+        "run": 1,
+        "request": "DELETE /admin/session",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 303,
+        "beforeRequestMs": 2,
+        "responseWaitMs": 199,
+        "appMs": 132,
+        "passwordMs": null,
+        "result": "Signed out"
+      },
+      {
+        "run": 2,
+        "request": "POST /admin/session",
+        "status": 201,
+        "protocol": "h3",
+        "totalMs": 3006,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 2998,
+        "appMs": 2913.4,
+        "passwordMs": 2778.7,
+        "result": "Success"
+      },
+      {
+        "run": 2,
+        "request": "GET /admin/teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 210,
+        "beforeRequestMs": 4,
+        "responseWaitMs": 199,
+        "appMs": 128.3,
+        "passwordMs": null,
+        "result": "5 records"
+      },
+      {
+        "run": 2,
+        "request": "GET /admin/lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 294,
+        "beforeRequestMs": 3,
+        "responseWaitMs": 282,
+        "appMs": 189.6,
+        "passwordMs": null,
+        "result": "12 lessons"
+      },
+      {
+        "run": 2,
+        "request": "GET /admin/overview",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 428,
+        "beforeRequestMs": 4,
+        "responseWaitMs": 415,
+        "appMs": 322,
+        "passwordMs": null,
+        "result": "12 lessons"
+      },
+      {
+        "run": 2,
+        "request": "DELETE /admin/session",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 223,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 215,
+        "appMs": 129.1,
+        "passwordMs": null,
+        "result": "Signed out"
+      },
+      {
+        "run": 3,
+        "request": "POST /admin/session",
+        "status": 201,
+        "protocol": "h3",
+        "totalMs": 2781,
+        "beforeRequestMs": 2,
+        "responseWaitMs": 2772,
+        "appMs": 2684.9,
+        "passwordMs": 2531.1,
+        "result": "Success"
+      },
+      {
+        "run": 3,
+        "request": "GET /admin/teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 226,
+        "beforeRequestMs": 3,
+        "responseWaitMs": 215,
+        "appMs": 126.8,
+        "passwordMs": null,
+        "result": "5 records"
+      },
+      {
+        "run": 3,
+        "request": "GET /admin/lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 260,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 255,
+        "appMs": 189.5,
+        "passwordMs": null,
+        "result": "12 lessons"
+      },
+      {
+        "run": 3,
+        "request": "GET /admin/overview",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 426,
+        "beforeRequestMs": 4,
+        "responseWaitMs": 414,
+        "appMs": 319.7,
+        "passwordMs": null,
+        "result": "12 lessons"
+      },
+      {
+        "run": 3,
+        "request": "DELETE /admin/session",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 219,
+        "beforeRequestMs": 2,
+        "responseWaitMs": 211,
+        "appMs": 130.8,
+        "passwordMs": null,
+        "result": "Signed out"
+      }
+    ]
+  },
+  "afterListenerFixRound1": {
+    "capturedAt": "2026-10-17T12:29:47.286Z",
+    "retries": 0,
+    "warmup": false,
+    "results": [
+      {
+        "run": 1,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 372,
+        "beforeRequestMs": 53,
+        "responseWaitMs": 312,
+        "appMs": 79.6,
+        "result": "12 records"
+      },
+      {
+        "run": 1,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 193,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 186,
+        "appMs": 90.6,
+        "result": "4 records"
+      },
+      {
+        "run": 2,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 159,
+        "beforeRequestMs": 2,
+        "responseWaitMs": 149,
+        "appMs": 64.1,
+        "result": "12 records"
+      },
+      {
+        "run": 2,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 148,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 143,
+        "appMs": 66.7,
+        "result": "4 records"
+      },
+      {
+        "run": 3,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 156,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 152,
+        "appMs": 65.9,
+        "result": "12 records"
+      },
+      {
+        "run": 3,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 163,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 159,
+        "appMs": 68.8,
+        "result": "4 records"
+      },
+      {
+        "run": 4,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 156,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 150,
+        "appMs": 63.3,
+        "result": "12 records"
+      },
+      {
+        "run": 4,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 155,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 151,
+        "appMs": 62.6,
+        "result": "4 records"
+      },
+      {
+        "run": 5,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 143,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 137,
+        "appMs": 63.2,
+        "result": "12 records"
+      },
+      {
+        "run": 5,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 161,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 152,
+        "appMs": 62.5,
+        "result": "4 records"
+      }
+    ]
+  },
+  "privacy": "Allowlisted timing/status/counts only; raw HAR containing credentials was removed.",
+  "capturedAt": "2026-10-17",
+  "apiRevision": "c5b47287520b775d0281ff4d8eb6c434a85beaa5",
+  "frontendRevision": "6b5f26149f5d6ae00224f1706d41d63f196bbbd2",
+  "afterListenerFixRound2": {
+    "capturedAt": "2026-10-17T12:31:35.283Z",
+    "idleSincePreviousCaptureMs": 59273,
+    "retries": 0,
+    "warmup": false,
+    "results": [
+      {
+        "run": 1,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 325,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 323,
+        "appMs": 63.5,
+        "result": "12 records"
+      },
+      {
+        "run": 1,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 144,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 140,
+        "appMs": 64.8,
+        "result": "4 records"
+      },
+      {
+        "run": 2,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 158,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 155,
+        "appMs": 63.5,
+        "result": "12 records"
+      },
+      {
+        "run": 2,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 143,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 141,
+        "appMs": 62.7,
+        "result": "4 records"
+      },
+      {
+        "run": 3,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 152,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 149,
+        "appMs": 62.8,
+        "result": "12 records"
+      },
+      {
+        "run": 3,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 139,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 137,
+        "appMs": 62.4,
+        "result": "4 records"
+      },
+      {
+        "run": 4,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 135,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 132,
+        "appMs": 65.2,
+        "result": "12 records"
+      },
+      {
+        "run": 4,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 135,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 131,
+        "appMs": 62.7,
+        "result": "4 records"
+      },
+      {
+        "run": 5,
+        "request": "GET /lessons",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 139,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 136,
+        "appMs": 64.1,
+        "result": "12 records"
+      },
+      {
+        "run": 5,
+        "request": "GET /teachers",
+        "status": 200,
+        "protocol": "h3",
+        "totalMs": 133,
+        "beforeRequestMs": 1,
+        "responseWaitMs": 131,
+        "appMs": 62.5,
+        "result": "4 records"
+      }
+    ]
+  },
+  "afterListenerFixRound3": {
+    "capturedAt": "2026-10-17T12:37:05.492Z",
+    "retries": 0,
+    "warmup": false,
+    "results": [
+      {
+        "run": "1",
+        "request": "GET /lessons",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "273",
+        "beforeRequestMs": "28",
+        "responseWaitMs": "243",
+        "appMs": "63",
+        "passwordMs": "\u2014",
+        "result": "12 records"
+      },
+      {
+        "run": "1",
+        "request": "GET /teachers",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "157",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "153",
+        "appMs": "62.4",
+        "passwordMs": "\u2014",
+        "result": "4 records"
+      },
+      {
+        "run": "2",
+        "request": "GET /lessons",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "135",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "131",
+        "appMs": "63",
+        "passwordMs": "\u2014",
+        "result": "12 records"
+      },
+      {
+        "run": "2",
+        "request": "GET /teachers",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "145",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "142",
+        "appMs": "62.4",
+        "passwordMs": "\u2014",
+        "result": "4 records"
+      },
+      {
+        "run": "3",
+        "request": "GET /lessons",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "143",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "139",
+        "appMs": "63.4",
+        "passwordMs": "\u2014",
+        "result": "12 records"
+      },
+      {
+        "run": "3",
+        "request": "GET /teachers",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "137",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "133",
+        "appMs": "62.4",
+        "passwordMs": "\u2014",
+        "result": "4 records"
+      },
+      {
+        "run": "4",
+        "request": "GET /lessons",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "166",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "162",
+        "appMs": "62.8",
+        "passwordMs": "\u2014",
+        "result": "12 records"
+      },
+      {
+        "run": "4",
+        "request": "GET /teachers",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "142",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "138",
+        "appMs": "62.3",
+        "passwordMs": "\u2014",
+        "result": "4 records"
+      },
+      {
+        "run": "5",
+        "request": "GET /lessons",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "155",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "150",
+        "appMs": "63",
+        "passwordMs": "\u2014",
+        "result": "12 records"
+      },
+      {
+        "run": "5",
+        "request": "GET /teachers",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "137",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "132",
+        "appMs": "62.3",
+        "passwordMs": "\u2014",
+        "result": "4 records"
+      }
+    ]
+  },
+  "currentRawFormLogins": {
+    "capturedAt": "2026-10-17T12:37:23.821Z",
+    "encoding": "form",
+    "credentials": "omit",
+    "retries": 0,
+    "results": [
+      {
+        "run": "1",
+        "request": "POST /admin/session",
+        "status": "201",
+        "protocol": "h3",
+        "totalMs": "3112",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "3107",
+        "appMs": "2996.5",
+        "passwordMs": "2847.5",
+        "result": "Success"
+      },
+      {
+        "run": "1",
+        "request": "GET /admin/teachers",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "389",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "307",
+        "appMs": "128.7",
+        "passwordMs": "\u2014",
+        "result": "5 records"
+      },
+      {
+        "run": "1",
+        "request": "GET /admin/overview",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "502",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "412",
+        "appMs": "338.5",
+        "passwordMs": "\u2014",
+        "result": "12 lessons"
+      },
+      {
+        "run": "1",
+        "request": "GET /admin/lessons",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "944",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "728",
+        "appMs": "592.8",
+        "passwordMs": "\u2014",
+        "result": "12 lessons"
+      },
+      {
+        "run": "1",
+        "request": "DELETE /admin/session",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "275",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "197",
+        "appMs": "131.8",
+        "passwordMs": "\u2014",
+        "result": "Signed out"
+      },
+      {
+        "run": "2",
+        "request": "POST /admin/session",
+        "status": "201",
+        "protocol": "h3",
+        "totalMs": "2959",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "2954",
+        "appMs": "2852.8",
+        "passwordMs": "2718.4",
+        "result": "Success"
+      },
+      {
+        "run": "2",
+        "request": "GET /admin/teachers",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "211",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "207",
+        "appMs": "128.1",
+        "passwordMs": "\u2014",
+        "result": "5 records"
+      },
+      {
+        "run": "2",
+        "request": "GET /admin/lessons",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "270",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "267",
+        "appMs": "191",
+        "passwordMs": "\u2014",
+        "result": "12 lessons"
+      },
+      {
+        "run": "2",
+        "request": "GET /admin/overview",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "387",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "382",
+        "appMs": "309.9",
+        "passwordMs": "\u2014",
+        "result": "12 lessons"
+      },
+      {
+        "run": "2",
+        "request": "DELETE /admin/session",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "216",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "212",
+        "appMs": "131.3",
+        "passwordMs": "\u2014",
+        "result": "Signed out"
+      },
+      {
+        "run": "3",
+        "request": "POST /admin/session",
+        "status": "201",
+        "protocol": "h3",
+        "totalMs": "3031",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "3027",
+        "appMs": "2950.5",
+        "passwordMs": "2796.2",
+        "result": "Success"
+      },
+      {
+        "run": "3",
+        "request": "GET /admin/teachers",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "228",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "223",
+        "appMs": "127.3",
+        "passwordMs": "\u2014",
+        "result": "5 records"
+      },
+      {
+        "run": "3",
+        "request": "GET /admin/lessons",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "286",
+        "beforeRequestMs": "1",
+        "responseWaitMs": "283",
+        "appMs": "186.7",
+        "passwordMs": "\u2014",
+        "result": "12 lessons"
+      },
+      {
+        "run": "3",
+        "request": "GET /admin/overview",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "463",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "443",
+        "appMs": "332.3",
+        "passwordMs": "\u2014",
+        "result": "12 lessons"
+      },
+      {
+        "run": "3",
+        "request": "DELETE /admin/session",
+        "status": "200",
+        "protocol": "h3",
+        "totalMs": "198",
+        "beforeRequestMs": "2",
+        "responseWaitMs": "194",
+        "appMs": "131.1",
+        "passwordMs": "\u2014",
+        "result": "Signed out"
+      }
+    ]
+  },
+  "adverseResults": [
+    {
+      "capturedAt": "2026-10-17T12:34:51.801Z",
+      "encoding": "json",
+      "credentials": "same-origin",
+      "retries": 0,
+      "result": "Legacy JSON comparison remained pending without a response; page reloaded to cancel it. This path is no longer used by Studio.",
+      "businessDataChanged": false
+    },
+    {
+      "capturedAt": "2026-10-17T12:36:38.224Z",
+      "encoding": "form",
+      "credentials": "omit",
+      "result": "One raw form sign-in failed before an HTTP response after the deliberately stalled legacy JSON comparison.",
+      "totalMs": 43095,
+      "retries": 0,
+      "serverTiming": null
+    }
+  ],
+  "interpretation": {
+    "confirmed": "Node default 5-second idle timeout was shorter than Render\u2019s 75-second upstream reuse window; production listener corrected to 120 seconds. Baseline login extra delay was queued outside password verification. JSON preflight comparison remained pending; form plus browser connection verification is used by Studio.",
+    "limits": "Provider packet traces unavailable. An exact Safari/QUIC defect is not established. A raw form failure after the deliberately stalled JSON comparison is retained; repeated application UI verification is recorded separately.",
+    "businessData": "No live lesson, teacher, order, price or availability changes; auth sessions created and revoked only."
+  },
+  "tests": {
+    "backendPassed": 56,
+    "frontendPassed": 34,
+    "nativeAtlasPassed": 3,
+    "failures": 0,
+    "postmanAtlasRequests": 37,
+    "postmanAtlasAssertions": 52,
+    "postmanHostedRequests": 14,
+    "postmanHostedAssertions": 23,
+    "totalPassed": 93
+  },
+  "diagnosticRevision": "a5e03417d9607f019470f7900b1b111472c34cc1",
+  "pagesWorkflow": 39033318734,
+  "renderDeploy": "dep-db9mjc5g1s2s73997pd0",
+  "applicationUI": {
+    "public": {
+      "freshLoadsPassed": 3,
+      "activeLessons": 12,
+      "publicTeachers": 4,
+      "loadErrorsInTheseLoads": 0,
+      "cartFeedback": true,
+      "viewCart": true,
+      "incrementToTwo": true,
+      "decrementAndLastLineRemoval": true,
+      "emailField": true,
+      "noOrderSubmitted": true
+    },
+    "studio": {
+      "successfulSessions": 3,
+      "fastFreshSessionObservations": [
+        {
+          "pageReloaded": true,
+          "loginReadyObservedWithinMs": 5877,
+          "libraryLoaded": true,
+          "countsUnchanged": true,
+          "passwordSaved": false
+        },
+        {
+          "pageOpenedFromPublicLink": true,
+          "loginReadyObservedWithinMs": 3803,
+          "libraryLoaded": true,
+          "countsUnchanged": true,
+          "passwordSaved": false
+        }
+      ],
+      "firstConnectionAttempt": {
+        "result": "Failed at the bounded health-check deadline; UI error observed 93535 ms after click. Password POST not reached.",
+        "passed": false
+      },
+      "recoveredTracedAttempt": {
+        "result": "Successful session after a failed first health read and retry; exact completion time not captured, so not counted as a fast benchmark.",
+        "passed": true
+      },
+      "teacherProfilesAndAssignmentsPassed": true,
+      "bookingInsightsPassed": true,
+      "allSuccessfulSessionsSignedOut": true,
+      "passwordSavePromptsDismissed": true
+    }
+  },
+  "clientVersusRawHealth": {
+    "capturedAt": "2026-10-17T12:44:09.132Z",
+    "cells": [
+      "client",
+      "GET /health",
+      "200",
+      "unavailable",
+      "156",
+      "\u2014",
+      "\u2014",
+      "\u2014",
+      "\u2014",
+      "Healthy",
+      "raw",
+      "GET /health",
+      "200",
+      "h3",
+      "161",
+      "1",
+      "158",
+      "61.4",
+      "\u2014",
+      "Success"
+    ]
+  },
+  "status": "Known server misconfiguration fixed and deployed; repeated public/Studio checks passed, but a remaining Safari connection timeout was observed. Universal resolution and an exact browser/proxy packet-level cause are not established."
+}

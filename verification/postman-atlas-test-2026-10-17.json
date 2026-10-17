@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-17T11:53:21.145Z",
+  "executedAt": "2026-10-17T12:16:45.440Z",
   "runner": "Newman 6.2.3 (official Postman collection runner)",
   "mode": "atlas-test",
   "target": "Production Express application on loopback, real separate MongoDB Atlas test database",
@@ -33,7 +33,7 @@
     {
       "name": "Lesson detail and teaching team",
       "method": "GET",
-      "path": "/lessons/6ad361acf1b1f7f81b29a502",
+      "path": "/lessons/6ad36729b7aeb3448e639633",
       "status": 200,
       "assertions": [
         {
@@ -197,7 +197,7 @@
     {
       "name": "Enrolment — confirmed purchased quantities",
       "method": "GET",
-      "path": "/enrolment/6ad361acf1b1f7f81b29a502",
+      "path": "/enrolment/6ad36729b7aeb3448e639633",
       "status": 200,
       "assertions": [
         {
@@ -289,7 +289,7 @@
     {
       "name": "Edit test lesson — absolute price and spaces",
       "method": "PUT",
-      "path": "/admin/lessons/6ad361aef1b1f7f81b29a513",
+      "path": "/admin/lessons/6ad3672bb7aeb3448e639644",
       "status": 200,
       "assertions": [
         {
@@ -301,7 +301,7 @@
     {
       "name": "Delete test lesson — preserve history",
       "method": "DELETE",
-      "path": "/admin/lessons/6ad361aef1b1f7f81b29a513",
+      "path": "/admin/lessons/6ad3672bb7aeb3448e639644",
       "status": 200,
       "assertions": [
         {
@@ -313,7 +313,7 @@
     {
       "name": "Restore test lesson",
       "method": "POST",
-      "path": "/admin/lessons/6ad361aef1b1f7f81b29a513/restore",
+      "path": "/admin/lessons/6ad3672bb7aeb3448e639644/restore",
       "status": 200,
       "assertions": [
         {
@@ -393,7 +393,7 @@
     {
       "name": "Edit teacher and assignments",
       "method": "PUT",
-      "path": "/admin/teachers/6ad361aff1b1f7f81b29a514",
+      "path": "/admin/teachers/6ad3672cb7aeb3448e639645",
       "status": 200,
       "assertions": [
         {
@@ -405,7 +405,7 @@
     {
       "name": "Delete teacher — retain associations for restore",
       "method": "DELETE",
-      "path": "/admin/teachers/6ad361aff1b1f7f81b29a514",
+      "path": "/admin/teachers/6ad3672cb7aeb3448e639645",
       "status": 200,
       "assertions": [
         {
@@ -417,7 +417,7 @@
     {
       "name": "Restore teacher",
       "method": "POST",
-      "path": "/admin/teachers/6ad361aff1b1f7f81b29a514/restore",
+      "path": "/admin/teachers/6ad3672cb7aeb3448e639645/restore",
       "status": 200,
       "assertions": [
         {

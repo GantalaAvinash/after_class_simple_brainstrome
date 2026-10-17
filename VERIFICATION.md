@@ -6,14 +6,14 @@ The requesting user is a developer providing paid assistance to a separate stude
 
 ## Current result — 17 October 2026
 
-89 application checks have passed: 54 backend, 32 frontend and three native Atlas tests. Official Postman runner Newman 6.2.3 passed all 37 collection requests/52 assertions against the real separate Atlas test database, and 14 hosted read-only requests/23 assertions. Actual assessment exports contain lesson (12), teacher (5, including one soft-deleted QA profile), order (1) and adminAudit (5). Archive verification is recorded in the final submission entry below. Student review, independent rehearsal, portal submission/access and assessed demonstration remain pending. The earlier entries are preserved milestone history, not the current completion state.
+93 application checks have passed: 56 backend, 34 frontend and three native Atlas tests. Official Postman runner Newman 6.2.3 passed all 37 collection requests/52 assertions against the real separate Atlas test database, and 14 hosted read-only requests/23 assertions. Actual assessment exports contain lesson (12), teacher (5, including one soft-deleted QA profile), order (1) and adminAudit (5). Archive verification is recorded in the final submission entry below. Student review, independent rehearsal, portal submission/access and assessed demonstration remain pending. The earlier entries are preserved milestone history, not the current completion state.
 
 ## Automated local checks
 
 | Check | Evidence |
 |---|---|
-| Backend suite | 54 application/HTTP tests passed; 3 real-Atlas cases deliberately skipped in the ordinary run and passed in the explicit separate run |
-| Frontend suite | 32 tests passed across coursework state, admin/recovery, discovery, details, teachers and actual Vue template compilation |
+| Backend suite | 56 application/HTTP tests passed; 3 real-Atlas cases deliberately skipped in the ordinary run and passed in the explicit separate run |
+| Frontend suite | 34 tests passed across coursework state, admin/recovery, discovery, details, teachers and actual Vue template compilation |
 | Postman artifact | 37 requests / 52 assertions executed successfully by official Newman against isolated Atlas test fixtures |
 | Export format | Actual Atlas Extended JSON exports of all four assessment collections have checked counts and SHA-256 checksums |
 | Clean install | npm ci recreated locked dependencies successfully |
@@ -195,3 +195,17 @@ In **normal Safari**, the live public page loaded all twelve lessons/teacher ass
 Screenshots are saved locally under output/diagnostics/safari-live-cart-feedback.png, safari-live-cart-email.png and safari-live-admin.png. User browser data and privacy/security settings were not cleared or weakened. The original normal-Safari intermittent transport cause remains unconfirmed; the release adds bounded recovery and passed these live checks, without claiming that every future network failure is eliminated.
 
 The refreshed cart/email package passed clean locked installation from a fresh extraction: 54 backend and 32 frontend checks, zero failures, with the same three explicit native skips in that credential-free extraction. Its application files match the separately Atlas-tested workspace exactly. verification/cart-package-check-2026-10-17.json records source hashes and these checks; final ZIP metadata, CRC/checksums, credential exclusion and SHA-256 are recorded beside the archive in output/. The existing PDF remains its explicitly dated earlier source snapshot.
+
+
+## Safari connection investigation follow-up — 17 October 2026
+
+See verification/safari-root-cause-2026-10-17.md and its sanitised JSON for measured before/after results. The production listener's five-second idle timeout was incompatible with Render's documented 75-second upstream reuse window; keepAliveTimeout and headersTimeout are now 120 seconds. A real socket test verifies reuse after 6.1 seconds. Baseline Safari login took 34.088 seconds, of which 31.180 seconds were queued and about 2.907 seconds were response wait. Secure scrypt verification remains unchanged and accounts for roughly 2.5–2.8 seconds on the free service.
+
+Scoped form-encoded login avoids the JSON-only preflight dependency. Studio verifies GET /health in the same browser before sending credentials, using existing bounded read recovery, and shows separate connection/credential/workspace phases. The login POST is not automatically replayed. Requests expose non-secret request IDs and Server-Timing phases to the permitted Pages origin; logs exclude credentials and tokens. No security/browser settings were changed.
+
+Thirty raw normal-Safari public requests passed without retries, including a round after 59.273 seconds idle. Three current raw form login/read/logout cycles passed in 2.959–3.112 seconds. Adverse comparisons are retained: a legacy JSON request remained pending and was cancelled by reload; one subsequent raw form request failed without an HTTP response after 43.095 seconds. Consequently the listener correction alone is not described as proof of eliminating every Safari transport failure. The final Studio flow adds a browser connection check; actual UI results are recorded in the linked report.
+
+Regression suites passed 56 backend and 34 frontend checks, with all three native Atlas tests passed separately. Postman passed 37 requests/52 assertions on isolated Atlas fixtures and 14 requests/23 assertions on the hosted read-only subset. All assessment collections and stock stayed unchanged. The PDF remains its explicitly dated earlier snapshot; current Markdown and ZIP contain this follow-up.
+
+
+Final Safari follow-up gate: three fresh public loads and three actual Studio sessions passed, including the latest two fresh sign-ins observed ready within 5.877/3.803 seconds, teacher assignments, booking insights and logout. However, an earlier actual Studio health handshake still reached its bounded deadline before credentials were sent; a following read retry recovered. The exact remaining browser/edge cause is unresolved. This follow-up is therefore **partially resolved**, not an assertion that all Safari intermittency is eliminated. Successful raw requests or fast repetitions do not erase that failed gate.
