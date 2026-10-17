@@ -209,3 +209,6 @@ Regression suites passed 56 backend and 34 frontend checks, with all three nativ
 
 
 Final Safari follow-up gate: three fresh public loads and three actual Studio sessions passed, including the latest two fresh sign-ins observed ready within 5.877/3.803 seconds, teacher assignments, booking insights and logout. However, an earlier actual Studio health handshake still reached its bounded deadline before credentials were sent; a following read retry recovered. The exact remaining browser/edge cause is unresolved. This follow-up is therefore **partially resolved**, not an assertion that all Safari intermittency is eliminated. Successful raw requests or fast repetitions do not erase that failed gate.
+
+
+The refreshed Safari follow-up ZIP passed a fresh locked installation (zero reported vulnerabilities) and 56 backend/34 frontend checks, zero failures; the three private-credential Atlas cases skipped in this extraction and passed separately in the workspace. Application file hashes match the tested extracted source. verification/safari-package-check-2026-10-17.json records source checksums and results; final archive CRC, paths, export checksums, actual-secret exclusion, size and SHA-256 are stored beside the ZIP. Packaging does not close the explicitly unresolved Safari connection gate.
