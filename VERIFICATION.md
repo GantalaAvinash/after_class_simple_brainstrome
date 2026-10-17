@@ -117,3 +117,19 @@ After the current development IP rule became active, the Atlas ping and rolled-b
 Non-destructive seed verification found 12 lessons with five spaces each, four teachers, valid lesson associations, populated description/learningOutcomes/ageGroup/durationMinutes fields, and zero assessment orders at this point. The regression suite passes 52 backend tests and 28 frontend tests; the three native database tests pass separately, for 83 checks total. Evidence: verification/atlas-native-2026-10-17.json.
 
 Created the Free Singapore Render service afterclass-21j41a62f1 from the combined repository, root backend, npm ci/npm start, Node runtime, /health, and six production-only environment variables. Removed test/local values from the visible imported configuration before saving. The frontend production origin is now set to the actual service URL. Hosted behaviour and narrowed network access remain in progress.
+
+## Hosted verification completed — 17 October 2026
+
+Pages workflow cffa534 succeeded and serves the production API origin. Hosted read-only checks passed for Pages assets, Render database health, catalogue, lesson details, teacher associations, enrolment, SVGs/missing-image errors, matching CORS and anonymous admin denial.
+
+Browser checks passed for all eight field/direction sorts (including £9 and £100), numeric search 100 intersected with Leo Grant, preserved basket quantities across detail/catalogue/filter switching, invalid name/phone rejection and a leading-zero phone checkout. With explicit student approval, Ava/007123456 purchased two Coding Club places and one Art Workshop place in one confirmed order, reference 6ad2fd4ea6d150d1d282b801. The basket cleared; resulting spaces are three/four and enrolment two/one. No payment was made.
+
+Hosted Studio sign-in/protected reads/logout passed. With permission, created Alex Morgan, assigned Coding Club and Art Workshop, edited the biography, verified public profiles and the exact two-lesson teacher filter, soft-deleted, restored and finally soft-deleted the QA profile. Four seeded teachers remain public. Insights still show twelve active lessons, 57 spaces, three purchased places and £70 fictitious booking value. Audit history records the five teacher actions. Stock and purchase history were preserved.
+
+Hosted lesson/detail checks at 375×667 and 768×1024, plus the teacher editor at those widths, had matching document/body/viewport widths. Public and Studio console warn/error lists were empty. The operator signed out after checks; temporary viewport overrides were reset. Saved screenshots under verification/screenshots/. Earlier local checks provide the fuller responsive boundary-content and keyboard evidence.
+
+Render Events confirms a service restart on 17 October. Subsequent fresh API reads preserved both purchased quantities/remaining spaces and the four public teachers. The temporary production credential import file was removed. The private .env and operator credential file remain excluded from Git. Evidence is in verification/hosted-checks-2026-10-17.json.
+
+Remaining deployment hardening: approval to add the two observed Render outbound CIDRs and remove 0.0.0.0/0 is pending. The deployed application is functional; restricted-network verification is not yet claimed. Manual Postman execution, final exports/ZIP, student explanation review and assessed demonstration remain separate submission tasks.
+
+The hosted walkthrough also exposed the label “1 confirmed orders”. Changed it to “Confirmed orders: 1” (and the equivalent for any count); reran all 28 frontend/template compilation checks successfully. No application state or API behaviour changed.

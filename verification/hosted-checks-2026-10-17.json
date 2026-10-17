@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-17",
+  "frontendUrl": "https://gantalaavinash.github.io/after_class_simple_brainstrome/",
+  "apiOrigin": "https://afterclass-21j41a62f1.onrender.com",
+  "health": {
+    "status": "ok",
+    "database": "connected"
+  },
+  "lessons": 12,
+  "publicTeachers": 4,
+  "approvedTestOrder": {
+    "reference": "6ad2fd4ea6d150d1d282b801",
+    "coding": {
+      "spaces": 3,
+      "enrolment": 2
+    },
+    "art": {
+      "spaces": 4,
+      "enrolment": 1
+    }
+  },
+  "teacherManagement": {
+    "create": "passed",
+    "edit": "passed",
+    "twoLessonAssignments": "passed",
+    "publicFilter": "passed",
+    "softDelete": "passed",
+    "restore": "passed",
+    "finalState": "soft-deleted"
+  },
+  "browser": {
+    "sortingCombinationsPassed": 8,
+    "cartDuringCombinedFilters": "passed",
+    "contactValidation": "passed",
+    "checkout": "passed",
+    "phoneAndTabletOverflow": false,
+    "consoleWarningsAndErrors": 0
+  },
+  "restartPersistence": "passed: Render Events records the service restart; subsequent requests preserve the approved stock/enrolment and four public teachers",
+  "networkRestriction": "awaiting scoped-range approval"
+}

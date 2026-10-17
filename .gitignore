@@ -7,5 +7,4 @@ node_modules/
 *.log
 coverage/
 exports/
-submission-links.json
 *.zip
