@@ -1,47 +1,63 @@
-# AfterClass demonstration preparation
+# AfterClass — independent demonstration preparation
 
-Use this for preparation before the assessed session. Do not use GenAI during that session. The student still needs to rehearse, book and attend their own demonstration.
+This guide was prepared with Codex for the developer providing paid assistance to a separate student. It does not establish student authorship, understanding or completed rehearsal. Read [STUDENT_HANDOVER.md](STUDENT_HANDOVER.md) and [AI_ACKNOWLEDGEMENT.md](AI_ACKNOWLEDGEMENT.md), confirm permitted commissioned assistance/disclosure with the module team, and describe contributions accurately.
 
-## Before the session
+Use these materials during preparation. The handbook prohibits GenAI during the assessed demonstration; follow its rules on permitted materials and assistance. Rehearse without AI or developer prompting once you have learned the code. Do not mark a rehearsal complete until the student actually performs it.
 
-Open the actual GitHub Pages app, Render logs, Atlas database, both source repositories in the editor, and the imported Postman collection. Warm the Render service. Use fictitious contact details. Verify current stock and avoid resetting real purchase history while practising.
+## Prepare a practice environment
 
-The local fixture preview is for development and cannot replace the required hosted demonstration.
+Use an extracted copy and the disposable preview on a separate port, or an authorised separate Atlas test database. The handover guide provides setup instructions. Use fictitious contact details. Full Postman collection runs change stock and profiles; keep them on test data. A local fixture rehearsal cannot replace the required hosted assessed demonstration.
 
-For the optional Studio extension, sign in before the rehearsal, then show a small create/edit/delete/restore cycle with a fictitious lesson. Explain that authorisation is checked by Express, the password is hashed, the browser token is temporary, and deletion keeps confirmed purchase history. Show an edit conflict after a booking and identify the revision check. Open a lesson detail page, create a fictitious teacher in Teaching team, assign that lesson, and verify the public profile/filter. Explain why teacher-side and lesson-side assignments share one relationship and invalidate stale forms. Show teacher membership and booking insights without exposing customer details. Prioritise assessed features within ten minutes; this extension has no promised extra marks.
+For the hosted session, verify the student identifier, repository/cloud access and current stock. Open the GitHub Pages app, Render logs, Atlas, frontend/backend source and selected Postman requests. Warm /health. Keep private environment files/passwords/bearer headers off the screen. Select any live demonstration mutation deliberately and retain its explainable history; do not reset sold stock for appearance.
 
-## Ten-minute rehearsal
+## Ten-minute independent rehearsal
 
-| Time | Show and explain |
+| Time | Show | Explain and locate |
+|---|---|---|
+| 0:00–2:00 | Catalogue, sorting in both directions, add/remove, basket and validation | v-for/v-on/v-model, computed values, state.mjs numeric comparisons and independent cart |
+| 2:00–4:00 | One fictitious multi-lesson practice checkout; selected GET/POST/absolute PUT examples | checkout.mjs persisted UUID, orders.js pending record, updates.js transactional confirmation |
+| 4:00–5:00 | Practice order/stock in the database and a matching request log | Native ObjectIds, expected/target spaces, confirmed status; timestamp/method/URL/status/duration |
+| 5:00–7:00 | Literal text/numeric search plus teacher filter, detail page and enrolment | catalogue.js backend search/associations, lesson-route.mjs, enrolment.js confirmed quantities |
+| 7:00–10:00 | Trace a request and explain or make one small practice change | Relevant callers, validation, error path, tests and actual developer/AI/student contributions |
+
+Fit the required criteria first. If time allows, show Studio teacher creation/assignment and lesson detail content using practice records. Explain memory-only bearer access, server permissions, revisions, UUID retry, soft deletion and relationship ownership in teacher.lessonIds. Delete/restore preserves purchase history. Studio/design extensions have no guaranteed extra marks.
+
+## Explain without reading a prepared answer
+
+1. Trace a catalogue request from mounted() through fetch, middleware, route and database response to v-for.
+2. Show why sorting £9/£100 uses subtraction and how displayed spaces subtract basket quantity.
+3. Explain how filtering can hide a lesson without removing it from the basket.
+4. Locate browser and server name/phone validation, and explain the phone's string type.
+5. Follow one checkout UUID across POST, confirmation PUT, a lost response and a reload.
+6. Identify every write in the transaction and what aborts the whole multi-lesson purchase.
+7. Explain why a replay cannot deduct stock again and why changing details with the same UUID is rejected.
+8. Show where search runs and how teacher.lessonIds restricts results.
+9. Explain why pending orders and space edits do not determine enrolment.
+10. Show how a detail fragment works on static Pages hosting and how stale requests are cancelled.
+11. Distinguish CORS from admin authorisation, and locate session expiry checks.
+12. Explain why teacher assignments have one stored owner and why both editor sides use revisions.
+13. Distinguish adapter tests, actual Atlas tests, hosted checks and independent student understanding.
+14. Describe your actual personal work and the external developer/AI contributions accurately.
+
+Use STUDENT_HANDOVER.md for learning points and exercises before trying these independently. If an answer is uncertain, inspect the code and practise again; do not invent an explanation or an authorship claim.
+
+## Small local changes to practise
+
+Choose a form message or default sort direction. Predict the effect, locate the function/template, make the edit on a practice branch/copy, run the relevant frontend tests and explain the diff. Separately practise teacher assignment and an absolute spaces/price PUT on test data. Show why an old Studio revision conflicts after a booking.
+
+Do not change production configuration or reset live orders merely for a rehearsal. Save genuine independent student changes with an accurate description and update the contribution record.
+
+## Student rehearsal record
+
+| Item | Student evidence |
 |---|---|
-| 0:00–2:00 | Catalogue, subject/location/price/space sorting in both directions, basket addition/removal, disabled sold-out state and validation |
-| 2:00–4:00 | Submit an order; show Postman GET, POST and absolute PUT, including another editable attribute |
-| 4:00–5:00 | Locate the order and changed spaces in Atlas; explain method, URL, status and duration in a matching Render log |
-| 5:00–7:00 | Numeric/text search, teacher selection, enrolment and the related frontend/backend code |
-| 7:00–10:00 | Answer short code questions and trace one complete request or small edit |
+| Date and actual duration | Not recorded |
+| Environment/data used | Not recorded |
+| Completed without AI or developer prompting | Not recorded |
+| Request/function trace explained independently | Not recorded |
+| Small change explained and verified | Not recorded |
+| Questions needing more study | Not recorded |
+| Permitted assistance/disclosure and identifier verified | Not recorded |
+| Demonstration booked/attended | Not recorded |
 
-## Questions to practise in your own words
-
-1. How do v-for, v-on, v-model, computed state and mounted contribute to this app?
-2. Why are cart quantities separate from stored spaces?
-3. Why do numeric fields need numeric sorting?
-4. How does fetch differ from receiving a successful HTTP response, and why check response.ok?
-5. What does each middleware do, and why is logging first?
-6. Why does a CORS origin omit the GitHub repository path?
-7. How are string IDs validated and converted to MongoDB ObjectIds?
-8. Why does POST save a pending order and PUT confirm it?
-9. How do the transaction, compare-and-set condition and request ID prevent partial or duplicate purchases?
-10. Why must transaction operations be sequential?
-11. Where does search execute, and how are price and space searched?
-12. How does a teacher's lesson association restrict results?
-13. Why is enrolment calculated from confirmed quantities rather than five minus spaces?
-14. Why does seeding use $setOnInsert?
-15. Which local tests use an adapter, and what can only be proved against Atlas?
-
-## Small edits to rehearse
-
-Change the default sort direction, adjust a form error message, add a teacher association, set a lesson's spaces to an absolute value through Postman, and trace an unavailable-image response. Explain the relevant code before and after each change.
-
-## Honest completion record
-
-Mark a rehearsal complete only after the student performs it independently. The current automated tests and agent browser walkthrough do not stand in for student understanding or the assessed demonstration.
+Automated passes and developer/Codex walkthroughs are technical evidence. They do not fill this student record or constitute an assessed demonstration.

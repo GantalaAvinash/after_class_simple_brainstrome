@@ -2,6 +2,12 @@
 
 A fictitious after-school lesson discovery and booking service for North London, with GBP prices, detailed programmes and protected lesson/teacher management. There are no real payments or customer accounts.
 
+## Developer and student roles
+
+The requester is a developer providing paid assistance to a separate student. The developer directed this work and completed the recorded setup/approval steps; OpenAI Codex generated or edited implementation, tests, design and documentation. Student authorship, direct contributions and independent review are not verified. See [AI_ACKNOWLEDGEMENT.md](AI_ACKNOWLEDGEMENT.md) for the full provenance record. The student should confirm permitted use and required disclosure with the module team.
+
+Start with [STUDENT_HANDOVER.md](STUDENT_HANDOVER.md) for architecture, code traces, safe local exercises, troubleshooting and independent demonstration preparation. The guide does not mark student learning or rehearsal complete.
+
 ## Live application
 
 - [AfterClass on GitHub Pages](https://gantalaavinash.github.io/after_class_simple_brainstrome/)
@@ -11,7 +17,7 @@ A fictitious after-school lesson discovery and booking service for North London,
 - [Backend coursework repository (private)](https://github.com/GantalaAvinash/afterclass-backend)
 - [Deployment source](https://github.com/GantalaAvinash/after_class_simple_brainstrome)
 
-Student number: **21j41a62f1**. The two coursework repositories retain separate genuine development histories; both are synchronised with the submitted source.
+Configured student number: **21j41a62f1**, supplied by the developer and requiring confirmation by the student. The two coursework repositories retain separate genuine development histories; both are synchronised with the submitted source.
 
 Both hosted apps use this repository: Pages publishes `frontend/`; Render runs `backend/`. The original [frontend repository](https://github.com/GantalaAvinash/afterclass-frontend) and [private backend repository](https://github.com/GantalaAvinash/afterclass-backend) remain intact with their genuine coursework development histories, also preserved in this repository. Assessment access to the separate private repository must be arranged if required.
 

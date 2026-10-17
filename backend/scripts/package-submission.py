@@ -82,7 +82,7 @@ def main():
         require(len(json.loads(path.read_bytes())) == item["count"], "Export count mismatch: " + name)
         add(path, "exports/" + name)
     add(manifest_path, "exports/manifest.json")
-    for name in ["README.md", "AI_ACKNOWLEDGEMENT.md", "VERIFICATION.md", "DEMO_GUIDE.md", "SUBMISSION_GUIDE.md", "submission-links.json"]:
+    for name in ["README.md", "AI_ACKNOWLEDGEMENT.md", "VERIFICATION.md", "DEMO_GUIDE.md", "SUBMISSION_GUIDE.md", "STUDENT_HANDOVER.md", "submission-links.json"]:
         add(ROOT / name, name)
     # Only committed evidence is eligible; exports above remain local/private.
     for name in filter(None, git(ROOT, "ls-files", "verification").splitlines()):

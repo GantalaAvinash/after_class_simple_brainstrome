@@ -1,6 +1,12 @@
 # AfterClass submission guide
 
-Student number: **21j41a62f1**. Prepared on **17 October 2026**. The application uses fictitious programmes, teachers and contact details, and processes no payments.
+Configured student number: **21j41a62f1**, supplied by the developer; the student must confirm it is their required identifier. Prepared on **17 October 2026**. The application uses fictitious programmes, teachers and contact details, and processes no payments.
+
+## Contributor roles and learning handover
+
+The requesting user is the developer providing paid assistance; Codex generated or edited the implementation and documents under their direction. The student is the assessment candidate and their own contributions/review have not been verified here. The included AI_ACKNOWLEDGEMENT.md records both paid developer and AI involvement. Confirm permitted assessment use/disclosure with the module team before submitting externally commissioned work. Source history and technical checks do not establish student authorship.
+
+[STUDENT_HANDOVER.md](STUDENT_HANDOVER.md) provides architecture and code explanations, local practice exercises, troubleshooting, access handover and an uncompleted independent-readiness record. Use DEMO_GUIDE.md for a timed preparation session.
 
 ## Required links
 
@@ -21,7 +27,7 @@ The separate repositories contain genuine development histories and are synchron
 - exports/: actual Atlas lesson, teacher, order and adminAudit snapshots, with collection counts/checksums in manifest.json.
 - AfterClass.postman_collection.json: 37-request Postman v2.1 collection, also retained under backend/postman/.
 - verification/: sanitised execution reports and responsive/hosted screenshots.
-- README.md, VERIFICATION.md, AI_ACKNOWLEDGEMENT.md, DEMO_GUIDE.md, this guide, submission-links.json and PACKAGE_MANIFEST.json.
+- README.md, VERIFICATION.md, AI_ACKNOWLEDGEMENT.md, DEMO_GUIDE.md, STUDENT_HANDOVER.md, this guide, submission-links.json and PACKAGE_MANIFEST.json.
 
 Dependencies, Git internals, environment files, operator passwords, raw credential-bearing reports, session/login-counter collections, temporary files and supplied assessment PDFs are excluded. The archive limit is enforced as less than 10,000,000 bytes. An adjacent .sha256 file identifies the exact ZIP.
 
@@ -100,4 +106,4 @@ The optional Studio and design extensions carry no guaranteed mark improvement. 
 
 ## Student actions still required
 
-Review and understand the assisted implementation and acknowledgement; record any genuine subsequent independent work. Perform the ten-minute rehearsal independently using DEMO_GUIDE.md. Confirm the submission portal's deadline/timezone (the brief states 14 December at 11pm), upload the ZIP and enter the four required links. Verify the uploaded archive and repository access. Book and attend the scheduled assessed demonstration before the deadline, without AI assistance as required by the handbook. Packaging and automated checks do not establish student understanding or constitute portal submission.
+Confirm permitted use/disclosure of paid developer and AI assistance with the module team. Review and understand the assisted implementation and acknowledgement; record any genuine subsequent independent work. Perform the ten-minute rehearsal independently using DEMO_GUIDE.md. Confirm the submission portal's deadline/timezone (the brief states 14 December at 11pm), upload the ZIP and enter the four required links. Verify the uploaded archive and repository access. Book and attend the scheduled assessed demonstration before the deadline, without AI assistance as required by the handbook. Packaging and automated checks do not establish student understanding or constitute portal submission.
