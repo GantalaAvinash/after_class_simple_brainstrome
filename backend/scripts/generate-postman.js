@@ -47,6 +47,7 @@ const order = {
   requestId: "{{requestId}}",
   name: "Ava",
   phone: "007123456",
+  email: "ava@example.test",
   items: [{ lessonId: "{{lessonId}}", quantity: 1 }],
 };
 const protectedRequest = (...args) => {

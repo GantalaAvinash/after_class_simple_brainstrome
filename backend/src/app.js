@@ -31,6 +31,10 @@ export function createApp({ db, client, allowedOrigins, logger, admin }) {
     res.status(404).json({ error: "Lesson image not found." }),
   );
 
+  // Availability and sessions must never be restored from a browser/proxy cache.
+  // Static lesson images retain their separate caching behaviour above.
+  app.use((_req, res, next) => { res.set("Cache-Control", "no-store"); next(); });
+
   app.get("/health", async (_req, res) => {
     try {
       await db.command({ ping: 1 });

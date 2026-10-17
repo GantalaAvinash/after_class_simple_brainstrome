@@ -131,7 +131,7 @@
             "url": "{{baseUrl}}/orders",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava\",\n  \"phone\": \"007123456\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava\",\n  \"phone\": \"007123456\",\n  \"email\": \"ava@example.test\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -211,7 +211,7 @@
             "url": "{{baseUrl}}/orders",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava\",\n  \"phone\": \"007123456\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava\",\n  \"phone\": \"007123456\",\n  \"email\": \"ava@example.test\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1206,7 +1206,7 @@
             "url": "{{baseUrl}}/orders",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava2\",\n  \"phone\": \"007123456\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"name\": \"Ava2\",\n  \"phone\": \"007123456\",\n  \"email\": \"ava@example.test\",\n  \"items\": [\n    {\n      \"lessonId\": \"{{lessonId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

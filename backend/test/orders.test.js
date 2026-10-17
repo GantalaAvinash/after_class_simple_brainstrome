@@ -37,3 +37,22 @@ test('unavailable and missing lessons do not create pending orders', async () =>
   await assert.rejects(createPendingOrder(db, body), (error) => error.status === 404);
   assert.equal(state.order.length, 0);
 });
+
+test('email is optional, validated, stored, and part of checkout duplicate protection', async () => {
+  const { db, state } = setup();
+  const legacy = payload();
+  const original = await createPendingOrder(db, legacy);
+  assert.equal(Object.hasOwn(original.order, 'email'), false);
+  const blankRetry = await createPendingOrder(db, { ...legacy, email: '  ' });
+  assert.equal(blankRetry.created, false);
+  const body = { ...payload(), email: ' Ava@example.test ' };
+  const result = await createPendingOrder(db, body);
+  assert.equal(result.order.email, 'Ava@example.test');
+  assert.equal((await createPendingOrder(db, body)).created, false);
+  await assert.rejects(createPendingOrder(db, { ...body, email: 'other@example.test' }), error => error.status === 409);
+  for (const email of ['broken', 'a@@example.test', 'a b@example.test', 42, null, 'a'.repeat(255)]) {
+    await assert.rejects(createPendingOrder(db, { ...payload(), email }), error => error.status === 400);
+  }
+  assert.equal(state.order.length, 2);
+  assert.equal(state.lesson[0].space, 5);
+});

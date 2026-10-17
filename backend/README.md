@@ -41,9 +41,12 @@ POST body:
   "requestId": "00000000-0000-4000-8000-000000000001",
   "name": "Ava",
   "phone": "007123456",
+  "email": "ava@example.test",
   "items": [{"lessonId": "100000000000000000000001", "quantity": 2}]
 }
 ~~~
+
+Email is optional: omit it or send an empty string for the original coursework contract. A supplied address is trimmed, limited to 254 characters and validated on the server; it is saved with the order, without sending email. Blank email is omitted from normalisation so old unfinished orders keep the same payload hash. Changing email for an existing request ID returns 409. API JSON responses carry Cache-Control: no-store; static images keep their own caching policy.
 
 POST returns orderId, status and the exact updates required for PUT. A repeated request ID with the same normalised payload returns the existing order; changed details return 409. Pending orders do not reduce spaces or contribute to enrolment.
 

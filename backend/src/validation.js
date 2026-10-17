@@ -35,7 +35,7 @@ function text(value, label, max = 100) {
 
 export function normaliseOrder(body) {
   object(body, "Order");
-  keys(body, ["requestId", "name", "phone", "items"]);
+  keys(body, ["requestId", "name", "phone", "items", "email"]);
   requireValue(
     typeof body.requestId === "string" &&
       /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(
@@ -53,6 +53,10 @@ export function normaliseOrder(body) {
       body.items.length <= 100,
     "Choose between 1 and 100 different lessons.",
   );
+  const email = body.email === undefined ? '' : body.email;
+  requireValue(typeof email === 'string' && email.trim().length <= 254 &&
+    (!email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())),
+    "Email must be a valid address or omitted.");
   const seen = new Set();
   const items = body.items
     .map((item) => {
@@ -73,7 +77,9 @@ export function normaliseOrder(body) {
     .sort((a, b) =>
       a.lessonId.toHexString().localeCompare(b.lessonId.toHexString()),
     );
-  return { requestId: body.requestId.toLowerCase(), name, phone, items };
+  // Omit blank email to preserve the hash of pre-email checkout retries.
+  return { requestId: body.requestId.toLowerCase(), name, phone, items,
+    ...(email.trim() ? { email: email.trim() } : {}) };
 }
 
 export function normaliseUpdates(body) {

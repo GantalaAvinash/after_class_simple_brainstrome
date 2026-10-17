@@ -128,3 +128,22 @@ test("HTTP checkout conflict rolls back all places and preserves a pending order
   );
   assert.equal(state.order[0].status, "pending");
 });
+
+test('HTTP email checkout confirms quantities once and API reads prohibit cached stock', async (t) => {
+  const { request, state, base } = await setup(t);
+  assert.equal((await fetch(base + '/lessons')).headers.get('cache-control'), 'no-store');
+  assert.equal((await fetch(base + '/teachers')).headers.get('cache-control'), 'no-store');
+  assert.equal((await request('/orders', 'POST', { ...payload(), email: 'invalid' })).status, 400);
+  const body = { ...payload([{ lessonId: a, quantity: 3 }]), email: 'ava@example.test' };
+  const pending = await request('/orders', 'POST', body);
+  assert.equal(pending.status, 201);
+  const update = { orderId: pending.data.orderId, updates: pending.data.updates };
+  assert.equal((await request('/lessons', 'PUT', update)).data.status, 'confirmed');
+  assert.equal((await request('/orders', 'POST', body)).data.status, 'confirmed');
+  assert.equal((await request('/lessons', 'PUT', update)).status, 200);
+  assert.equal(state.order.length, 1);
+  assert.equal(state.order[0].email, 'ava@example.test');
+  assert.equal(state.order[0].phone, '007123456');
+  assert.equal((await request('/enrolment/' + a)).data.enrolment, 3);
+  assert.equal((await request('/lessons')).data.find(lesson => lesson._id === a).space, 2);
+});
