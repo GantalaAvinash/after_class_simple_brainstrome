@@ -62,7 +62,7 @@ npm run check:deployment
 
 The explicit Atlas command requires `MONGODB_TEST_URI` and a separate database ending in `_test`; it refuses the assessment database. The ordinary backend command deliberately does not load `.env`, so native tests are skipped there and run separately.
 
-Verified on 17 October 2026: 52 backend regression tests, 28 frontend tests and all three native Atlas tests passed (83 checks). Hosted read-only checks, all eight browser sorting combinations, combined filtering/basket stability, a permitted fictitious multi-lesson checkout, enrolment, admin sign-in/logout and teacher create/edit/assign/delete/restore checks passed. Hosted phone/tablet checks found no horizontal overflow or console warnings/errors. Actual evidence and remaining gates are recorded in `VERIFICATION.md` and `verification/`.
+Verified on 17 October 2026: 54 backend regression tests, 32 frontend tests and all three native Atlas tests passed (89 checks). Hosted read-only checks, all eight browser sorting combinations, combined filtering/basket stability, a permitted fictitious multi-lesson checkout, enrolment, admin sign-in/logout and teacher create/edit/assign/delete/restore checks passed. Hosted phone/tablet checks found no horizontal overflow or console warnings/errors. Actual evidence and remaining gates are recorded in `VERIFICATION.md` and `verification/`.
 
 The approved live test order purchased two Coding Club places and one Art Workshop place, leaving three and four spaces respectively. Its test teacher is soft-deleted, leaving the four seed profiles public. These are genuine persisted verification records; availability was not silently reset.
 
@@ -75,3 +75,5 @@ The approved live test order purchased two Coding Club places and one Art Worksh
 See [SUBMISSION_GUIDE.md](SUBMISSION_GUIDE.md) for the ZIP contents, clean-install commands, data restoration, reproducible Postman checks, packaging and remaining student actions. Archive integrity and extracted-install verification are recorded in [VERIFICATION.md](VERIFICATION.md). Secrets, dependencies and Git internals are excluded.
 
 The actual AI assistance and pending student explanation review are recorded in `AI_ACKNOWLEDGEMENT.md`. Do not describe generated assistance as independent student authorship. The assessed demonstration must follow the module’s prohibition on AI assistance.
+
+Maintenance release: normal Safari public loading/admin sign-in verified; cart additions show a notification and View cart action, quantities are editable in the cart, and checkout accepts optional email. See the dated maintenance entry in VERIFICATION.md and STUDENT_HANDOVER.md.

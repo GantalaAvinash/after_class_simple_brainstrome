@@ -1,0 +1,72 @@
+{
+  "executedAt": "2026-10-17T12:00:56.831606+00:00",
+  "deployment": {
+    "backendCommit": "ae9b1826cbb3dfcfe9b719cd5f56ac7571ea494f",
+    "renderDeploy": "dep-db9m46e1egvs73fpmos0",
+    "pagesCommit": "f6e104f4741c6ffce12438036fb473176fbe9f87",
+    "pagesRun": 39030594834,
+    "status": "success"
+  },
+  "tests": {
+    "frontendPassed": 32,
+    "backendPassed": 54,
+    "ordinaryBackendAtlasSkipped": 3,
+    "separateAtlasPassed": 3,
+    "separateAtlasSkipped": 0,
+    "postmanAtlasRequests": 37,
+    "postmanAtlasAssertions": 52,
+    "postmanHostedRequests": 14,
+    "postmanHostedAssertions": 23,
+    "failures": 0
+  },
+  "browsers": {
+    "normalSafari": [
+      "Live catalogue: 12 lessons and teacher associations",
+      "Added notification and View cart",
+      "Cart increase/decrease and totals",
+      "Optional email visible",
+      "Fresh admin sign-in succeeded",
+      "Protected lesson and teacher lists loaded",
+      "No password saved"
+    ],
+    "chromiumPreview": [
+      "Capacity five / disabled plus / decrease restores capacity",
+      "Invalid email blocks checkout; valid email + leading-zero phone accepted",
+      "Successful disposable checkout",
+      "Teacher/search filtering preserves cart",
+      "Detail-page shared cart and feedback",
+      "Last removal returns catalogue; empty basket disabled"
+    ],
+    "responsive": [
+      {
+        "width": 375,
+        "height": 812,
+        "horizontalOverflow": false,
+        "quantityTouchTarget": 44
+      },
+      {
+        "width": 768,
+        "height": 1024,
+        "horizontalOverflow": false
+      }
+    ],
+    "liveInAppConsoleErrors": 0
+  },
+  "assessmentData": {
+    "changedByThisMaintenance": false,
+    "activeLessons": 12,
+    "activeTeachers": 4,
+    "availablePlaces": 57,
+    "confirmedOrders": 1,
+    "purchasedPlaces": 3,
+    "bookingValueGBP": 70
+  },
+  "limitations": [
+    "Intermittent normal-Safari transport cause not conclusively identified",
+    "No sign-in latency benchmark claimed",
+    "No native Safari sign-out rerun after developer navigated elsewhere",
+    "Physical iOS/iPad devices not tested",
+    "Existing PDF pack is an earlier dated snapshot; Markdown handover updated"
+  ],
+  "privacy": "No credentials, tokens, request bodies, browser history, auth records or private connection strings included."
+}

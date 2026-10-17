@@ -6,16 +6,16 @@ The requesting user is a developer providing paid assistance to a separate stude
 
 ## Current result — 17 October 2026
 
-83 application checks have passed: 52 backend, 28 frontend and three native Atlas tests. Official Postman runner Newman 6.2.3 passed all 37 collection requests/52 assertions against the real separate Atlas test database, and 14 hosted read-only requests/23 assertions. Actual assessment exports contain lesson (12), teacher (5, including one soft-deleted QA profile), order (1) and adminAudit (5). Archive verification is recorded in the final submission entry below. Student review, independent rehearsal, portal submission/access and assessed demonstration remain pending. The earlier entries are preserved milestone history, not the current completion state.
+89 application checks have passed: 54 backend, 32 frontend and three native Atlas tests. Official Postman runner Newman 6.2.3 passed all 37 collection requests/52 assertions against the real separate Atlas test database, and 14 hosted read-only requests/23 assertions. Actual assessment exports contain lesson (12), teacher (5, including one soft-deleted QA profile), order (1) and adminAudit (5). Archive verification is recorded in the final submission entry below. Student review, independent rehearsal, portal submission/access and assessed demonstration remain pending. The earlier entries are preserved milestone history, not the current completion state.
 
 ## Automated local checks
 
 | Check | Evidence |
 |---|---|
-| Backend suite | 50 application/HTTP tests passed; 3 real-Atlas tests skipped pending the separate test URI |
-| Frontend suite | 28 tests passed across coursework state, admin/recovery, discovery, details, teachers and actual Vue template compilation |
-| Postman artifact | 37 requests generated; JSON and all script syntax validated; not yet imported/executed in Postman |
-| Export format | Native Extended JSON round-trip preserves IDs, dates and quantities; actual export pending |
+| Backend suite | 54 application/HTTP tests passed; 3 real-Atlas cases deliberately skipped in the ordinary run and passed in the explicit separate run |
+| Frontend suite | 32 tests passed across coursework state, admin/recovery, discovery, details, teachers and actual Vue template compilation |
+| Postman artifact | 37 requests / 52 assertions executed successfully by official Newman against isolated Atlas test fixtures |
+| Export format | Actual Atlas Extended JSON exports of all four assessment collections have checked counts and SHA-256 checksums |
 | Clean install | npm ci recreated locked dependencies successfully |
 | Dependency audit | Zero known vulnerabilities at the last npm audit on 16 October |
 | Frontend syntax | app.js and supporting modules accepted by Node syntax checks |
@@ -187,3 +187,9 @@ Local regression: **32 frontend + 54 backend tests passed**. The ordinary backen
 Browser checks on disposable preview 8086: visible added notification and View cart state, increase to five/disabled plus, decrease restoring capacity, valid/invalid optional email, leading-zero phone, one successful checkout, teacher/search preserving a hidden basket line, detail-page shared cart, last-line removal returning to catalogue, disabled empty basket, no browser error logs. At 375×812 and 768×1024 the cart had no horizontal overflow; quantity controls measured 44×44 pixels. Normal Safari also loaded the preview and passed add/View cart/increase checks. Live deployment verification follows in the dated maintenance evidence.
 
 API JSON responses use no-store. Browser reads use cache bypass and one transport-only GET retry within the existing 90-second total budget. Mutation retry identities, transaction boundaries, password hashing and browser security settings are retained. The earlier normal-Safari stall happened without HTTP response headers while direct probes and private Safari worked; its exact browser transport cause was not conclusively established.
+
+Live maintenance verification: Render deployed backend commit ae9b182 successfully (deploy dep-db9m46e1egvs73fpmos0); Pages workflow 39030594834 completed successfully for f6e104f. API health/catalogue/teachers returned 200, no-store and the correct Pages CORS origin. Post-deploy catalogue/teacher probes took 168/182 ms after health warm-up; these are direct probes, not a Safari sign-in benchmark. Hosted Postman passed 14 requests / 23 assertions, and the existing deployment checker passed.
+
+In **normal Safari**, the live public page loaded all twelve lessons/teacher associations; adding Art Workshop displayed the notification and View cart action. The cart showed the email field; plus/minus changed one/two places and £20/£40 totals. A fresh Studio sign-in succeeded with existing credentials and loaded twelve lessons, four teacher profiles/assignments and overview values of 57 available places, three purchased places and £70 from one confirmed order. Safari offered to save the password; this was dismissed without saving. Browser verification ended when the developer navigated elsewhere; no sign-out rerun is claimed. No live order, lesson or teacher was changed. The refreshed in-app public page also loaded 12 lessons/four teachers with no captured console errors.
+
+Screenshots are saved locally under output/diagnostics/safari-live-cart-feedback.png, safari-live-cart-email.png and safari-live-admin.png. User browser data and privacy/security settings were not cleared or weakened. The original normal-Safari intermittent transport cause remains unconfirmed; the release adds bounded recovery and passed these live checks, without claiming that every future network failure is eliminated.

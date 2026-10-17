@@ -170,7 +170,7 @@ cd ../frontend
 node --test test/*.test.mjs
 ```
 
-Expected: 52 backend checks pass, three native Atlas tests skip without test credentials, and 28 frontend checks pass. A skip is not a native-database pass. The previous real Atlas run passed those three tests separately.
+Expected: 54 backend checks pass, three native Atlas tests skip without test credentials, and 32 frontend checks pass. A skip is not a native-database pass. The previous real Atlas run passed those three tests separately.
 
 For the disposable preview, from backend:
 
@@ -205,8 +205,8 @@ For a controlled lost-response or concurrency exercise use the prepared automate
 
 | Check | Command/location | Meaning and limit |
 |---|---|---|
-| Frontend tests | node --test frontend/test/*.test.mjs from project root | 28 state/recovery/template tests; not a full physical-device audit |
-| Backend regression | npm test in backend | 52 tests using an explicit adapter and real local HTTP; native suites skip without credentials |
+| Frontend tests | node --test frontend/test/*.test.mjs from project root | 32 state/recovery/template tests; not a full physical-device audit |
+| Backend regression | npm test in backend | 54 tests using an explicit adapter and real local HTTP; native suites skip without credentials |
 | Native Atlas | npm run test:atlas in backend | Three real database suites for rollback, last-place races, replay/history and assignment races |
 | Postman full collection | check-postman.js atlas-test; instructions in submission guide | 37 requests/52 assertions on production Express code with fresh real Atlas test fixtures |
 | Hosted Postman subset | check-postman.js hosted-read-only | 14 GET requests/23 assertions; no live stock mutation |
