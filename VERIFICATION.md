@@ -109,3 +109,11 @@ Frontend publication was explicitly approved by the student. Published all 16 co
 ## Combined repository deployment preparation — 17 October 2026
 
 The student authorized Atlas verification and deployment from after_class_simple_brainstrome. Added a Pages workflow that tests and publishes only frontend/, with official actions pinned to resolved commits. Enabled Pages in workflow mode at https://gantalaavinash.github.io/after_class_simple_brainstrome/. Prepared Render from the public repository with backend root, student-number service name, npm ci/npm start, free plan and /health. Actual Atlas connection attempts failed with MongoServerSelectionError/MongoNetworkError on both saved connection strings; network access investigation is pending Atlas re-authentication. No native database pass or live API completion is claimed.
+
+## Native Atlas verification completed — 17 October 2026
+
+After the current development IP rule became active, the Atlas ping and rolled-back transaction write passed. All three explicit native tests passed with zero skips: checkout rollback/last-place concurrency/idempotency/enrolment; duplicate admin creation/stale edits/history-preserving deletion; and opposite-side teacher assignment races. The earlier connection-only failures are retained as setup history rather than application assertion failures.
+
+Non-destructive seed verification found 12 lessons with five spaces each, four teachers, valid lesson associations, populated description/learningOutcomes/ageGroup/durationMinutes fields, and zero assessment orders at this point. The regression suite passes 52 backend tests and 28 frontend tests; the three native database tests pass separately, for 83 checks total. Evidence: verification/atlas-native-2026-10-17.json.
+
+Created the Free Singapore Render service afterclass-21j41a62f1 from the combined repository, root backend, npm ci/npm start, Node runtime, /health, and six production-only environment variables. Removed test/local values from the visible imported configuration before saving. The frontend production origin is now set to the actual service URL. Hosted behaviour and narrowed network access remain in progress.

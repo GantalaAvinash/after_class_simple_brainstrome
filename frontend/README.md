@@ -66,3 +66,11 @@ Configure the backend's FRONTEND_ORIGINS as the GitHub Pages origin without a re
 - No remote font service, CSS framework, icon JavaScript library, or generated raster image is required.
 
 The workspace AI_ACKNOWLEDGEMENT.md records actual assistance. Student explanation review and real hosted verification remain pending.
+
+## Current combined-repository deployment
+
+- Source: https://github.com/GantalaAvinash/after_class_simple_brainstrome
+- Frontend: https://gantalaavinash.github.io/after_class_simple_brainstrome/
+- API lessons: https://afterclass-21j41a62f1.onrender.com/lessons
+
+The service is configured from this combined repository. Hosted verification is in progress; see the root VERIFICATION.md. The original frontend/backend repositories remain available separately for coursework history.

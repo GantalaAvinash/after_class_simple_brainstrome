@@ -78,3 +78,11 @@ Repository: https://github.com/GantalaAvinash/after_class_simple_brainstrome
 GitHub Pages publishes only `frontend/` through `.github/workflows/pages.yml`, with frontend regression tests before publishing. Pages is configured at https://gantalaavinash.github.io/after_class_simple_brainstrome/. The public API origin in `frontend/config.js` must match the verified Render service before the app is operational.
 
 Render uses this repository with root directory `backend`, build `npm ci`, start `npm start`, Node 24.x, the Free compute plan and health path `/health`. Secrets are entered only in Render environment settings. Native Atlas tests and hosted verification are still pending at this setup milestone.
+
+## Current combined-repository deployment
+
+- Source: https://github.com/GantalaAvinash/after_class_simple_brainstrome
+- Frontend: https://gantalaavinash.github.io/after_class_simple_brainstrome/
+- API lessons: https://afterclass-21j41a62f1.onrender.com/lessons
+
+The service is configured from this combined repository. Hosted verification is in progress; see the root VERIFICATION.md. The original frontend/backend repositories remain available separately for coursework history.

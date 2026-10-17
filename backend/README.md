@@ -126,3 +126,11 @@ Once real links, tests and exports are ready, enter the root submission-links.js
 public/images contains twelve unmodified Lucide 0.468.0 SVGs. Mapping/source: public/images/ATTRIBUTION.md. Licence: public/images/LICENSE.lucide. No icon JavaScript library is used.
 
 The root AI_ACKNOWLEDGEMENT.md records actual assistance. Review the code independently before the assessed demonstration.
+
+## Current combined-repository deployment
+
+- Source: https://github.com/GantalaAvinash/after_class_simple_brainstrome
+- Frontend: https://gantalaavinash.github.io/after_class_simple_brainstrome/
+- API lessons: https://afterclass-21j41a62f1.onrender.com/lessons
+
+The service is configured from this combined repository. Hosted verification is in progress; see the root VERIFICATION.md. The original frontend/backend repositories remain available separately for coursework history.
