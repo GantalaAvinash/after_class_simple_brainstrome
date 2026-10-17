@@ -1,0 +1,177 @@
+{
+  "date": "2026-10-17",
+  "apiOrigin": "https://afterclass-21j41a62f1.onrender.com",
+  "renderRanges": [
+    "74.220.52.0/24",
+    "74.220.60.0/24"
+  ],
+  "beforeRestart": {
+    "capturedAt": "2026-10-17T05:01:54.679Z",
+    "lessons": [
+      {
+        "id": "100000000000000000000001",
+        "space": 5,
+        "price": 9
+      },
+      {
+        "id": "100000000000000000000002",
+        "space": 5,
+        "price": 15
+      },
+      {
+        "id": "100000000000000000000003",
+        "space": 3,
+        "price": 25
+      },
+      {
+        "id": "100000000000000000000004",
+        "space": 5,
+        "price": 18
+      },
+      {
+        "id": "100000000000000000000005",
+        "space": 5,
+        "price": 30
+      },
+      {
+        "id": "100000000000000000000006",
+        "space": 5,
+        "price": 12
+      },
+      {
+        "id": "100000000000000000000007",
+        "space": 4,
+        "price": 20
+      },
+      {
+        "id": "100000000000000000000008",
+        "space": 5,
+        "price": 28
+      },
+      {
+        "id": "100000000000000000000009",
+        "space": 5,
+        "price": 16
+      },
+      {
+        "id": "10000000000000000000000a",
+        "space": 5,
+        "price": 22
+      },
+      {
+        "id": "10000000000000000000000b",
+        "space": 5,
+        "price": 19
+      },
+      {
+        "id": "10000000000000000000000c",
+        "space": 5,
+        "price": 100
+      }
+    ],
+    "teacherIds": [
+      "200000000000000000000001",
+      "200000000000000000000002",
+      "200000000000000000000003",
+      "200000000000000000000004"
+    ],
+    "codingEnrolment": 2,
+    "artEnrolment": 1
+  },
+  "afterRestart": {
+    "capturedAt": "2026-10-17T05:05:39.441Z",
+    "health": {
+      "status": "ok",
+      "database": "connected"
+    },
+    "lessons": [
+      {
+        "id": "100000000000000000000001",
+        "space": 5,
+        "price": 9
+      },
+      {
+        "id": "100000000000000000000002",
+        "space": 5,
+        "price": 15
+      },
+      {
+        "id": "100000000000000000000003",
+        "space": 3,
+        "price": 25
+      },
+      {
+        "id": "100000000000000000000004",
+        "space": 5,
+        "price": 18
+      },
+      {
+        "id": "100000000000000000000005",
+        "space": 5,
+        "price": 30
+      },
+      {
+        "id": "100000000000000000000006",
+        "space": 5,
+        "price": 12
+      },
+      {
+        "id": "100000000000000000000007",
+        "space": 4,
+        "price": 20
+      },
+      {
+        "id": "100000000000000000000008",
+        "space": 5,
+        "price": 28
+      },
+      {
+        "id": "100000000000000000000009",
+        "space": 5,
+        "price": 16
+      },
+      {
+        "id": "10000000000000000000000a",
+        "space": 5,
+        "price": 22
+      },
+      {
+        "id": "10000000000000000000000b",
+        "space": 5,
+        "price": 19
+      },
+      {
+        "id": "10000000000000000000000c",
+        "space": 5,
+        "price": 100
+      }
+    ],
+    "teacherIds": [
+      "200000000000000000000001",
+      "200000000000000000000002",
+      "200000000000000000000003",
+      "200000000000000000000004"
+    ],
+    "codingEnrolment": 2,
+    "artEnrolment": 1
+  },
+  "atlasRules": {
+    "renderRangesActive": true,
+    "broadRuleRemoved": true,
+    "developmentRuleCountPreserved": 2,
+    "changesFinishedBeforeRestart": true
+  },
+  "renderRestart": {
+    "event": "Service restarted by you",
+    "displayedDate": "17 October 2026",
+    "displayedTime": "10:34 AM IST"
+  },
+  "checks": {
+    "hostedReadOnly": "passed",
+    "localAtlasConnectionAndRollback": "passed",
+    "allLessonStockAndPricesPreserved": true,
+    "publicTeachersPreserved": true,
+    "enrolmentPreserved": true,
+    "browser": "passed: fresh reload, mixed-case search intersected with Leo Grant, lesson details, three available spaces and two purchased places; no console warnings/errors"
+  }
+}

@@ -58,7 +58,7 @@ The approved live test order purchased two Coding Club places and one Art Worksh
 
 ## Deployment and submission
 
-`.github/workflows/pages.yml` runs the frontend tests and publishes only the frontend folder using official actions pinned to commits. Render uses the Free Singapore service, backend root, `npm ci`, `npm start`, Node 24.x and `/health`. Production credentials are held only in Render environment settings; the test connection and plaintext admin password are excluded. Use Render’s Manual Deploy controls after backend changes and verify the resulting deployment.
+`.github/workflows/pages.yml` runs the frontend tests and publishes only the frontend folder using official actions pinned to commits. Render uses the Free Singapore service, backend root, `npm ci`, `npm start`, Node 24.x and `/health`. Production credentials are held only in Render environment settings; the test connection and plaintext admin password are excluded. Atlas allows Render’s verified outbound ranges 74.220.52.0/24 and 74.220.60.0/24 plus the retained development IP rules; 0.0.0.0/0 has been removed. A fresh Render restart, hosted checks and stock/enrolment comparisons passed with that restriction. Use Render’s Manual Deploy controls after backend changes and verify the resulting deployment.
 
 `submission-links.json` contains actual public deployment links. `backend/postman/AfterClass.postman_collection.json` contains 37 importable requests. The export and packaging commands remain available in the backend; do not treat source publication or deployment as proof that the final submission ZIP, manual Postman run, student review or assessed demonstration is complete.
 

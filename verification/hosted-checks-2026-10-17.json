@@ -37,5 +37,14 @@
     "consoleWarningsAndErrors": 0
   },
   "restartPersistence": "passed: Render Events records the service restart; subsequent requests preserve the approved stock/enrolment and four public teachers",
-  "networkRestriction": "awaiting scoped-range approval"
+  "networkRestriction": {
+    "status": "passed",
+    "activeRenderRanges": [
+      "74.220.52.0/24",
+      "74.220.60.0/24"
+    ],
+    "broadRuleRemoved": true,
+    "developmentRulesRetained": 2,
+    "verifiedAfterNewRenderRestart": true
+  }
 }

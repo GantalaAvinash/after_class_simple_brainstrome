@@ -130,6 +130,16 @@ Hosted lesson/detail checks at 375×667 and 768×1024, plus the teacher editor a
 
 Render Events confirms a service restart on 17 October. Subsequent fresh API reads preserved both purchased quantities/remaining spaces and the four public teachers. The temporary production credential import file was removed. The private .env and operator credential file remain excluded from Git. Evidence is in verification/hosted-checks-2026-10-17.json.
 
-Remaining deployment hardening: approval to add the two observed Render outbound CIDRs and remove 0.0.0.0/0 is pending. The deployed application is functional; restricted-network verification is not yet claimed. Manual Postman execution, final exports/ZIP, student explanation review and assessed demonstration remain separate submission tasks.
+The restricted-network deployment gate subsequently passed; see the final access-list/restart verification below. Manual Postman execution, final exports/ZIP, student explanation review and assessed demonstration remain separate submission tasks.
 
 The hosted walkthrough also exposed the label “1 confirmed orders”. Changed it to “Confirmed orders: 1” (and the equivalent for any count); reran all 28 frontend/template compilation checks successfully. No application state or API behaviour changed.
+
+## Restricted Atlas access and fresh Render restart — 17 October 2026
+
+The student explicitly authorized adding Render’s two outbound ranges, removing broad access and verifying AfterClass after restarting Render. Added 74.220.52.0/24 and 74.220.60.0/24, verified both Active, then deleted only 0.0.0.0/0. The two existing development /32 rules were retained. Waited until Atlas no longer reported changes being deployed before restarting Render, so the new API process established its database connection under the restricted rules. No development addresses or credentials are included in the published evidence.
+
+Render Events records the new service restart at 10:34am IST. The local Atlas ping and transaction-write/rollback probe passed with broad access removed. The full hosted read-only checker passed again: Pages assets and correct API configuration; Render database health; catalogue, details, teachers and enrolment; SVG and missing-image handling; CORS; and anonymous admin denial.
+
+Compared all twelve lesson IDs, spaces and prices, all four public teacher IDs and the two purchased-quantity totals with a baseline captured before the restart. They matched exactly: Coding Club still has three spaces and two purchased, Art Workshop four spaces and one purchased. A fresh live browser reload, mixed-case cOdInG search combined with Leo Grant, detail page and purchased-quantity display passed. The console warn/error list was empty. No new order or teacher record was created during this network verification.
+
+Saved verification/network-restart-2026-10-17.json and verification/screenshots/restricted-network-live-lesson.jpg. The Atlas network restriction and post-restart deployment gates are now complete. Manual Postman execution, final exports/ZIP and student demonstration preparation remain separate submission work.
