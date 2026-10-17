@@ -1,0 +1,246 @@
+{
+  "lessons": [
+    {
+      "_id": "100000000000000000000001",
+      "topic": "Maths Explorers",
+      "location": "Hendon",
+      "price": 9,
+      "space": 5,
+      "image": "/images/maths.svg",
+      "ageGroup": "Ages 7\u201311",
+      "durationMinutes": 60,
+      "description": "Turn number puzzles into small discoveries. Learners explore patterns, practise useful calculations and explain their ideas through friendly, hands-on challenges. The example session balances independent thinking with small-group problem solving, helping children build confidence at their own pace.",
+      "learningOutcomes": [
+        "Spot number patterns and explain a rule",
+        "Try more than one way to solve a puzzle",
+        "Describe mathematical thinking clearly"
+      ]
+    },
+    {
+      "_id": "100000000000000000000002",
+      "topic": "Creative Writing",
+      "location": "Colindale",
+      "price": 15,
+      "space": 5,
+      "image": "/images/writing.svg",
+      "ageGroup": "Ages 8\u201313",
+      "durationMinutes": 60,
+      "description": "Build a story from a spark of an idea. Young writers try character creation, vivid settings and playful writing prompts, then develop a short piece they can share. The example workshop makes room for different voices and gentle, constructive feedback.",
+      "learningOutcomes": [
+        "Create a character with a clear goal",
+        "Use sensory detail to build a setting",
+        "Plan and revise a short story"
+      ]
+    },
+    {
+      "_id": "100000000000000000000003",
+      "topic": "Coding Club",
+      "location": "Brent Cross",
+      "price": 25,
+      "space": 5,
+      "image": "/images/coding.svg",
+      "ageGroup": "Ages 9\u201314",
+      "durationMinutes": 75,
+      "description": "Discover how an idea becomes an interactive project. Learners break a problem into steps, try simple programming concepts and improve their work through testing. The example club encourages collaboration and curiosity, with small challenges that make logical thinking feel practical.",
+      "learningOutcomes": [
+        "Describe an algorithm as clear steps",
+        "Use sequences and simple decisions",
+        "Test a project and explain a change"
+      ]
+    },
+    {
+      "_id": "100000000000000000000004",
+      "topic": "Drama Studio",
+      "location": "Golders Green",
+      "price": 18,
+      "space": 5,
+      "image": "/images/drama.svg",
+      "ageGroup": "Ages 8\u201313",
+      "durationMinutes": 60,
+      "description": "Explore characters, movement and storytelling through drama games. Learners practise listening, improvisation and working together before building a short group scene. The example studio gives children space to experiment and share ideas without pressure to perform perfectly.",
+      "learningOutcomes": [
+        "Use voice and movement to express a character",
+        "Respond to a partner during improvisation",
+        "Contribute to a short group scene"
+      ]
+    },
+    {
+      "_id": "100000000000000000000005",
+      "topic": "Science Lab",
+      "location": "Hendon",
+      "price": 30,
+      "space": 5,
+      "image": "/images/science.svg",
+      "ageGroup": "Ages 8\u201312",
+      "durationMinutes": 75,
+      "description": "Ask a question, make a prediction and investigate what happens. Learners explore everyday scientific ideas through supervised example activities, observation and discussion. The programme focuses on careful thinking and recording results, helping curiosity develop into a useful method.",
+      "learningOutcomes": [
+        "Make a prediction with a reason",
+        "Record observations clearly",
+        "Compare results with an initial idea"
+      ]
+    },
+    {
+      "_id": "100000000000000000000006",
+      "topic": "Junior Chess",
+      "location": "Colindale",
+      "price": 12,
+      "space": 5,
+      "image": "/images/chess.svg",
+      "ageGroup": "Ages 7\u201312",
+      "durationMinutes": 60,
+      "description": "Learn the board, discover how pieces move and try a little strategic thinking. Learners practise with friendly puzzles and short games, taking time to explain their choices. The example club values patience, fair play and learning from the next move.",
+      "learningOutcomes": [
+        "Recognise legal moves for each piece",
+        "Look for a simple tactic",
+        "Reflect on a move and consider an alternative"
+      ]
+    },
+    {
+      "_id": "100000000000000000000007",
+      "topic": "Art Workshop",
+      "location": "Brent Cross",
+      "price": 20,
+      "space": 5,
+      "image": "/images/art.svg",
+      "ageGroup": "Ages 7\u201312",
+      "durationMinutes": 75,
+      "description": "Make room for colour, texture and original ideas. Learners experiment with drawing and mixed-media approaches, then build a piece around a creative prompt. This example workshop celebrates the process of making, with time to discuss choices and discover new techniques.",
+      "learningOutcomes": [
+        "Explore colour and mark-making",
+        "Combine materials in an original composition",
+        "Explain a creative choice"
+      ]
+    },
+    {
+      "_id": "100000000000000000000008",
+      "topic": "Guitar Basics",
+      "location": "Golders Green",
+      "price": 28,
+      "space": 5,
+      "image": "/images/guitar.svg",
+      "ageGroup": "Ages 9\u201314",
+      "durationMinutes": 60,
+      "description": "Start making music one small step at a time. Learners explore rhythm, basic technique and simple chord patterns through guided practice. The example session supports beginners with approachable exercises and encourages listening as well as playing.",
+      "learningOutcomes": [
+        "Keep a steady pulse",
+        "Practise a simple chord transition",
+        "Play a short pattern with control"
+      ]
+    },
+    {
+      "_id": "100000000000000000000009",
+      "topic": "Football Skills",
+      "location": "Hendon",
+      "price": 16,
+      "space": 5,
+      "image": "/images/football.svg",
+      "ageGroup": "Ages 7\u201312",
+      "durationMinutes": 60,
+      "description": "Build ball skills through friendly drills and small-group games. Learners practise control, passing and movement while developing communication and fair play. The example programme focuses on participation and steady improvement, with challenges that can be adapted to different starting points.",
+      "learningOutcomes": [
+        "Control the ball during a simple drill",
+        "Pass accurately to a teammate",
+        "Use communication and fair play in a game"
+      ]
+    },
+    {
+      "_id": "10000000000000000000000a",
+      "topic": "Ballet Beginners",
+      "location": "Colindale",
+      "price": 22,
+      "space": 5,
+      "image": "/images/ballet.svg",
+      "ageGroup": "Ages 6\u201310",
+      "durationMinutes": 60,
+      "description": "Discover movement, rhythm and the foundations of ballet through a welcoming beginner session. Learners explore posture, coordination and short movement sequences. The example programme encourages careful practice and expression, with time to repeat and build confidence.",
+      "learningOutcomes": [
+        "Recognise basic positions",
+        "Coordinate movement with a musical pulse",
+        "Remember a short movement sequence"
+      ]
+    },
+    {
+      "_id": "10000000000000000000000b",
+      "topic": "French Discovery",
+      "location": "Brent Cross",
+      "price": 19,
+      "space": 5,
+      "image": "/images/french.svg",
+      "ageGroup": "Ages 7\u201312",
+      "durationMinutes": 60,
+      "description": "Meet a new language through conversation, games and everyday themes. Learners practise greetings, useful words and simple exchanges in French. The example session makes repetition playful and encourages children to try speaking, listening and responding with growing confidence.",
+      "learningOutcomes": [
+        "Use a greeting and introduce yourself",
+        "Recognise familiar everyday words",
+        "Take part in a short question-and-answer exchange"
+      ]
+    },
+    {
+      "_id": "10000000000000000000000c",
+      "topic": "Robotics Lab",
+      "location": "Golders Green",
+      "price": 100,
+      "space": 5,
+      "image": "/images/robotics.svg",
+      "ageGroup": "Ages 10\u201315",
+      "durationMinutes": 90,
+      "description": "Connect coding ideas with a practical design challenge. Learners plan a simple robotic behaviour, consider how inputs affect actions and test improvements as a team. The example lab values clear reasoning, patient experimentation and explaining how a design works.",
+      "learningOutcomes": [
+        "Describe an input-process-output system",
+        "Plan a simple robotic behaviour",
+        "Use test results to improve a design"
+      ]
+    }
+  ],
+  "teachers": [
+    {
+      "_id": "200000000000000000000001",
+      "firstName": "Mina",
+      "lastName": "Patel",
+      "lessonIds": [
+        "100000000000000000000001",
+        "100000000000000000000005",
+        "100000000000000000000006"
+      ],
+      "specialism": "Numbers, science & strategy",
+      "bio": "Mina helps learners turn questions into practical investigations and thoughtful problem solving. This is a fictitious coursework profile."
+    },
+    {
+      "_id": "200000000000000000000002",
+      "firstName": "Theo",
+      "lastName": "Reed",
+      "lessonIds": [
+        "100000000000000000000002",
+        "100000000000000000000004",
+        "10000000000000000000000b"
+      ],
+      "specialism": "Stories, drama & languages",
+      "bio": "Theo creates space for learners to experiment with language, characters and new ideas. This is a fictitious coursework profile."
+    },
+    {
+      "_id": "200000000000000000000003",
+      "firstName": "Sarah",
+      "lastName": "Khan",
+      "lessonIds": [
+        "100000000000000000000007",
+        "100000000000000000000008",
+        "10000000000000000000000a"
+      ],
+      "specialism": "Art, music & movement",
+      "bio": "Sarah encourages creative practice through visual art, music and expressive movement. This is a fictitious coursework profile."
+    },
+    {
+      "_id": "200000000000000000000004",
+      "firstName": "Leo",
+      "lastName": "Grant",
+      "lessonIds": [
+        "100000000000000000000003",
+        "100000000000000000000009",
+        "10000000000000000000000c"
+      ],
+      "specialism": "Coding, sport & robotics",
+      "bio": "Leo uses hands-on challenges to connect logical thinking, teamwork and practical skills. This is a fictitious coursework profile."
+    }
+  ]
+}
