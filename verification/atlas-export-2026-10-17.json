@@ -1,0 +1,47 @@
+{
+  "verifiedAt": "2026-10-17T05:19:13.888Z",
+  "database": "afterclass",
+  "snapshotExport": "2026-10-17T05:16:52.315Z",
+  "collections": [
+    {
+      "name": "adminAudit",
+      "file": "adminAudit.json",
+      "count": 5,
+      "sha256": "f90ad2e801a0b5126989efd81d85a7838fb79401d8fcea7c3d48ff9fa5fe7d8b"
+    },
+    {
+      "name": "lesson",
+      "file": "lesson.json",
+      "count": 12,
+      "sha256": "9dab521cb4272c7fca338754bc32220e583e7a0d22b7192a48b52676b4cb6ec0"
+    },
+    {
+      "name": "order",
+      "file": "order.json",
+      "count": 1,
+      "sha256": "9d64d4ea96ae1480c9ae3a8c3ea6a8aacd46aba7fc82ae0f458d56f3a47d2f4c"
+    },
+    {
+      "name": "teacher",
+      "file": "teacher.json",
+      "count": 5,
+      "sha256": "883fb8881cbee2bbd90150eb7c06b3833d92e39c9386089b5fcb38bcb85100a2"
+    }
+  ],
+  "checks": {
+    "checksums": true,
+    "counts": true,
+    "objectIdsAndDates": true,
+    "lessonContentAndAvailability": true,
+    "teacherLessonReferences": true,
+    "orderQuantitiesAndLeadingZeroPhone": true,
+    "operationalAuthExcluded": true
+  },
+  "activeTeachers": 4,
+  "confirmedOrders": 1,
+  "purchasedQuantities": {
+    "Coding Club": 2,
+    "Art Workshop": 1
+  },
+  "availablePlaces": 57
+}

@@ -6,3 +6,5 @@ coverage/
 .DS_Store
 *.log
 .admin-local.txt
+__pycache__/
+*.pyc

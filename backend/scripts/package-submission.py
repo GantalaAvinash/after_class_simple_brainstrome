@@ -1,6 +1,7 @@
-"""Build the submission only after genuine links and Atlas exports are present."""
-from pathlib import Path
+"""Package current source, real exports and evidence; never infer separate histories from a monorepo."""
+from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
+import argparse
 import hashlib
 import json
 import subprocess
@@ -14,82 +15,118 @@ def require(condition, message):
         raise ValueError(message)
 
 
+def git(repo, *args):
+    return subprocess.check_output(["git", "-C", str(repo), *args], text=True).strip()
+
+
+def safe_name(name):
+    path = PurePosixPath(name)
+    require(name and not path.is_absolute() and ".." not in path.parts and "\\" not in name, "Unsafe archive path.")
+    require(not any(part in [".git", "node_modules", "__pycache__", ".admin-local.txt", ".DS_Store"] or part.endswith(".pyc") or (part.startswith(".env") and part != ".env.example") for part in path.parts), "Refusing a private/dependency path: " + name)
+
+
 def main():
-    config_path = ROOT / "submission-links.json"
-    require(config_path.is_file(), "Create submission-links.json from the example and enter actual hosted links.")
-    links = json.loads(config_path.read_text())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source-workspace", type=Path, default=ROOT, help="Workspace containing the two independent frontend/backend Git checkouts")
+    args = parser.parse_args()
+    source = args.source_workspace.resolve()
+    links = json.loads((ROOT / "submission-links.json").read_text())
     number = links.get("studentNumber", "").strip()
     require(number, "The actual student number is required.")
-    keys = ["frontendRepository", "frontendUrl", "backendRepository", "lessonsUrl"]
     urls = {}
-    for key in keys:
-        value = links.get(key, "").strip()
-        url = urlparse(value)
+    for key in ["frontendRepository", "frontendUrl", "backendRepository", "lessonsUrl"]:
+        url = urlparse(links.get(key, "").strip())
         require(url.scheme == "https" and url.hostname and not url.username and not url.password and not url.query and not url.fragment, "Enter a complete HTTPS URL for " + key)
         urls[key] = url
-    require(urls["frontendRepository"].hostname == "github.com" and urls["backendRepository"].hostname == "github.com", "Use GitHub repository URLs.")
-    require(links["frontendRepository"] != links["backendRepository"], "The repositories must be separate.")
+    require(all(urls[key].hostname == "github.com" for key in ["frontendRepository", "backendRepository"]), "Use GitHub repository URLs.")
+    require(links["frontendRepository"] != links["backendRepository"], "The coursework repositories must be separate.")
     require(urls["frontendUrl"].hostname.endswith(".github.io"), "The frontend must be on GitHub Pages.")
     require(urls["lessonsUrl"].hostname.endswith(".onrender.com") and urls["lessonsUrl"].path == "/lessons", "Supply the Render /lessons URL.")
     require(number.lower() in urls["lessonsUrl"].hostname.lower(), "The Render hostname must contain your student number.")
-    files = []
+    files, provenance = {}, {}
+
+    def add(path, name):
+        safe_name(name)
+        require(name not in files, "Duplicate archive entry: " + name)
+        require(path.is_file() and not path.is_symlink(), "Missing file or symlink: " + name)
+        files[name] = path.read_bytes()
+
     for folder in ["frontend", "backend"]:
-        repo = ROOT / folder
-        count = int(subprocess.check_output(["git", "-C", str(repo), "rev-list", "--count", "HEAD"], text=True).strip())
+        repo = source / folder
+        require(Path(git(repo, "rev-parse", "--show-toplevel")).resolve() == repo.resolve(), "Use --source-workspace with two independent Git checkouts; monorepo totals are not separate development histories.")
+        count = int(git(repo, "rev-list", "--count", "HEAD"))
         require(count >= 10, folder + " needs at least ten genuine development commits.")
-        require(not subprocess.check_output(["git", "-C", str(repo), "status", "--porcelain"], text=True).strip(), folder + " has uncommitted changes; review and commit them before packaging.")
+        require(not git(repo, "status", "--porcelain"), folder + " has uncommitted changes.")
+        require(git(repo, "remote", "get-url", "origin").removesuffix(".git") == links[folder + "Repository"].rstrip("/"), "Repository link does not match " + folder)
         tracked = subprocess.check_output(["git", "-C", str(repo), "ls-files", "-z"]).decode().split("\0")
+        if repo.resolve() != (ROOT / folder).resolve():
+            current_names = set(filter(None, git(ROOT / folder, "ls-files").splitlines()))
+            require(current_names == set(filter(None, tracked)), "Synchronise the complete " + folder + " file list before packaging.")
         for name in filter(None, tracked):
-            path = repo / name
-            require(not path.is_symlink(), "Refusing to archive a symlink: " + name)
-            require(".git" not in path.parts and "node_modules" not in path.parts and path.name != ".admin-local.txt" and (not path.name.startswith(".env") or path.name == ".env.example"), "Refusing to include a secret or dependency path.")
-            files.append((path, folder + "/" + name))
+            if repo.resolve() != (ROOT / folder).resolve():
+                current = ROOT / folder / name
+                require(current.is_file() and not current.is_symlink() and current.read_bytes() == (repo / name).read_bytes(), "Synchronise the deployment and coursework source: " + folder + "/" + name)
+            add(repo / name, folder + "/" + name)
+        provenance[folder] = {"repository": links[folder + "Repository"], "commit": git(repo, "rev-parse", "HEAD"), "genuineHistoryCommits": count}
+
     manifest_path = ROOT / "exports" / "manifest.json"
-    require(manifest_path.is_file(), "Run the actual Atlas export before packaging.")
     manifest = json.loads(manifest_path.read_text())
-    require(manifest.get("source") == "MongoDB Atlas", "Atlas export metadata is required.")
-    collections = manifest["collections"]
-    require({"lesson", "order", "teacher"}.issubset({item["name"] for item in collections}), "Export lessons, orders and teachers.")
-    for item in collections:
-        require(item["name"] not in ["adminSession", "adminLoginAttempt"], "Never package operational authentication data.")
+    require(manifest.get("source") == "MongoDB Atlas", "Actual Atlas export metadata is required.")
+    require({"lesson", "order", "teacher"}.issubset({item["name"] for item in manifest["collections"]}), "Export lessons, orders and teachers.")
+    for item in manifest["collections"]:
+        require(item["name"] not in ["adminSession", "adminLoginAttempt"] and not item["name"].startswith("system."), "Never package operational authentication data.")
         name = item["file"]
         require(Path(name).name == name, "Invalid export filename.")
         path = ROOT / "exports" / name
-        contents = path.read_bytes()
-        require(hashlib.sha256(contents).hexdigest() == item["sha256"], "The export changed or is incomplete: " + name)
-        require(len(json.loads(contents)) == item["count"], "Export count mismatch: " + name)
-        files.append((path, "exports/" + name))
-    files.append((manifest_path, "exports/manifest.json"))
-    acknowledgement = ROOT / "AI_ACKNOWLEDGEMENT.md"
-    require(acknowledgement.is_file(), "Include the completed assistance acknowledgement.")
-    files.append((acknowledgement, "AI_ACKNOWLEDGEMENT.md"))
-    postman = ROOT / "backend" / "postman" / "AfterClass.postman_collection.json"
-    require(postman.is_file(), "Generate the Postman collection.")
-    collection = json.loads(postman.read_text())
+        require(hashlib.sha256(path.read_bytes()).hexdigest() == item["sha256"], "Export checksum mismatch: " + name)
+        require(len(json.loads(path.read_bytes())) == item["count"], "Export count mismatch: " + name)
+        add(path, "exports/" + name)
+    add(manifest_path, "exports/manifest.json")
+    for name in ["README.md", "AI_ACKNOWLEDGEMENT.md", "VERIFICATION.md", "DEMO_GUIDE.md", "SUBMISSION_GUIDE.md", "submission-links.json"]:
+        add(ROOT / name, name)
+    # Only committed evidence is eligible; exports above remain local/private.
+    for name in filter(None, git(ROOT, "ls-files", "verification").splitlines()):
+        add(ROOT / name, name)
+    collection_path = ROOT / "backend/postman/AfterClass.postman_collection.json"
+    collection = json.loads(collection_path.read_text())
     for variable in collection.get("variable", []):
         if any(word in variable.get("key", "").lower() for word in ["token", "password", "secret"]):
             require(not variable.get("value"), "Never package populated Postman credentials.")
     for group in collection.get("item", []):
         for item in group.get("item", []):
-            if item.get("request", {}).get("url", "").endswith("/admin/session") and item["request"].get("method") == "POST":
-                body = json.loads(item["request"]["body"]["raw"])
-                require(body.get("password") == "{{adminPassword}}", "Keep the Postman password as a private environment placeholder.")
-    files.append((postman, "AfterClass.postman_collection.json"))
-    readme = "# AfterClass — CST3144\n\n" + "\n".join("- " + key + ": " + links[key] for key in keys)
-    readme += "\n\nStudent number: " + number + "\n\nBackend: Node 24; npm ci; configure .env; npm start. Frontend: serve its folder or open the GitHub Pages link. See both application READMEs for tests, API behaviour and attribution. Review and include the actual GenAI record. Paste the same four links into the submission text area.\n"
+            request = item.get("request", {})
+            if request.get("url", "").endswith("/admin/session") and request.get("method") == "POST":
+                require(json.loads(request["body"]["raw"]).get("password") == "{{adminPassword}}", "Keep the Postman password as a private placeholder.")
+    add(collection_path, "AfterClass.postman_collection.json")
+    for mode in ["atlas-test", "hosted-read-only"]:
+        reports = sorted((ROOT / "verification").glob("postman-" + mode + "-*.json"))
+        require(reports, "Run the actual Postman checks: " + mode)
+        report = json.loads(reports[-1].read_text())
+        require(report["requests"]["total"] == report["expectedRequests"] and not report["failures"] and not report["assertions"]["failed"] and not report["requests"]["failed"], "Postman checks failed: " + mode)
+    # Reject actual URI credentials, keys and hashes even if accidentally tracked.
+    import re
+    forbidden = re.compile(rb"mongodb(?:\+srv)?://[^\s/@:]+:[^\s/@]+@|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|scrypt-v1:[a-f0-9]{32}:[a-f0-9]{128}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}")
+    for name, contents in files.items():
+        require(not forbidden.search(contents), "Credential pattern detected in " + name)
+    package_manifest = {"studentNumber": number, "repositories": provenance, "deploymentRepository": links.get("deploymentRepository"), "files": {name: hashlib.sha256(contents).hexdigest() for name, contents in sorted(files.items())}}
+    files["PACKAGE_MANIFEST.json"] = (json.dumps(package_manifest, indent=2) + "\n").encode()
     output = ROOT / "output"
     output.mkdir(exist_ok=True)
     target = output / "AfterClass-submission.zip"
     temporary = output / "AfterClass-submission.zip.tmp"
     with zipfile.ZipFile(temporary, "w", zipfile.ZIP_DEFLATED) as archive:
-        for path, name in files:
-            archive.write(path, name)
-        archive.writestr("README.md", readme)
+        for name, contents in sorted(files.items()):
+            archive.writestr(name, contents)
     require(temporary.stat().st_size < 10_000_000, "The ZIP exceeds 10MB.")
     with zipfile.ZipFile(temporary) as archive:
         require(archive.testzip() is None, "ZIP integrity check failed.")
+        require(len(archive.namelist()) == len(set(archive.namelist())), "Duplicate ZIP entries.")
+        for name, contents in files.items():
+            require(archive.read(name) == contents, "Archive content mismatch: " + name)
     temporary.replace(target)
-    print("Submission ZIP created and checked:", target, target.stat().st_size, "bytes")
+    digest = hashlib.sha256(target.read_bytes()).hexdigest()
+    (output / "AfterClass-submission.zip.sha256").write_text(digest + "  AfterClass-submission.zip\n")
+    print("Submission ZIP created and checked:", target, target.stat().st_size, "bytes;", len(files), "files")
 
 
 if __name__ == "__main__":

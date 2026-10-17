@@ -1,0 +1,226 @@
+{
+  "executedAt": "2026-10-17T05:16:48.705Z",
+  "runner": "Newman 6.2.3 (official Postman collection runner)",
+  "mode": "hosted-read-only",
+  "target": "https://afterclass-21j41a62f1.onrender.com",
+  "collectionSchema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+  "expectedRequests": 14,
+  "requests": {
+    "total": 14,
+    "pending": 0,
+    "failed": 0
+  },
+  "assertions": {
+    "total": 23,
+    "pending": 0,
+    "failed": 0
+  },
+  "failures": [],
+  "executions": [
+    {
+      "name": "Health",
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Lesson detail and teaching team",
+      "method": "GET",
+      "path": "/lessons/100000000000000000000001",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Detail includes lesson and teachers",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "All lessons",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        },
+        {
+          "name": "At least ten lessons",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Search all four fields — numeric example",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Case-insensitive location search",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Teachers",
+      "method": "GET",
+      "path": "/teachers",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Lessons taught by Mina Patel",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Combined teacher and search",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Enrolment — confirmed purchased quantities",
+      "method": "GET",
+      "path": "/enrolment/100000000000000000000001",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Nonnegative enrolment",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Anonymous management denied",
+      "method": "GET",
+      "path": "/admin/lessons",
+      "status": 401,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Anonymous teacher management denied",
+      "method": "GET",
+      "path": "/admin/teachers",
+      "status": 401,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Existing image",
+      "method": "GET",
+      "path": "/images/maths.svg",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Missing image",
+      "method": "GET",
+      "path": "/images/not-present.svg",
+      "status": 404,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Malformed lesson ID",
+      "method": "GET",
+      "path": "/enrolment/bad-id",
+      "status": 400,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "privacy": "Allowlisted summary only; no credentials, tokens, request/response bodies or raw Newman reports saved."
+}

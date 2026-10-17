@@ -7,7 +7,11 @@ A fictitious after-school lesson discovery and booking service for North London,
 - [AfterClass on GitHub Pages](https://gantalaavinash.github.io/after_class_simple_brainstrome/)
 - [Render lesson API](https://afterclass-21j41a62f1.onrender.com/lessons)
 - [Protected Studio](https://gantalaavinash.github.io/after_class_simple_brainstrome/admin.html)
+- [Frontend coursework repository](https://github.com/GantalaAvinash/afterclass-frontend)
+- [Backend coursework repository (private)](https://github.com/GantalaAvinash/afterclass-backend)
 - [Deployment source](https://github.com/GantalaAvinash/after_class_simple_brainstrome)
+
+Student number: **21j41a62f1**. The two coursework repositories retain separate genuine development histories; both are synchronised with the submitted source.
 
 Both hosted apps use this repository: Pages publishes `frontend/`; Render runs `backend/`. The original [frontend repository](https://github.com/GantalaAvinash/afterclass-frontend) and [private backend repository](https://github.com/GantalaAvinash/afterclass-backend) remain intact with their genuine coursework development histories, also preserved in this repository. Assessment access to the separate private repository must be arranged if required.
 
@@ -60,6 +64,8 @@ The approved live test order purchased two Coding Club places and one Art Worksh
 
 `.github/workflows/pages.yml` runs the frontend tests and publishes only the frontend folder using official actions pinned to commits. Render uses the Free Singapore service, backend root, `npm ci`, `npm start`, Node 24.x and `/health`. Production credentials are held only in Render environment settings; the test connection and plaintext admin password are excluded. Atlas allows Render’s verified outbound ranges 74.220.52.0/24 and 74.220.60.0/24 plus the retained development IP rules; 0.0.0.0/0 has been removed. A fresh Render restart, hosted checks and stock/enrolment comparisons passed with that restriction. Use Render’s Manual Deploy controls after backend changes and verify the resulting deployment.
 
-`submission-links.json` contains actual public deployment links. `backend/postman/AfterClass.postman_collection.json` contains 37 importable requests. The export and packaging commands remain available in the backend; do not treat source publication or deployment as proof that the final submission ZIP, manual Postman run, student review or assessed demonstration is complete.
+`submission-links.json` contains the two coursework repository links and actual deployment URLs. The 37-request Postman collection passed 52 assertions through official Newman 6.2.3 against the separate real Atlas test database. Its 14 read-only hosted requests passed 23 assertions. Full collection mutations must run against test data. Actual Atlas snapshot exports contain all four assessment collections with checksums; operational authentication state is excluded.
+
+See [SUBMISSION_GUIDE.md](SUBMISSION_GUIDE.md) for the ZIP contents, clean-install commands, data restoration, reproducible Postman checks, packaging and remaining student actions. Archive integrity and extracted-install verification are recorded in [VERIFICATION.md](VERIFICATION.md). Secrets, dependencies and Git internals are excluded.
 
 The actual AI assistance and pending student explanation review are recorded in `AI_ACKNOWLEDGEMENT.md`. Do not describe generated assistance as independent student authorship. The assessed demonstration must follow the module’s prohibition on AI assistance.

@@ -1,0 +1,527 @@
+{
+  "executedAt": "2026-10-17T05:18:03.512Z",
+  "runner": "Newman 6.2.3 (official Postman collection runner)",
+  "mode": "atlas-test",
+  "target": "Production Express application on loopback, real separate MongoDB Atlas test database",
+  "database": "afterclass_test",
+  "collectionSchema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+  "expectedRequests": 37,
+  "requests": {
+    "total": 37,
+    "pending": 0,
+    "failed": 0
+  },
+  "assertions": {
+    "total": 52,
+    "pending": 0,
+    "failed": 0
+  },
+  "failures": [],
+  "executions": [
+    {
+      "name": "Health",
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Lesson detail and teaching team",
+      "method": "GET",
+      "path": "/lessons/6ad30502ae990a0bb436d80a",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Detail includes lesson and teachers",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "All lessons",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        },
+        {
+          "name": "At least ten lessons",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "New order — saves pending order",
+      "method": "POST",
+      "path": "/orders",
+      "status": 201,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Pending order",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Confirm order — absolute space PUT",
+      "method": "PUT",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Confirmed order",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Replay the same POST — no duplicate order",
+      "method": "POST",
+      "path": "/orders",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Same order ID",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Search all four fields — numeric example",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Case-insensitive location search",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Teachers",
+      "method": "GET",
+      "path": "/teachers",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Lessons taught by Mina Patel",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Combined teacher and search",
+      "method": "GET",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Enrolment — confirmed purchased quantities",
+      "method": "GET",
+      "path": "/enrolment/6ad30502ae990a0bb436d80a",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Nonnegative enrolment",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Admin sign-in",
+      "method": "POST",
+      "path": "/admin/session",
+      "status": 201,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Verify session",
+      "method": "GET",
+      "path": "/admin/session",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Manage catalogue",
+      "method": "GET",
+      "path": "/admin/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Booking overview",
+      "method": "GET",
+      "path": "/admin/overview",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Create test lesson",
+      "method": "POST",
+      "path": "/admin/lessons",
+      "status": 201,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Replay create — same lesson",
+      "method": "POST",
+      "path": "/admin/lessons",
+      "status": 201,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Same ID on replay",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Edit test lesson — absolute price and spaces",
+      "method": "PUT",
+      "path": "/admin/lessons/6ad30507ae990a0bb436d81b",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Delete test lesson — preserve history",
+      "method": "DELETE",
+      "path": "/admin/lessons/6ad30507ae990a0bb436d81b",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Restore test lesson",
+      "method": "POST",
+      "path": "/admin/lessons/6ad30507ae990a0bb436d81b/restore",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Set absolute spaces to 5 and price to 9",
+      "method": "PUT",
+      "path": "/lessons",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Forbidden field update",
+      "method": "PUT",
+      "path": "/lessons",
+      "status": 400,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Manage teaching team",
+      "method": "GET",
+      "path": "/admin/teachers",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Returns an array",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Create and assign a teacher",
+      "method": "POST",
+      "path": "/admin/teachers",
+      "status": 201,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Replay teacher create",
+      "method": "POST",
+      "path": "/admin/teachers",
+      "status": 201,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        },
+        {
+          "name": "Same teacher on replay",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Edit teacher and assignments",
+      "method": "PUT",
+      "path": "/admin/teachers/6ad30509ae990a0bb436d81c",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Delete teacher — retain associations for restore",
+      "method": "DELETE",
+      "path": "/admin/teachers/6ad30509ae990a0bb436d81c",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Restore teacher",
+      "method": "POST",
+      "path": "/admin/teachers/6ad30509ae990a0bb436d81c/restore",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Sign out and clear local token",
+      "method": "DELETE",
+      "path": "/admin/session",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Anonymous management denied",
+      "method": "GET",
+      "path": "/admin/lessons",
+      "status": 401,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Anonymous teacher management denied",
+      "method": "GET",
+      "path": "/admin/teachers",
+      "status": 401,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Anonymous general PUT denied",
+      "method": "PUT",
+      "path": "/lessons",
+      "status": 401,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Existing image",
+      "method": "GET",
+      "path": "/images/maths.svg",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Missing image",
+      "method": "GET",
+      "path": "/images/not-present.svg",
+      "status": 404,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Malformed lesson ID",
+      "method": "GET",
+      "path": "/enrolment/bad-id",
+      "status": 400,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "Invalid name",
+      "method": "POST",
+      "path": "/orders",
+      "status": 400,
+      "assertions": [
+        {
+          "name": "Expected HTTP status",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "privacy": "Allowlisted summary only; no credentials, tokens, request/response bodies or raw Newman reports saved."
+}

@@ -2,6 +2,8 @@
 
 This record follows the module handbook's columns and records actual assistance. It does not claim that AI assistance was absent or that student review has occurred.
 
+**Current status — 17 October 2026:** implementation, native Atlas tests, hosted verification, restricted-network restart, actual Postman execution and assessment exports have passed. Submission packaging is being verified. Student explanation/integration review, independent rehearsal and assessed demonstration remain pending. Earlier entries below are dated milestone history; their pending setup checks were resolved by the later entries.
+
 | Tool | Date | Category and purpose | Prompt examples | Validity checks | Phase |
 |---|---|---|---|---|---|
 | OpenAI Codex | 16 October 2026 | Amber: requirements analysis and project planning | Analyse the coursework brief and handbook; revise the schedule to today | Compared both supplied PDFs; consulted official technical documentation. Student review remains pending. | Planning |
@@ -31,7 +33,7 @@ Codex authored or edited the implementation sections and technical documentation
 Vue is vendored from the official npm distribution under MIT. Lesson SVGs and the favicon are unmodified Lucide assets with their licence and attribution included. They are not presented as original student illustrations.
 
 Student explanation/integration review: **not yet completed**.
-Actual Atlas/deployment verification: **not yet completed**.
+Actual Atlas/deployment verification: **completed on 17 October; evidence recorded below**.
 Assessed demonstration: GenAI use is prohibited.
 
 Update the record with actual student edits, checks, prompts and explanations as they happen. Do not change pending items to completed claims without evidence.
@@ -55,3 +57,13 @@ Deployment follow-up: the real Atlas transaction probe and all three native inte
 Hosted follow-up on 17 October 2026: Codex verified production Pages/Render/Atlas reads and browser flows, all eight sorts, search/teacher intersections, basket stability and validation. After specific student approval, Codex submitted the fictitious three-place booking and exercised the Alex Morgan teacher profile through create/edit/assign/delete/restore/final soft-delete. Codex checked phone/tablet geometry, console output, admin logout and persistence after a recorded Render restart, and saved non-secret evidence. The separate restricted-network approval and student submission/demonstration tasks remain pending.
 
 On 17 October 2026 the student explicitly instructed Codex to add Render’s two Atlas IP ranges, remove broad access and verify the app after a Render restart. Codex added and verified both specific ranges, removed only 0.0.0.0/0, preserved the development IP rules, waited for Atlas to finish applying changes, restarted Render, reran the local rollback probe and hosted checks, compared all stock/prices/teacher IDs and enrolment with a prior baseline, and verified fresh public browser flows and console output. The restricted-network deployment gate passed. No additional business-data mutation was made for this check. Student explanation review and assessed demonstration remain pending.
+
+## Submission preparation — 17 October 2026
+
+| Tool | Date | Category and purpose | Prompt examples | Validity checks | Phase |
+|---|---|---|---|---|---|
+| OpenAI Codex | 17 October 2026 | Code and documentation assistance: executed Postman scripts, fixed the collection, exported actual assessment data, synchronised coursework source and prepared the archive | “Now finish the submission package: run the Postman checks, export the Atlas collections, update the documentation and AI acknowledgement, and create a tested ZIP under 10MB.” | Official Newman 6.2.3 executed all 37 requests/52 assertions against production Express code and disposable fixtures in the separate Atlas test database; 14 read-only hosted requests/23 assertions passed. Snapshot exports were checked for counts, SHA-256, native IDs/dates, valid associations and order quantities. Archive/extraction results are recorded in VERIFICATION.md. | Submission preparation |
+
+Codex authored the safe Postman runner, repaired a pending-order script variable collision discovered by execution, updated the packaging script to validate the two genuine independent repository histories, and edited README, submission instructions and this record. No application feature or production business record was changed by this packaging work. Full Postman mutations used freshly generated test IDs and an ephemeral local test administrator; the runner removed its own fixtures afterwards. The hosted run used GET requests only. Exports include the real fictitious assessment order and the soft-deleted QA teacher, plus audit evidence; operational authentication records and credentials are excluded. Newman ran the actual Postman scripts through the official runner; this is not a claim of a manual desktop Postman run.
+
+The student remains responsible for reviewing and understanding assisted code, recording any subsequent independent edits, arranging assessor access to the private backend repository, submitting through the portal and completing the assessed demonstration without AI assistance. Do not replace the pending student review with an invented completion claim.

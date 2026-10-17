@@ -1,4 +1,8 @@
-# Verification log — 16 October 2026
+# Verification log — 16–17 October 2026
+
+## Current result — 17 October 2026
+
+83 application checks have passed: 52 backend, 28 frontend and three native Atlas tests. Official Postman runner Newman 6.2.3 passed all 37 collection requests/52 assertions against the real separate Atlas test database, and 14 hosted read-only requests/23 assertions. Actual assessment exports contain lesson (12), teacher (5, including one soft-deleted QA profile), order (1) and adminAudit (5). Archive verification is recorded in the final submission entry below. Student review, independent rehearsal, portal submission/access and assessed demonstration remain pending. The earlier entries are preserved milestone history, not the current completion state.
 
 ## Automated local checks
 
@@ -143,3 +147,11 @@ Render Events records the new service restart at 10:34am IST. The local Atlas pi
 Compared all twelve lesson IDs, spaces and prices, all four public teacher IDs and the two purchased-quantity totals with a baseline captured before the restart. They matched exactly: Coding Club still has three spaces and two purchased, Art Workshop four spaces and one purchased. A fresh live browser reload, mixed-case cOdInG search combined with Leo Grant, detail page and purchased-quantity display passed. The console warn/error list was empty. No new order or teacher record was created during this network verification.
 
 Saved verification/network-restart-2026-10-17.json and verification/screenshots/restricted-network-live-lesson.jpg. The Atlas network restriction and post-restart deployment gates are now complete. Manual Postman execution, final exports/ZIP and student demonstration preparation remain separate submission work.
+
+## Actual Postman execution and Atlas exports — 17 October 2026
+
+Executed the exported v2.1 Postman collection with the official Newman 6.2.3 runner, using the current Express application and real afterclass_test Atlas database. The full run uses 12 newly generated lesson IDs, four teacher IDs and ephemeral test administrator credentials. It never targets the assessment database, never drops a database, and removes only its own created fixtures. The separate hosted mode permits only public GET requests and the two anonymous admin-denial GET requests.
+
+The first complete execution found a Postman sandbox SyntaxError: the pending-order script declared a reserved global name, data. It prevented storing orderId/updates, causing downstream confirmation/replay assertions to fail. Renamed it pendingResponse in the generator and regenerated the exported collection. Rerun: 37 requests, 52 assertions, zero failures. This was a collection script defect; no application route change was needed. Hosted run: 14 requests, 23 assertions, zero failures. Newman emits a dependency deprecation warning under Node 24; it does not affect assertions or the running application. No desktop GUI Postman run is claimed. Sanitised reports are in verification/postman-atlas-test-2026-10-17.json and verification/postman-hosted-read-only-2026-10-17.json.
+
+Exported actual afterclass assessment data through a native snapshot transaction: 12 lessons, five teachers (four active plus the soft-deleted Alex Morgan verification profile), one confirmed Ava order and five teacher-management audit events. Strict MongoDB Extended JSON preserves ObjectIds, numeric types and dates. Checked each manifest SHA-256/count, IDs/dates, lesson content/availability, every teacher/order lesson reference and order space/quantity calculations. Confirmed history still records Coding Club quantity two and Art Workshop quantity one; available places total 57. adminSession/adminLoginAttempt are intentionally excluded as operational authentication state. Export metadata and independent validation are recorded in verification/atlas-export-2026-10-17.json; actual export files remain local and are included in the submission ZIP.

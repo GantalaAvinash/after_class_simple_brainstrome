@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "AfterClass CST3144",
-    "description": "Import into Postman. Set baseUrl to the real service. Practise mutations against test data. Run New order before Confirm order. For administration, set adminUsername/adminPassword as private local environment variables, then run Admin sign-in. Never export populated passwords/tokens. The administration folder creates a new test lesson, edits it, deletes/restores it and signs out.",
+    "description": "Postman v2.1 collection, verified with Newman 6.2.3. Run the full collection ONLY against a separate test database: it purchases a place, changes a seed lesson's absolute price/spaces, and creates/edits/deletes/restores test lessons and teachers. Use check-postman.js hosted-read-only for live checks. Run New order before Confirm order. For manual administration, set adminUsername/adminPassword as private local environment variables, then run Admin sign-in. Never export populated passwords/tokens.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -155,10 +155,10 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Expected HTTP status\", () => pm.response.to.have.status(201));",
-                  "const data = pm.response.json();",
-                  "pm.collectionVariables.set(\"orderId\", data.orderId);",
-                  "pm.collectionVariables.set(\"orderUpdates\", JSON.stringify(data.updates));",
-                  "pm.test(\"Pending order\", () => pm.expect(data.status).to.equal(\"pending\"));"
+                  "const pendingResponse = pm.response.json();",
+                  "pm.collectionVariables.set(\"orderId\", pendingResponse.orderId);",
+                  "pm.collectionVariables.set(\"orderUpdates\", JSON.stringify(pendingResponse.updates));",
+                  "pm.test(\"Pending order\", () => pm.expect(pendingResponse.status).to.equal(\"pending\"));"
                 ]
               }
             }

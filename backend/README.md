@@ -103,7 +103,7 @@ npm run postman
 npm run export:atlas
 ~~~
 
-Import postman/AfterClass.postman_collection.json into Postman. Set baseUrl to the real Render URL for the demonstration. New order generates a fresh UUID; Confirm order reuses its saved ID/updates. The replay request tests duplicate safety. General PUT intentionally changes persistent attributes, so practise against test data.
+Import postman/AfterClass.postman_collection.json into Postman. Full collection execution modifies stock and profiles; use a separate test service/database. Set baseUrl to the real Render URL only for individual, deliberately selected demonstration requests. New order generates a fresh UUID; Confirm order reuses its saved ID/updates. The replay request tests duplicate safety. General PUT intentionally changes persistent attributes, so practise against test data.
 
 The collection now contains 37 requests. For the protected folder set adminUsername/adminPassword as private local environment variables, then run Admin sign-in. CRUD uses separate test lesson/teacher records and revision values. Teacher assignment advances affected lesson revisions; refresh a lesson before editing it afterwards. Never export a populated password/token. The generated artifact contains neither.
 
@@ -117,9 +117,9 @@ After the real addresses are saved in the workspace submission-links.json, run n
 
 ## Render and submission
 
-Connect the separate backend repository. Use Node 24, npm ci, npm start, health path /health, and the provider's PORT. Name the service with the actual student number. Supply credentials through Render environment settings. For GitHub Pages, FRONTEND_ORIGINS must be the origin without its repository path or trailing slash.
+The current Render service uses the combined repository with root directory backend; the separate private backend repository is retained and synchronised for assessment history. Use Node 24, npm ci, npm start, health path /health, and the provider's PORT. Name the service with the actual student number. Supply credentials through Render environment settings. For GitHub Pages, FRONTEND_ORIGINS must be the origin without its repository path or trailing slash.
 
-Once real links, tests and exports are ready, enter the root submission-links.json and run npm run package:submission. The package command checks both repositories and exports before producing a ZIP under 10MB. Actual deployment and export remain pending.
+Deployment, actual Postman execution and assessment export passed on 17 October 2026. See root SUBMISSION_GUIDE.md for packaging. From the combined checkout use npm run package:submission -- --source-workspace /absolute/path/to/workspace-containing-two-repositories. The packager checks clean independent Git histories, matching repository URLs, source synchronisation, real exports and passing Postman evidence before producing a ZIP under 10MB. Git internals are excluded from the delivered archive; rebuilding needs the original checkouts.
 
 ## Images and assistance
 
@@ -133,4 +133,8 @@ The root AI_ACKNOWLEDGEMENT.md records actual assistance. Review the code indepe
 - Frontend: https://gantalaavinash.github.io/after_class_simple_brainstrome/
 - API lessons: https://afterclass-21j41a62f1.onrender.com/lessons
 
-The service is configured from this combined repository. Hosted verification is in progress; see the root VERIFICATION.md. The original frontend/backend repositories remain available separately for coursework history.
+The service is configured from this combined repository. Hosted verification and restricted-network restart passed on 17 October 2026; see the root VERIFICATION.md. The original frontend/backend repositories remain available separately for coursework history.
+
+## Executed Postman checks
+
+The official Newman 6.2.3 runner executed the actual collection: 37 requests/52 assertions passed on real Atlas test data; 14 read-only hosted requests/23 assertions passed. The runner injects ephemeral test credentials in memory, allocates fresh fixture IDs and removes its own records. It saves only allowlisted evidence, never raw reports or populated environments. Install Newman separately from production dependencies and follow root SUBMISSION_GUIDE.md.
