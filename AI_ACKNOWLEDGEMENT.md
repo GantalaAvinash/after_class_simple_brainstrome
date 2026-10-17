@@ -47,3 +47,5 @@ The student explicitly approved public frontend publication and completed both n
 ## Requested combined repository publication — 17 October 2026
 
 The student asked to push the project to GantalaAvinash/after_class_simple_brainstrome before further deployment planning. Codex prepared a combined repository containing the existing frontend/backend source and their genuine histories, retained the acknowledgement and verification records, excluded private environment files, credentials, dependencies and supplied assessment PDFs, and checked the publication. No new functionality, completed native Atlas tests or finished deployment is claimed by this source-publication step.
+
+On 17 October 2026 the student authorized deployment from the combined repository. Codex prepared the folder-scoped Pages workflow, configured Pages, prepared Render settings and attempted real Atlas connection/rollback verification. The connection failed at network selection, so native tests remain pending. Private credential insertion was completed by the student; approval was requested before transferring the production-only configuration to Render.

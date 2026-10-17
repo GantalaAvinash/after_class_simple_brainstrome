@@ -69,6 +69,12 @@ No final ZIP or actual Atlas export has been produced yet. The assessed demonstr
 
 ## Combined source repository
 
-This repository contains the AfterClass frontend in `frontend/` and API in `backend/`, with their existing development histories preserved. The original two coursework repositories remain separate. Deployment work is paused until this source publication has been verified. Real database connections, native Atlas checks and hosted API verification remain pending; see VERIFICATION.md.
+This repository contains the AfterClass frontend in `frontend/` and API in `backend/`, with their existing development histories preserved. The original two coursework repositories remain separate. Source publication is verified. Deployment is being configured from this combined repository. Real database connections, native Atlas checks and hosted API verification remain pending; see VERIFICATION.md.
 
 Repository: https://github.com/GantalaAvinash/after_class_simple_brainstrome
+
+## Deployment from this repository
+
+GitHub Pages publishes only `frontend/` through `.github/workflows/pages.yml`, with frontend regression tests before publishing. Pages is configured at https://gantalaavinash.github.io/after_class_simple_brainstrome/. The public API origin in `frontend/config.js` must match the verified Render service before the app is operational.
+
+Render uses this repository with root directory `backend`, build `npm ci`, start `npm start`, Node 24.x, the Free compute plan and health path `/health`. Secrets are entered only in Render environment settings. Native Atlas tests and hosted verification are still pending at this setup milestone.
